@@ -92,17 +92,17 @@ async function bootstrap() {
         } catch (error) {
           console.error(
             `❌ Failed to migrate gallery "${gallery.title}":`,
-            error.message,
+            (error as Error).message,
           );
           failed++;
-          errors.push({ gallery: gallery.title, error: error.message });
+          errors.push({ gallery: gallery.title, error: (error as Error).message });
         }
       }
     });
 
     console.log('\n✅ Transaction committed successfully');
   } catch (error) {
-    console.error('\n❌ Transaction failed and rolled back:', error.message);
+    console.error('\n❌ Transaction failed and rolled back:', (error as Error).message);
     await session.endSession();
     await app.close();
     process.exit(1);

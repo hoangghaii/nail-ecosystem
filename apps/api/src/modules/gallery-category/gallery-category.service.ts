@@ -48,8 +48,8 @@ export class GalleryCategoryService {
       });
       return await category.save();
     } catch (error) {
-      if (error.code === 11000) {
-        const field = Object.keys(error.keyPattern)[0];
+      if ((error as any).code === 11000) {
+        const field = Object.keys((error as any).keyPattern)[0];
         throw new ConflictException(
           `Category with this ${field} already exists (case-insensitive)`,
         );
@@ -145,8 +145,8 @@ export class GalleryCategoryService {
 
       return category;
     } catch (error) {
-      if (error.code === 11000) {
-        const field = Object.keys(error.keyPattern)[0];
+      if ((error as any).code === 11000) {
+        const field = Object.keys((error as any).keyPattern)[0];
         throw new ConflictException(
           `Category with this ${field} already exists (case-insensitive)`,
         );

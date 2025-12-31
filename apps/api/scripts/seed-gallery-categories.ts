@@ -78,7 +78,7 @@ async function bootstrap() {
     } catch (error) {
       console.error(
         `❌ Failed to create category "${categoryData.name}":`,
-        error.message,
+        (error as Error).message,
       );
     }
   }
