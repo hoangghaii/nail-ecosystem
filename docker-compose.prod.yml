@@ -83,7 +83,7 @@ services:
       - "80"
 
     env_file:
-      - ./nail-client/.env.production
+      - ./apps/client/.env.production
 
     environment:
       NODE_ENV: production
@@ -131,7 +131,7 @@ services:
       - "81"
 
     env_file:
-      - ./nail-admin/.env.production
+      - ./apps/admin/.env.production
 
     environment:
       NODE_ENV: production
@@ -179,7 +179,7 @@ services:
       - "3000"
 
     env_file:
-      - ./nail-api/.env.production
+      - ./apps/api/.env.production
 
     environment:
       NODE_ENV: production

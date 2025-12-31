@@ -15,8 +15,8 @@ services:
   # ==========================================
   nail-client:
     build:
-      context: ./nail-client
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/client/Dockerfile
 
     container_name: nail-client
     hostname: nail-client-host
@@ -31,8 +31,8 @@ services:
   # ==========================================
   nail-admin:
     build:
-      context: ./nail-admin
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/admin/Dockerfile
 
     container_name: nail-admin
     hostname: nail-admin-host
@@ -47,8 +47,8 @@ services:
   # ==========================================
   nail-api:
     build:
-      context: ./nail-api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/api/Dockerfile
 
     container_name: nail-api
     hostname: nail-api-host

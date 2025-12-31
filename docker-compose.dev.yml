@@ -27,13 +27,16 @@ services:
       - "5173:5173"
 
     volumes:
-      # Mount source code for hot-reload
-      - ./nail-client:/app
+      # Mount entire monorepo for hot-reload
+      - .:/app
       # Prevent node_modules from being overwritten
       - /app/node_modules
+      - /app/apps/client/node_modules
 
     env_file:
-      - ./nail-client/.env
+      - ./apps/client/.env
+
+    working_dir: /app/apps/client
 
     environment:
       NODE_ENV: development
@@ -68,13 +71,16 @@ services:
       - "5174:5174"
 
     volumes:
-      # Mount source code for hot-reload
-      - ./nail-admin:/app
+      # Mount entire monorepo for hot-reload
+      - .:/app
       # Prevent node_modules from being overwritten
       - /app/node_modules
+      - /app/apps/admin/node_modules
 
     env_file:
-      - ./nail-admin/.env
+      - ./apps/admin/.env
+
+    working_dir: /app/apps/admin
 
     environment:
       NODE_ENV: development
@@ -105,15 +111,18 @@ services:
       - "3000:3000"
 
     volumes:
-      # Mount source code for hot-reload
-      - ./nail-api:/app
+      # Mount entire monorepo for hot-reload
+      - .:/app
       # Prevent node_modules from being overwritten
       - /app/node_modules
+      - /app/apps/api/node_modules
       # Note: /app/dist volume removed to prevent EBUSY errors during production builds
       # Hot-reload watches src/, not dist/, so no impact on development
 
     env_file:
-      - ./nail-api/.env
+      - ./apps/api/.env
+
+    working_dir: /app/apps/api
 
     environment:
       NODE_ENV: development
