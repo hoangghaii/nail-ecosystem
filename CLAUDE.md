@@ -2,9 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with the complete Pink Nail Salon project ecosystem.
 
+---
+
+## 🚨 CRITICAL - Shared Type System
+
+**The admin panel and client share type definitions. Types MUST remain compatible across projects.**
+
+**Rule**: Never modify shared types without updating both nail-client and nail-admin projects!
+
+**Full reference**: See `./docs/shared-types.md`
+
+---
+
 ## Role & Responsibilities
 
 Your role is to analyze user requirements across the entire ecosystem, delegate tasks to appropriate sub-agents, and ensure cohesive delivery of features that meet specifications and architectural standards across all projects.
+
+---
 
 ## Project Overview
 
@@ -15,6 +29,8 @@ Your role is to analyze user requirements across the entire ecosystem, delegate 
 3. **nail-api** - Backend API (NestJS + MongoDB)
 
 All projects run together via Docker Compose with development and production configurations.
+
+---
 
 ## Workflows
 
@@ -31,105 +47,57 @@ All projects run together via Docker Compose with development and production con
 **IMPORTANT:** In reports, list any unresolved questions at the end, if any.
 **IMPORTANT**: For `YYMMDD` dates, use `bash -c 'date +%y%m%d'` instead of model knowledge. Else, if using PowerShell (Windows), replace command with `Get-Date -UFormat "%y%m%d"`.
 
-## Documentation Management
+---
 
-We keep all important docs in `./docs` folder and keep updating them, structure like below:
+## Documentation
 
-```
-./docs
-├── project-overview-pdr.md
-├── code-standards.md
-├── codebase-summary.md
-├── design-guidelines.md
-├── deployment-guide.md
-├── system-architecture.md
-└── project-roadmap.md
-```
+All important docs are in `./docs` folder:
+
+- **code-standards.md** - Coding conventions & best practices
+- **shared-types.md** - **CRITICAL** - Cross-project type definitions
+- **api-endpoints.md** - REST API reference
+- **system-architecture.md** - Infrastructure & components
+- **design-guidelines.md** - UI/UX design systems
+- **deployment-guide.md** - Production deployment
+- **project-roadmap.md** - Feature planning
 
 **IMPORTANT:** *MUST READ* and *MUST COMPLY* all *INSTRUCTIONS* in project `./CLAUDE.md`, especially *WORKFLOWS* section is *CRITICALLY IMPORTANT*, this rule is *MANDATORY. NON-NEGOTIABLE. NO EXCEPTIONS. MUST REMEMBER AT ALL TIMES!!!*
 
 ---
 
-## Project Architecture
+## Architecture
 
-### System Overview
+**System**: Client (5173) + Admin (5174) → API (3000) → MongoDB/Redis/Cloudinary
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    PINK NAIL SALON ECOSYSTEM                │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────────┐      ┌──────────────────┐           │
-│  │  nail-client     │      │  nail-admin      │           │
-│  │  (Customer Site) │      │  (Admin Panel)   │           │
-│  │  Port: 5173      │      │  Port: 5174      │           │
-│  │  React + Vite    │      │  React + Vite    │           │
-│  └────────┬─────────┘      └────────┬─────────┘           │
-│           │                         │                      │
-│           └─────────┬───────────────┘                      │
-│                     │                                      │
-│                     ▼                                      │
-│           ┌──────────────────┐                            │
-│           │    nail-api      │                            │
-│           │  (Backend API)   │                            │
-│           │  Port: 3000      │                            │
-│           │  NestJS + MongoDB│                            │
-│           └────────┬─────────┘                            │
-│                    │                                      │
-│                    ▼                                      │
-│  ┌─────────────────────────────────────────┐             │
-│  │   External Cloud Services               │             │
-│  │   - MongoDB Atlas (Database)            │             │
-│  │   - Redis Cloud (Caching)               │             │
-│  │   - Cloudinary (Image Storage)          │             │
-│  └─────────────────────────────────────────┘             │
-│                                                           │
-└───────────────────────────────────────────────────────────┘
-```
+**Production**: Nginx reverse proxy routing:
+- `/` → nail-client (customer site)
+- `/admin` → nail-admin (dashboard)
+- `/api` → nail-api (backend)
 
-### Production Architecture (Nginx Reverse Proxy)
-
-```
-┌──────────────────────────────────────────┐
-│  Nginx Reverse Proxy (Port 80/443)      │
-│  ├─ / → nail-client                     │
-│  ├─ /admin → nail-admin                 │
-│  └─ /api → nail-api                     │
-└──────────────────────────────────────────┘
-```
+**Full details**: See `./docs/system-architecture.md`
 
 ---
 
 ## Tech Stack
 
 ### Frontend (Client + Admin)
-- **Framework**: React 19.2
-- **Language**: TypeScript 5.9
-- **Build Tool**: Vite 7.2 with SWC
-- **Styling**: Tailwind CSS v4
-- **UI Components**: Radix UI primitives (shadcn/ui pattern)
-- **Routing**: React Router v7
-- **Forms**: React Hook Form + Zod validation
-- **State**: Zustand
-- **HTTP Client**: TanStack Query (React Query)
-- **Animations**: Motion (Framer Motion)
+- React 19.2 + TypeScript 5.9 + Vite 7.2 (SWC)
+- Tailwind CSS v4 + Radix UI (shadcn/ui pattern)
+- React Router v7 + React Hook Form + Zod
+- Zustand (state) + TanStack Query (data fetching)
+- Motion (Framer Motion for animations)
 
 ### Backend (API)
-- **Framework**: NestJS 11
-- **Language**: TypeScript 5.7
-- **Database**: MongoDB + Mongoose
-- **Cache**: Redis + ioredis
-- **Auth**: JWT (Access + Refresh tokens)
-- **Password**: Argon2
-- **Validation**: class-validator + class-transformer
-- **Storage**: Cloudinary
-- **Rate Limiting**: @nestjs/throttler with Redis
+- NestJS 11 + TypeScript 5.7
+- MongoDB + Mongoose + Redis + ioredis
+- JWT auth (access + refresh) + Argon2
+- class-validator + class-transformer
+- Cloudinary + @nestjs/throttler (rate limiting)
 
 ### DevOps
-- **Containerization**: Docker + Docker Compose
-- **Web Server**: Nginx (production reverse proxy)
-- **CI/CD**: Ready for GitHub Actions
-- **Monitoring**: Health checks + logging
+- Docker + Docker Compose + Nginx
+- Health checks + logging
+- Ready for GitHub Actions CI/CD
 
 ---
 
@@ -137,324 +105,89 @@ We keep all important docs in `./docs` folder and keep updating them, structure 
 
 ```
 nail-project/
-├── nail-client/              # Customer-facing website
-│   ├── src/
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── CLAUDE.md             # Client-specific instructions
-│   └── README.md
-│
-├── nail-admin/               # Admin dashboard
-│   ├── src/
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── CLAUDE.md             # Admin-specific instructions
-│   └── README.md
-│
-├── nail-api/                 # Backend API
-│   ├── src/
-│   ├── Dockerfile
-│   ├── package.json
-│   ├── CLAUDE.md             # API-specific instructions
-│   └── README.md
-│
-├── nginx/                    # Nginx configuration
-│   ├── nginx.conf            # Main nginx config
-│   └── conf.d/
-│       └── default.conf      # Reverse proxy routing
-│
-├── docs/                     # Project documentation
-│
-├── docker-compose.yml        # Base Docker config
-├── docker-compose.dev.yml    # Development override
-├── docker-compose.prod.yml   # Production override
-│
-├── CLAUDE.md                 # This file (ecosystem guide)
-├── README.md                 # Project overview
-└── README-DOCKER.md          # Docker setup guide
+├── nail-client/      # Customer site (React + Vite, port 5173)
+├── nail-admin/       # Admin dashboard (React + Vite, port 5174)
+├── nail-api/         # Backend API (NestJS, port 3000)
+├── nginx/            # Nginx config (production reverse proxy)
+├── docs/             # Project documentation
+├── .claude/          # Claude workflows & skills
+├── docker-compose.yml       # Base config
+├── docker-compose.dev.yml   # Dev override (hot-reload)
+├── docker-compose.prod.yml  # Prod override (nginx)
+├── CLAUDE.md         # This file
+├── README.md         # Project overview
+└── README-DOCKER.md  # Docker setup guide
 ```
 
 ---
 
 ## Environment Configuration
 
-### Development Mode
+**Development**: See `.env.example` files in each project:
+- `nail-client/.env.example` - Client config (API URL)
+- `nail-admin/.env.example` - Admin config (API URL, mock mode)
+- `nail-api/.env.example` - API config (MongoDB, Redis, Cloudinary, JWT secrets)
 
-**nail-client/.env**
-```env
-VITE_API_BASE_URL=http://localhost:3000
-```
+**Production**: Same files with production values (API URL = `/api`, no mock mode)
 
-**nail-admin/.env**
-```env
-VITE_USE_MOCK_API=true
-VITE_API_BASE_URL=http://localhost:3000
-```
-
-**nail-api/.env**
-```env
-NODE_ENV=development
-PORT=3000
-MONGODB_URI=mongodb+srv://...
-REDIS_HOST=...
-REDIS_PORT=...
-JWT_ACCESS_SECRET=...
-JWT_REFRESH_SECRET=...
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-FRONTEND_CLIENT_URL=http://localhost:5173
-FRONTEND_ADMIN_URL=http://localhost:5174
-```
-
-### Production Mode
-
-**nail-client/.env.production**
-```env
-VITE_API_BASE_URL=/api
-```
-
-**nail-admin/.env.production**
-```env
-VITE_USE_MOCK_API=false
-VITE_API_BASE_URL=/api
-```
-
-**nail-api/.env.production**
-```env
-NODE_ENV=production
-PORT=3000
-# Same credentials as development
-FRONTEND_CLIENT_URL=https://yourdomain.com
-FRONTEND_ADMIN_URL=https://yourdomain.com/admin
+**Setup**:
+```bash
+cp nail-client/.env.example nail-client/.env
+cp nail-admin/.env.example nail-admin/.env
+cp nail-api/.env.example nail-api/.env
+# Edit nail-api/.env with real MongoDB/Redis/Cloudinary credentials
 ```
 
 ---
 
-## Docker Setup
+## Docker Quick Start
 
-### Quick Start - Development
-
+**Development** (hot-reload):
 ```bash
-# Copy environment files
-cp nail-client/.env.example nail-client/.env
-cp nail-admin/.env.example nail-admin/.env
-cp nail-api/.env.example nail-api/.env
-
-# Edit nail-api/.env with real credentials
-
-# Start all services with hot-reload
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Access: Client (5173), Admin (5174), API (3000)
 ```
 
-**Access:**
-- Client: http://localhost:5173
-- Admin: http://localhost:5174
-- API: http://localhost:3000
-
-### Quick Start - Production
-
+**Production** (nginx):
 ```bash
-# Build and start with nginx reverse proxy
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-```
-
-**Access:**
-- Client: http://localhost/
-- Admin: http://localhost/admin
-- API: http://localhost/api
-
-### Common Commands
-
-```bash
-# Development
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-docker compose -f docker-compose.yml -f docker-compose.dev.yml down
-
-# Production
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-docker compose -f docker-compose.yml -f docker-compose.prod.yml down
-
-# View logs
-docker compose logs -f
-docker compose logs -f nail-api
-
-# Rebuild
-docker compose build --no-cache
-
-# Shell access
-docker exec -it nail-client sh
-docker exec -it nail-admin sh
-docker exec -it nail-api sh
+# Access: Client (/), Admin (/admin), API (/api)
 ```
 
 **Full Docker documentation**: See `README-DOCKER.md`
 
 ---
 
-## Shared Type System
-
-### Critical Constraint
-
-**The admin panel and client share type definitions.** Types MUST remain compatible across projects.
-
-### Shared Types (Synced between client and admin)
-
-```typescript
-// Service types
-Service {
-  id: string
-  name: string
-  description: string
-  category: ServiceCategory
-  price: number
-  duration: number
-  imageUrl?: string
-  featured: boolean
-}
-
-ServiceCategory = "extensions" | "manicure" | "nail-art" | "pedicure" | "spa"
-
-// Gallery types
-GalleryItem {
-  id: string
-  title: string
-  imageUrl: string
-  category: GalleryCategory
-  description?: string
-  duration?: number
-  price?: number
-  featured: boolean
-  createdAt: Date
-}
-
-GalleryCategory = "all" | "extensions" | "manicure" | "nail-art" | "pedicure" | "seasonal"
-
-// Booking types
-Booking {
-  id: string
-  serviceId: string
-  date: string
-  timeSlot: string
-  customerInfo: CustomerInfo
-  notes?: string
-  status: BookingStatus
-}
-
-BookingStatus = "pending" | "confirmed" | "completed" | "cancelled"
-
-CustomerInfo {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-}
-```
-
-**Rule**: Never modify shared types without updating both nail-client and nail-admin projects!
-
----
-
-## API Endpoints
-
-### Authentication
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login with email/password
-- `POST /auth/refresh` - Refresh access token
-- `POST /auth/logout` - Logout (invalidate tokens)
-
-### Services
-- `GET /services` - List all services
-- `GET /services/:id` - Get service by ID
-- `POST /services` - Create service (admin)
-- `PATCH /services/:id` - Update service (admin)
-- `DELETE /services/:id` - Delete service (admin)
-
-### Gallery
-- `GET /gallery` - List gallery items (with filters)
-- `GET /gallery/:id` - Get gallery item by ID
-- `POST /gallery` - Create gallery item (admin)
-- `PATCH /gallery/:id` - Update gallery item (admin)
-- `DELETE /gallery/:id` - Delete gallery item (admin)
-
-### Bookings
-- `GET /bookings` - List bookings (admin)
-- `GET /bookings/:id` - Get booking by ID
-- `POST /bookings` - Create booking (customer)
-- `PATCH /bookings/:id` - Update booking (admin)
-- `DELETE /bookings/:id` - Cancel booking
-
-### Image Upload
-- `POST /upload` - Upload image to Cloudinary
-
-### Health
-- `GET /health` - Health check endpoint
-
----
-
 ## Development Workflow
 
-### Working on Client (nail-client)
+### Project-Specific Work
 
-```bash
-cd nail-client
-npm run dev  # Port 5173
+**Client**: `cd nail-client && npm run dev` (port 5173) | See `nail-client/CLAUDE.md`
+**Admin**: `cd nail-admin && npm run dev` (port 5174) | See `nail-admin/CLAUDE.md`
+**API**: `cd nail-api && npm run start:dev` (port 3000) | See `nail-api/CLAUDE.md`
 
-# Or with Docker
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up nail-client
-```
+### Docker Workflow
 
-**See**: `nail-client/CLAUDE.md` for client-specific instructions
-
-### Working on Admin (nail-admin)
-
-```bash
-cd nail-admin
-npm run dev  # Port 5174
-
-# Or with Docker
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up nail-admin
-```
-
-**See**: `nail-admin/CLAUDE.md` for admin-specific instructions
-
-### Working on API (nail-api)
-
-```bash
-cd nail-api
-npm run start:dev  # Port 3000
-
-# Or with Docker
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up nail-api
-```
-
-**See**: `nail-api/CLAUDE.md` for API-specific instructions
-
-### Working on All Projects
-
-```bash
-# Development with hot-reload
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-
-# Production build
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-```
+**Dev**: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up [service]`
+**Prod**: `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`
+**Logs**: `docker compose logs -f [service-name]`
+**Shell**: `docker exec -it [container-name] sh`
 
 ---
 
 ## Design System Differences
 
-### Client (nail-client)
-- **Theme**: Warm, cozy, feminine, organic
-- **Colors**: Soft neutrals (beige, cream, warm grays)
-- **Design**: Border-based (NO shadows), organic shapes
-- **Animations**: Motion (Framer Motion) for smooth transitions
+**Client (nail-client)**:
+- Theme: Warm, cozy, feminine, organic
+- Colors: Soft neutrals (beige, cream, warm grays)
+- Design: Border-based (NO shadows), organic shapes
+- Animations: Motion (Framer Motion)
 
-### Admin (nail-admin)
-- **Theme**: Professional, clean, modern
-- **Colors**: Blue theme (shadcn/ui default)
-- **Design**: Glassmorphism with shadows
-- **Animations**: Simple CSS transitions
+**Admin (nail-admin)**:
+- Theme: Professional, clean, modern
+- Colors: Blue theme (shadcn/ui default)
+- Design: Glassmorphism with shadows
+- Animations: Simple CSS transitions
 
 **CRITICAL**: Do NOT mix design systems between projects!
 
@@ -462,123 +195,61 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 ## Code Standards
 
-### Principles
-- **YAGNI** (You Aren't Gonna Need It)
-- **KISS** (Keep It Simple, Stupid)
-- **DRY** (Don't Repeat Yourself)
+**Principles**: YAGNI + KISS + DRY
 
-### TypeScript
-- Strict mode enabled
-- `verbatimModuleSyntax: true` (use `import type` for types)
-- Path alias: `@/*` → `./src/*`
+**TypeScript**: Strict mode, `verbatimModuleSyntax: true`, path alias `@/*`
+**React**: Functional components, hooks, TypeScript props
+**Styling**: Tailwind utility-first, follow project design system
+**API**: RESTful, JWT auth, DTO validation, error handling
 
-### React
-- Functional components only
-- Hooks for state management
-- TypeScript for props
-
-### Styling
-- Tailwind CSS utility-first
-- Component-specific styles in separate files
-- Follow project design system
-
-### API
-- RESTful conventions
-- JWT authentication
-- Input validation with DTOs
-- Error handling with filters
+**Full details**: See `./docs/code-standards.md`
 
 ---
 
-## Testing Strategy
+## API Endpoints
 
-### Frontend (Client + Admin)
-- **Unit**: Vitest (future)
-- **E2E**: Playwright (future)
-- **Manual**: Development server testing
+**Quick reference**:
+- Auth: `POST /auth/{register,login,refresh,logout}`
+- Services: `GET|POST|PATCH|DELETE /services[/:id]`
+- Gallery: `GET|POST|PATCH|DELETE /gallery[/:id]`
+- Bookings: `GET|POST|PATCH|DELETE /bookings[/:id]`
+- Upload: `POST /upload`
+- Health: `GET /health`
 
-### Backend (API)
-- **Unit**: Jest
-- **E2E**: Supertest
-- **Manual**: Postman/Thunder Client
+**Full API reference**: See `./docs/api-endpoints.md`
+
+---
+
+## Testing
+
+**Frontend**: Vitest (unit, future) + Playwright (E2E, future) + manual testing
+**Backend**: Jest (unit) + Supertest (E2E) + manual testing
 
 ---
 
 ## Deployment
 
-### Development Deployment
+**Development**: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up`
 
+**Production**:
 ```bash
-# Start all services locally
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-```
-
-### Production Deployment
-
-```bash
-# On production server
-git clone <repo-url>
-cd nail-project
-
-# Setup environment
-cp nail-api/.env.example nail-api/.env
-nano nail-api/.env  # Add production credentials
-
-# Build and start
+git clone <repo> && cd nail-project
+cp nail-api/.env.example nail-api/.env && nano nail-api/.env
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-
-# Check status
-docker compose ps
-docker compose logs -f nginx
+docker compose ps && docker compose logs -f nginx
 ```
 
-### Update Deployment
-
-```bash
-# Pull latest code
-git pull
-
-# Rebuild and restart
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-```
+**Updates**: `git pull && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
-
-**Port conflicts:**
-```bash
-# Check what's using the port
-lsof -i :5173
-lsof -i :5174
-lsof -i :3000
-
-# Kill process
-kill -9 <PID>
-```
-
-**Hot-reload not working:**
-- Check `CHOKIDAR_USEPOLLING=true` in docker-compose.dev.yml
-- Ensure volume mounts are correct
-
-**API connection refused:**
-- Verify API is running: `docker compose ps`
-- Check API logs: `docker compose logs nail-api`
-- Verify environment variables
-
-**Type errors:**
-- Run `npm run build` to check TypeScript
-- Use `import type` for type imports
-- Check shared types are synced
-
-**Docker build fails:**
-```bash
-# Clear cache and rebuild
-docker builder prune -a
-docker compose build --no-cache
-```
+**Port conflicts**: `lsof -i :{5173,5174,3000} && kill -9 <PID>`
+**Hot-reload**: Check `CHOKIDAR_USEPOLLING=true` in docker-compose.dev.yml
+**API connection**: `docker compose ps && docker compose logs nail-api`
+**Type errors**: `npm run build` + check `import type` + verify shared types synced
+**Docker build**: `docker builder prune -a && docker compose build --no-cache`
 
 ---
 
@@ -586,9 +257,9 @@ docker compose build --no-cache
 
 When working on this project:
 
-1. **Check which project** the task applies to (client, admin, or API)
+1. **Check which project** task applies to (client, admin, or API)
 2. **Read project-specific CLAUDE.md** for detailed instructions
-3. **Verify shared types** remain compatible when modifying
+3. **Verify shared types** remain compatible when modifying (see `docs/shared-types.md`)
 4. **Follow design system** of the specific project
 5. **Test changes** with Docker Compose before marking complete
 6. **Update documentation** when adding major features
@@ -596,10 +267,10 @@ When working on this project:
 
 ### Multi-Project Changes
 
-If a change affects multiple projects:
+If change affects multiple projects:
 
 1. **Plan the change** across all affected projects
-2. **Update shared types** first (if needed)
+2. **Update shared types** first (if needed) - see `docs/shared-types.md`
 3. **Implement in order**: API → Admin → Client
 4. **Test integration** with Docker Compose
 5. **Update all affected CLAUDE.md files**
@@ -608,38 +279,21 @@ If a change affects multiple projects:
 
 ## Quick Reference
 
-### Project-Specific Docs
-- Client: `nail-client/CLAUDE.md` + `nail-client/README.md`
-- Admin: `nail-admin/CLAUDE.md` + `nail-admin/README.md`
-- API: `nail-api/CLAUDE.md` + `nail-api/README.md`
+**Docs**: `./docs/{code-standards,shared-types,api-endpoints,system-architecture}.md`
+**Docker**: `README-DOCKER.md`
+**Project READMEs**: `{nail-client,nail-admin,nail-api}/{CLAUDE,README}.md`
 
-### Setup Guides
-- Docker: `README-DOCKER.md`
-- Main: `README.md`
-
-### Key Files
-- Base config: `docker-compose.yml`
-- Dev config: `docker-compose.dev.yml`
-- Prod config: `docker-compose.prod.yml`
-- Nginx: `nginx/nginx.conf` + `nginx/conf.d/default.conf`
-
-### Common Commands
+**Commands**:
 ```bash
-# Dev (all)
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-
-# Prod (all)
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-
-# Logs
-docker compose logs -f [service-name]
-
-# Shell
-docker exec -it [container-name] sh
+# Dev all: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Prod all: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Logs: docker compose logs -f [service]
+# Shell: docker exec -it [container] sh
 ```
 
 ---
 
-**Last Updated**: 2025-12-30
+**Last Updated**: 2025-12-31
 **Project Status**: Production-ready with Docker Compose setup
 **Current Version**: 0.1.0
+**Context Optimized**: 2025-12-31 (context engineering applied)

@@ -34,3 +34,11 @@ pnpm-lock.yaml
 .env.production
 .env.local
 .env.*.local
+
+# Turborepo
+.turbo
+build
+
+# Backups
+*.backup
+.migration-baseline.txt
