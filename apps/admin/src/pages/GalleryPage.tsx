@@ -37,7 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounce } from "@repo/utils/hooks";
 import { galleryService } from "@/services/gallery.service";
 import { useGalleryStore } from "@/store/galleryStore";
 import { GalleryCategory } from "@repo/types/gallery";

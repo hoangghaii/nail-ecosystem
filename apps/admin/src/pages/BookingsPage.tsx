@@ -24,7 +24,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounce } from "@repo/utils/hooks";
 import { bookingsService } from "@/services/bookings.service";
 import { useBookingsStore } from "@/store/bookingsStore";
 

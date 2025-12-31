@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     "./cn": "./src/cn.ts",
-    "./format": "./src/format.ts"
+    "./format": "./src/format.ts",
+    "./hooks": "./src/hooks/use-debounce.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -13,5 +14,8 @@
   "devDependencies": {
     "@repo/typescript-config": "*",
     "typescript": "~5.9.3"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
   }
 }

@@ -19,7 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounce } from "@repo/utils/hooks";
 import { contactsService } from "@/services/contacts.service";
 import { useContactsStore } from "@/store/contactsStore";
 
