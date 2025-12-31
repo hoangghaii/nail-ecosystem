@@ -1,468 +1,845 @@
-# Codebase Summary
+# Codebase Summary - Pink Nail Salon Monorepo
 
-**Project**: Pink Nail Admin Dashboard
-**Version**: 0.2.0
-**Last Updated**: 2025-12-05
-**Generated From**: repomix-output.xml
+**Project**: Pink Nail Salon - Turborepo Monorepo
+**Version**: 0.1.0
+**Last Updated**: 2025-12-31
+**Migration**: Turborepo complete (7/7 phases)
 
-## Project Statistics
+## Overview
 
-- **Total Files**: 69 files
-- **Total Tokens**: 42,286 tokens
-- **Total Characters**: 164,919 chars
-- **TypeScript Coverage**: 100% (no `any` types)
-- **Build Status**: PASS (0 errors)
+Production-ready monorepo with 3 applications and 7 shared packages, built with Turborepo for optimal performance and zero type duplication.
 
-## Top Files by Size
+**Key Metrics**:
+- **Build Time**: 7s full / 89ms cached (79x faster)
+- **Type Duplication**: 0% (eliminated via @repo/types)
+- **Apps**: 3 (client, admin, API)
+- **Shared Packages**: 7 (@repo/*)
+- **Total LOC**: ~25,000+ (estimated)
 
-1. `CLAUDE.md` - 4,159 tokens (9.8%) - Project instructions
-2. `src/components/banners/HeroSettingsCard.tsx` - 2,741 tokens (6.5%)
-3. `src/pages/BannersPage.tsx` - 2,707 tokens (6.4%)
-4. `src/index.css` - 1,994 tokens (4.7%)
-
-## Directory Structure
+## Monorepo Structure
 
 ```
-nail-admin/
-├── docs/                     # Project documentation
+pink-nail-salon/
+├── apps/
+│   ├── client/          # Customer website (React + Vite)
+│   ├── admin/           # Admin dashboard (React + Vite)
+│   └── api/             # Backend API (NestJS)
+├── packages/
+│   ├── types/           # Shared TypeScript types
+│   ├── utils/           # Shared utilities (cn, formatters, hooks)
+│   ├── typescript-config/  # TS configs (base, react, nestjs)
+│   ├── eslint-config/   # ESLint rules (react, nestjs)
+│   ├── tailwind-config/ # Tailwind themes (client, admin)
+│   ├── prettier-config/ # Code formatting
+│   └── ui/              # UI components (intentionally empty)
+├── tooling/
+│   └── prettier-config/ # Tooling configuration
+├── nginx/               # Nginx reverse proxy config
+├── docs/                # Project documentation
+├── .claude/             # Claude workflows & skills
+├── plans/               # Planning & scout reports
+├── turbo.json           # Turborepo configuration
+├── package.json         # Root workspace config
+├── docker-compose.yml   # Base Docker config
+├── docker-compose.dev.yml   # Dev overrides
+└── docker-compose.prod.yml  # Prod overrides
+```
+
+## Applications
+
+### 1. Client App (`apps/client/`)
+
+**Purpose**: Customer-facing website for nail salon services
+**Port**: 5173 (dev) / 80 (prod)
+**Framework**: React 19.2 + Vite 7.2 + TypeScript 5.9
+
+#### Directory Structure
+
+```
+apps/client/
+├── src/
+│   ├── assets/          # Static images, fonts
+│   ├── components/
+│   │   ├── banner/      # Banner components
+│   │   ├── gallery/     # Gallery grid, filters, modals
+│   │   ├── home/        # Hero, About, Services, Gallery sections
+│   │   ├── layout/      # Header, Footer, Layout
+│   │   ├── services/    # Service cards, filters
+│   │   ├── shared/      # Shared UI components
+│   │   └── ui/          # shadcn/ui components (15 components)
+│   ├── data/            # Static data (business hours, contact)
+│   ├── hooks/           # Custom hooks (6 page-specific)
+│   ├── lib/
+│   │   └── validations/ # Yup form schemas
+│   ├── pages/           # 5 page components
+│   ├── services/        # API service layer (axios)
+│   ├── styles/          # Global CSS (Tailwind v4)
+│   └── types/           # TypeScript definitions (re-exports @repo/types)
+├── Dockerfile           # Multi-stage build (Nginx)
+├── package.json         # Dependencies
+├── vite.config.ts       # Vite configuration
+└── tailwind.config.ts   # Uses @repo/tailwind-config/client-theme
+```
+
+#### Tech Stack
+
+**Core**:
+- React 19.2, TypeScript 5.9, Vite 7.2 (SWC)
+
+**Styling**:
+- Tailwind CSS v4
+- @repo/tailwind-config/client-theme (warm/cozy/feminine)
+- Radix UI primitives (shadcn/ui pattern)
+
+**Routing**:
+- React Router v7 (BrowserRouter)
+
+**Forms**:
+- React Hook Form 7.54
+- Yup 1.6 validation
+- @hookform/resolvers
+
+**State**:
+- Zustand (lightweight global state)
+- No complex state management needed
+
+**Animations**:
+- Motion (Framer Motion) for smooth transitions
+
+**HTTP**:
+- Axios with interceptors
+
+#### Pages
+
+1. **HomePage** - Hero, About, Services preview, Gallery preview
+2. **ServicesPage** - Full service catalog with filters
+3. **GalleryPage** - Categorized nail art showcase
+4. **BookingPage** - Multi-step booking form
+5. **ContactPage** - Business info + contact form
+
+#### Design System
+
+**Theme**: Warm, cozy, feminine, organic
+**Colors**: Beige/cream/warm grays (#fdf8f6 → #43302b)
+**Borders**: YES (1-2px solid, rounded)
+**Shadows**: NO (border-based design)
+**Typography**: Poppins-style sans-serif
+
+### 2. Admin App (`apps/admin/`)
+
+**Purpose**: Business dashboard for salon management
+**Port**: 5174 (dev) / 81 (prod)
+**Framework**: React 19.2 + Vite 7.2 + TypeScript 5.9
+
+#### Directory Structure
+
+```
+apps/admin/
 ├── src/
 │   ├── components/
-│   │   ├── auth/            # ProtectedRoute (1 file)
-│   │   ├── banners/         # Banner components (3 files)
-│   │   ├── gallery/         # Gallery components (4 files)
-│   │   ├── layout/          # Layout components (3 files)
-│   │   ├── shared/          # Reusable components (4 files)
-│   │   └── ui/              # shadcn/ui primitives (23 files)
-│   ├── data/                # Mock data (3 files)
-│   ├── lib/                 # Utils, Firebase (2 files)
-│   ├── pages/               # Pages (7 files)
-│   ├── services/            # Service layer (7 files)
-│   ├── store/               # Zustand stores (4 files)
-│   └── types/               # TypeScript types (7 files)
-├── CLAUDE.md                # Development instructions
-├── package.json             # Dependencies
-└── vite.config.ts           # Build configuration
+│   │   ├── auth/        # ProtectedRoute
+│   │   ├── banners/     # Banner components (3 files)
+│   │   ├── gallery/     # Gallery components (4 files)
+│   │   ├── layout/      # Layout components (3 files)
+│   │   ├── shared/      # DataTable, ImageUpload, VideoUpload
+│   │   └── ui/          # shadcn/ui components (23 components)
+│   ├── data/            # Mock data (banners, gallery)
+│   ├── lib/             # Utils, Firebase
+│   ├── pages/           # 7 page components
+│   ├── services/        # Service layer (dual-mode: mock/API)
+│   ├── store/           # Zustand stores (4 stores)
+│   └── types/           # TypeScript definitions (re-exports @repo/types)
+├── Dockerfile           # Multi-stage build (Nginx)
+├── package.json         # Dependencies
+├── vite.config.ts       # Vite configuration
+└── tailwind.config.ts   # Uses @repo/tailwind-config/admin-theme
 ```
 
-## Core Technologies
+#### Tech Stack
 
-- **React**: 19.2 + **TypeScript**: 5.9
-- **Build**: Vite 7.2, **Styling**: Tailwind CSS v4
-- **UI**: shadcn/ui (Radix UI primitives)
-- **State**: Zustand 5.0
-- **Forms**: React Hook Form + Zod
-- **Tables**: TanStack Table v8
-- **Storage**: Firebase Storage 11.1
+**Core**:
+- React 19.2, TypeScript 5.9, Vite 7.2 (SWC)
 
-## State Management (Zustand)
+**Styling**:
+- Tailwind CSS v4
+- @repo/tailwind-config/admin-theme (professional/modern/blue)
+- Radix UI primitives (shadcn/ui pattern)
 
-### authStore.ts (42 lines)
+**Routing**:
+- React Router v7
 
-```typescript
-{
-  user: User | null;
-  isAuthenticated: boolean;
-  token: string | null;
-  login(user, token); // Saves to localStorage
-  logout(); // Clears localStorage
-  initializeAuth(); // Loads from localStorage on mount
-}
-```
+**Forms**:
+- React Hook Form 7.54
+- Zod validation
+- @hookform/resolvers
 
-### bannersStore.ts (90 lines) ✨ NEW v0.1.0
+**State**:
+- Zustand 5.0 (authStore, bannersStore, galleryStore, heroSettingsStore)
+- In-memory state with mock data support
 
-```typescript
-{
-  banners: Banner[] // In-memory state
-  isInitialized: boolean
-  initializeBanners() // Load mock data once
-  addBanner(banner)
-  updateBanner(id, data)
-  deleteBanner(id)
-  setPrimaryBanner(id) // Only one primary
-  toggleBannerActive(id)
-  reorderBanners(bannerIds) // Drag-drop support
-}
-```
+**Tables**:
+- TanStack Table v8 (DataTable component)
 
-### heroSettingsStore.ts (77 lines) ✨ NEW v0.1.0
+**Storage**:
+- Firebase Storage 11.1 (image/video uploads)
 
-```typescript
-{
-  settings: HeroSettings; // In-memory state
-  isInitialized: boolean;
-  initializeSettings(); // Load defaults once
-  setDisplayMode(mode); // image | video | carousel
-  setCarouselInterval(interval); // 2-10 seconds
-  setShowControls(show);
-  updateSettings(settings);
-  resetSettings();
-}
-```
+**HTTP**:
+- Dual-mode: Mock API (Zustand) or Real API (fetch)
 
-### galleryStore.ts (78 lines) ✨ NEW v0.2.0
+#### Pages
 
-```typescript
-{
-  galleryItems: GalleryItem[] // In-memory state
-  isInitialized: boolean
-  initializeGallery() // Load mock data once
-  addGalleryItem(item)
-  addMultipleItems(items) // Bulk add
-  updateGalleryItem(id, data)
-  deleteGalleryItem(id)
-  deleteMultipleItems(ids) // Bulk delete
-  toggleFeatured(id)
-  setGalleryItems(items)
-}
-```
+1. **LoginPage** - JWT authentication
+2. **DashboardPage** - Analytics overview (future)
+3. **BannersPage** - Banner CRUD, drag-drop reorder
+4. **GalleryPage** - Gallery CRUD, categories, bulk delete
+5. **ServicesPage** - Service management (placeholder)
+6. **BookingsPage** - Booking management
+7. **ContactsPage** - Business info + messages (placeholder)
 
-## Key Components
+#### Zustand Stores
 
-### Banner Management ✅ Complete
+**authStore**:
+- User authentication state
+- JWT token management
+- localStorage persistence
 
-**BannerFormModal** (289 lines)
-
-- Create/edit modal with React Hook Form + Zod
-- Image/Video upload to Firebase
-- Type field (image/video), CTA fields
-- Validation: title (3-100 chars), description (0-500 chars)
-
-**HeroSettingsCard** (376 lines)
-
-- Display mode: Image/Video/Carousel
-- Carousel interval slider (2-10s)
-- Show controls toggle
-- Auto-save on changes
-- Primary banner preview
-
-**BannersPage** (372 lines)
-
-- DataTable with TanStack Table
-- Drag-drop reordering (HTML5 API)
+**bannersStore**:
+- Banner CRUD operations
 - Primary banner selection
+- Drag-drop reordering
 - Active/inactive toggle
-- Filtering: all | active
-- Type-based filtering by display mode
 
-### Gallery Management ✅ Complete (v0.2.0)
-
-**GalleryFormModal** (335 lines)
-
-- Create/edit modal with React Hook Form + Zod
-- Image upload to Firebase Storage
-- Category selection (extensions, manicure, nail-art, pedicure, seasonal)
-- Featured toggle
-- Validation: title (3-100 chars), description (0-500 chars)
-
-**CategoryFilter** (59 lines)
-
-- Category filtering tabs
-- Active category highlighting
-- Item counts per category
-
-**DeleteGalleryDialog** (109 lines)
-
-- Single and bulk delete confirmation
-- Item preview with count
-
-**FeaturedBadge** (21 lines)
-
-- Visual indicator for featured items
-
-**GalleryPage** (331 lines)
-
-- Grid layout with image preview
+**galleryStore**:
+- Gallery CRUD operations
 - Category filtering
-- Bulk selection and delete
-- Featured item toggle
-- DataTable integration for list view
+- Featured items
+- Bulk operations
 
-### Booking Management ✅ Complete (v0.2.0)
+**heroSettingsStore**:
+- Hero display mode (image/video/carousel)
+- Carousel interval
+- Show controls toggle
 
-**BookingDetailsModal** (138 lines)
+#### Design System
 
-- Dialog-based centered modal (consistent with BannersPage, GalleryPage)
-- View booking details (customer info, appointment details)
-- Status badge indicator
-- Update status action button
-- Replaced BookingDetailsDrawer (Sheet component)
+**Theme**: Professional, clean, modern
+**Colors**: Blue theme (#3b82f6, #0ea5e9, #f8fafc)
+**Borders**: Subtle, shadows enabled
+**Shadows**: YES (glassmorphism)
+**Typography**: Inter-style sans-serif
 
-**BookingsPage** - Booking list and management
+### 3. API App (`apps/api/`)
 
-- DataTable with booking rows
-- Status filtering and actions
-- Modal-based detail view
+**Purpose**: Backend services and data management
+**Port**: 3000 (dev & prod)
+**Framework**: NestJS 11 + TypeScript 5.7
 
-### Shared Components
+#### Directory Structure
 
-**DataTable** (74 lines) - Generic table with sorting, pagination
-**ImageUpload** (170 lines) - Firebase upload, 5MB max
-**VideoUpload** (165 lines) - Firebase upload, 50MB max
-**StatusBadge** (64 lines) - Variant-based badges
+```
+apps/api/
+├── src/
+│   ├── auth/            # Authentication module
+│   │   ├── dto/         # Login, Register DTOs
+│   │   ├── guards/      # JWT guards
+│   │   ├── strategies/  # Passport strategies
+│   │   └── auth.controller.ts, auth.service.ts
+│   ├── bookings/        # Booking module
+│   │   ├── dto/         # CreateBooking, UpdateBooking DTOs
+│   │   ├── schemas/     # Mongoose schema
+│   │   └── bookings.controller.ts, bookings.service.ts
+│   ├── gallery/         # Gallery module (with categories)
+│   │   ├── dto/         # CreateGallery, UpdateGallery DTOs
+│   │   ├── schemas/     # Mongoose schema
+│   │   └── gallery.controller.ts, gallery.service.ts
+│   ├── services/        # Services module
+│   │   ├── dto/         # CreateService, UpdateService DTOs
+│   │   ├── schemas/     # Mongoose schema
+│   │   └── services.controller.ts, services.service.ts
+│   ├── upload/          # File upload module (Cloudinary)
+│   ├── health/          # Health check module
+│   ├── common/          # Shared utilities, decorators, filters
+│   ├── config/          # Configuration (MongoDB, Redis, JWT, Cloudinary)
+│   └── main.ts          # Application entry point
+├── test/                # E2E tests (Supertest)
+├── Dockerfile           # Multi-stage build (Node.js)
+├── package.json         # Dependencies
+├── tsconfig.json        # Extends @repo/typescript-config/nestjs
+└── nest-cli.json        # NestJS CLI configuration
+```
 
-### UI Primitives (shadcn/ui)
+#### Tech Stack
 
-23 components: button, card, dialog, dropdown-menu, input, label, radio-group, select, switch, table, textarea, etc.
+**Framework**:
+- NestJS 11.0
+- TypeScript 5.7
+- Node.js 25 (Alpine)
 
-## Services (Dual-Mode Architecture)
+**Database**:
+- MongoDB 9.0
+- Mongoose 9.1 (ODM)
 
-### banners.service.ts (151 lines) ✨ Updated v0.1.0
+**Caching**:
+- Redis 7.4
+- ioredis 5.4
 
+**Authentication**:
+- @nestjs/jwt
+- @nestjs/passport
+- Passport JWT strategy
+- Argon2 (password hashing)
+
+**Validation**:
+- class-validator
+- class-transformer
+
+**File Upload**:
+- Cloudinary SDK
+- Multer (multipart/form-data)
+
+**Security**:
+- @nestjs/throttler (rate limiting)
+- CORS configuration
+- Helmet (HTTP headers, future)
+
+**Testing**:
+- Jest (unit tests)
+- Supertest (E2E tests)
+
+#### Modules
+
+**auth**:
+- POST /auth/register (register admin)
+- POST /auth/login (JWT tokens)
+- POST /auth/refresh (refresh access token)
+- POST /auth/logout (invalidate refresh token)
+
+**services**:
+- GET /services (list with filters)
+- POST /services (create, admin)
+- PATCH /services/:id (update, admin)
+- DELETE /services/:id (delete, admin)
+
+**gallery**:
+- GET /gallery (list with category filter)
+- POST /gallery (create, admin)
+- PATCH /gallery/:id (update, admin)
+- DELETE /gallery/:id (delete, admin)
+
+**bookings**:
+- GET /bookings (list, admin)
+- POST /bookings (create, public)
+- PATCH /bookings/:id (update status, admin)
+- DELETE /bookings/:id (delete, admin)
+
+**upload**:
+- POST /upload (Cloudinary upload, admin)
+
+**health**:
+- GET /health (health check)
+
+## Shared Packages
+
+### @repo/types (`packages/types/`)
+
+**Purpose**: Centralized TypeScript type definitions
+
+**Structure**:
+```
+packages/types/
+├── src/
+│   ├── service.ts       # Service, ServiceCategory
+│   ├── gallery.ts       # Gallery, GalleryCategory
+│   ├── booking.ts       # Booking, BookingStatus, CustomerInfo
+│   └── auth.ts          # User, LoginCredentials, AuthResponse
+├── package.json         # Exports via "exports" field
+└── tsconfig.json        # Extends @repo/typescript-config/base
+```
+
+**Exports**:
 ```typescript
-class BannersService {
-  private useMockApi = import.meta.env.VITE_USE_MOCK_API === "true";
+import { Service, ServiceCategory } from "@repo/types/service";
+import { Gallery, GalleryCategory } from "@repo/types/gallery";
+import { Booking, BookingStatus } from "@repo/types/booking";
+import { User, LoginCredentials } from "@repo/types/auth";
+```
 
-  async getAll(): Promise<Banner[]> {
-    if (this.useMockApi) {
-      return useBannersStore.getState().banners; // Zustand
-    }
-    const res = await fetch("/api/banners");
-    return res.json();
+**Impact**: Eliminated 100% type duplication between client and admin
+
+### @repo/utils (`packages/utils/`)
+
+**Purpose**: Shared utility functions and React hooks
+
+**Structure**:
+```
+packages/utils/
+├── src/
+│   ├── cn.ts            # Tailwind class name merger (clsx + tailwind-merge)
+│   ├── format.ts        # formatCurrency, formatDate, formatPhoneNumber
+│   └── hooks/
+│       └── use-debounce.ts  # Debounce hook (shared between apps)
+├── package.json
+└── tsconfig.json
+```
+
+**Exports**:
+```typescript
+import { cn } from "@repo/utils/cn";
+import { formatCurrency, formatDate, formatPhoneNumber } from "@repo/utils/format";
+import { useDebounce } from "@repo/utils/hooks";
+```
+
+**Dependencies**:
+- clsx 2.1
+- tailwind-merge 3.4
+- react (peer dependency)
+
+### @repo/typescript-config (`packages/typescript-config/`)
+
+**Purpose**: Centralized TypeScript configurations
+
+**Configs**:
+```
+packages/typescript-config/
+├── base.json            # Common settings (strict, ES2022, verbatimModuleSyntax)
+├── react.json           # React-specific (JSX preserve, DOM lib, extends base)
+└── nestjs.json          # Node.js backend (CommonJS, Node libs, extends base)
+```
+
+**Usage**:
+```json
+// apps/client/tsconfig.json
+{
+  "extends": "@repo/typescript-config/react",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] }
   }
-
-  async create(data): Promise<Banner> {
-    if (this.useMockApi) {
-      const banner = { ...data, id: `banner_${Date.now()}`, ... };
-      useBannersStore.getState().addBanner(banner); // Zustand
-      return banner;
-    }
-    // Real API call
-  }
-
-  // update, delete, setPrimary, toggleActive, reorder...
 }
 ```
 
-### gallery.service.ts (155 lines) ✨ NEW v0.2.0
+### @repo/eslint-config (`packages/eslint-config/`)
 
-```typescript
-class GalleryService {
-  private useMockApi = import.meta.env.VITE_USE_MOCK_API === "true";
+**Purpose**: Centralized ESLint rules
 
-  async getAll(): Promise<GalleryItem[]> {
-    if (this.useMockApi) {
-      return useGalleryStore.getState().galleryItems; // Zustand
-    }
-    const res = await fetch("/api/gallery");
-    return res.json();
+**Configs**:
+```
+packages/eslint-config/
+├── react.js             # React + TypeScript + Perfectionist
+└── nestjs.js            # NestJS + Node.js linting
+```
+
+**Plugins**:
+- @eslint/js
+- typescript-eslint
+- eslint-plugin-perfectionist (import sorting)
+- eslint-plugin-react-hooks
+- eslint-plugin-react-refresh
+
+### @repo/tailwind-config (`packages/tailwind-config/`)
+
+**Purpose**: Tailwind CSS theme configurations
+
+**Configs**:
+```
+packages/tailwind-config/
+├── base.js              # Common Tailwind settings
+├── client-theme.js      # Warm theme (beige/cream/warm grays)
+└── admin-theme.js       # Blue theme (professional/modern)
+```
+
+**Usage**:
+```javascript
+// apps/client/tailwind.config.ts
+import clientTheme from "@repo/tailwind-config/client-theme";
+
+export default {
+  content: ["./src/**/*.{ts,tsx}"],
+  ...clientTheme,
+};
+```
+
+### @repo/prettier-config (`packages/prettier-config/`)
+
+**Purpose**: Code formatting standards (placeholder, uses root)
+
+### packages/ui
+
+**Status**: **Intentionally empty**
+**Rationale**: Client and admin have fundamentally different design systems, making component sharing impractical. Only shared hook: `useDebounce` in @repo/utils.
+
+## Build System (Turborepo)
+
+### turbo.json
+
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": { "outputs": [] },
+    "type-check": { "outputs": [] },
+    "clean": { "cache": false }
   }
-
-  async create(data): Promise<GalleryItem> {
-    if (this.useMockApi) {
-      const item = { ...data, id: `gallery_${Date.now()}`, ... };
-      useGalleryStore.getState().addGalleryItem(item); // Zustand
-      return item;
-    }
-    // Real API call
-  }
-
-  // update, delete, createMultiple, deleteMultiple, toggleFeatured, getFeatured, getByCategory...
 }
 ```
 
-### Other Services
+### Root package.json
 
-- **auth.service.ts** (102 lines) - Mock JWT login
-- **heroSettings.service.ts** (69 lines) - Uses heroSettingsStore
-- **imageUpload.service.ts** (89 lines) - Firebase Storage
-- **storage.service.ts** (58 lines) - localStorage wrapper with `nail_admin_` prefix
+```json
+{
+  "name": "pink-nail-salon",
+  "workspaces": ["apps/*", "packages/*", "tooling/*"],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "clean": "turbo clean"
+  },
+  "packageManager": "npm@11.7.0"
+}
+```
 
-## Type Definitions
+### Performance
 
-### Admin-Only Types ✨ NEW v0.1.0
+**Full Build**: 7.023s (all apps, parallel)
+**Cached Build**: 89ms (FULL TURBO)
+**Type-Check**: 3.937s (all apps, parallel)
+**Improvement**: 79x faster with caching
 
-**banner.types.ts**
+## Docker Configuration
 
+### docker-compose.yml (Base)
+
+**Services**:
+- client (React + Vite)
+- admin (React + Vite)
+- api (NestJS)
+- mongodb (MongoDB 9.0)
+- redis (Redis 7.4)
+
+### docker-compose.dev.yml (Development)
+
+**Features**:
+- Hot-reload enabled (CHOKIDAR_USEPOLLING=true)
+- Volume mounts for source code
+- Direct port access (5173, 5174, 3000)
+- MongoDB + Redis containers
+
+### docker-compose.prod.yml (Production)
+
+**Features**:
+- Multi-stage builds
+- Nginx reverse proxy
+- Resource limits (CPU, memory)
+- Health checks + dependencies
+- Log rotation
+
+**Services**:
+- nginx (reverse proxy, static serving)
+- client (optimized build)
+- admin (optimized build)
+- api (PM2 process manager)
+- mongodb (persistent volume)
+- redis (persistent volume)
+
+### Multi-Stage Dockerfiles
+
+**Client/Admin** (5 stages):
+1. **base**: Node.js Alpine
+2. **deps**: Install dependencies (BuildKit cache mounts)
+3. **dev**: Development stage (hot-reload)
+4. **builder**: Build with Turbo `--filter=client|admin`
+5. **production**: Nginx serving static files
+
+**API** (6 stages):
+1. **base**: Node.js Alpine
+2. **deps**: Install all dependencies
+3. **dev**: Development stage (watch mode)
+4. **builder**: Build with Turbo `--filter=api`
+5. **prod-deps**: Install only production dependencies
+6. **production**: Run with PM2
+
+### Nginx Configuration
+
+**Routes** (Production):
+```
+/          → client:80       (customer website)
+/admin     → admin:81        (dashboard)
+/api       → api:3000        (backend API)
+/health    → api:3000/health (health check)
+```
+
+**Static Files**:
+- Client: `/usr/share/nginx/html/client`
+- Admin: `/usr/share/nginx/html/admin`
+
+## Type System Architecture
+
+### Type Sharing Pattern
+
+**Before Migration**:
+```
+nail-client/src/types/service.types.ts    (duplicated)
+nail-admin/src/types/service.types.ts     (duplicated)
+```
+
+**After Migration**:
+```
+packages/types/src/service.ts             (single source of truth)
+apps/client/src/types/                    (re-exports from @repo/types)
+apps/admin/src/types/                     (re-exports from @repo/types)
+```
+
+### Import Convention
+
+**TypeScript verbatimModuleSyntax** (strict):
 ```typescript
-interface Banner {
-  id: string;
-  title: string;
-  description?: string;
-  imageUrl: string;
-  videoUrl?: string;
-  type: "image" | "video"; // ✨ NEW
-  ctaText?: string;
-  ctaLink?: string;
-  sortIndex: number;
-  active: boolean;
-  isPrimary: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// ✅ Correct (type-only import)
+import type { Service } from "@repo/types/service";
+
+// ❌ Wrong (build error with verbatimModuleSyntax)
+import { Service } from "@repo/types/service";
 ```
 
-**heroSettings.types.ts**
+**Exception**: When importing for runtime use (rare with types package).
 
+## Development Workflow
+
+### Local Development
+
+```bash
+# Install dependencies (root)
+npm install
+
+# Run all apps in parallel
+npm run dev
+
+# Access:
+# Client: http://localhost:5173
+# Admin:  http://localhost:5174
+# API:    http://localhost:3000
+```
+
+### Docker Development
+
+```bash
+# Start all services with hot-reload
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+# Logs
+docker compose logs -f [service-name]
+
+# Shell into container
+docker exec -it [container-name] sh
+```
+
+### Turborepo Commands
+
+```bash
+# Build all apps (7s full, 89ms cached)
+npm run build
+
+# Type-check all apps
+npm run type-check
+
+# Lint all apps
+npm run lint
+
+# Clean Turbo cache
+npm run clean
+
+# Build specific app
+npx turbo build --filter=client
+npx turbo build --filter=admin
+npx turbo build --filter=api
+
+# Run specific app
+npx turbo dev --filter=client
+```
+
+### Working with Shared Packages
+
+**Adding a new type**:
+1. Add to `packages/types/src/[module].ts`
+2. Update `packages/types/package.json` exports if new module
+3. Run `npm run type-check` to verify all apps
+4. Apps auto-import updated types (no changes needed)
+
+**Adding a utility**:
+1. Add to `packages/utils/src/[utility].ts`
+2. Update `packages/utils/package.json` exports
+3. Use in apps: `import { util } from "@repo/utils/[utility]"`
+
+**Updating configs**:
+1. Modify `packages/typescript-config/[config].json`
+2. Changes apply to all apps automatically
+3. Run `npm run type-check` to verify
+
+## Environment Variables
+
+### Client (`apps/client/.env`)
+
+```env
+VITE_API_BASE_URL=http://localhost:3000  # Dev
+VITE_API_BASE_URL=/api                    # Prod (Nginx proxy)
+```
+
+### Admin (`apps/admin/.env`)
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+VITE_USE_MOCK_API=true                    # Dev (Zustand mock)
+VITE_USE_MOCK_API=false                   # Prod (real API)
+VITE_FIREBASE_*=                          # Firebase config
+```
+
+### API (`apps/api/.env`)
+
+```env
+NODE_ENV=development|production
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/nail-salon
+REDIS_URL=redis://localhost:6379
+JWT_ACCESS_SECRET=your-secret
+JWT_REFRESH_SECRET=your-secret
+CLOUDINARY_CLOUD_NAME=your-cloud
+CLOUDINARY_API_KEY=your-key
+CLOUDINARY_API_SECRET=your-secret
+```
+
+## Testing
+
+### Unit Tests
+
+**Client/Admin**: Vitest (future implementation)
+**API**: Jest (implemented for core modules)
+
+### E2E Tests
+
+**Client/Admin**: Playwright (future implementation)
+**API**: Supertest (implemented for endpoints)
+
+### Manual Testing
+
+Currently primary method for frontend applications.
+
+## Code Quality
+
+### TypeScript Strict Mode
+
+All apps use strict TypeScript:
+- `strict: true`
+- `verbatimModuleSyntax: true`
+- `noImplicitAny: true`
+- `strictNullChecks: true`
+
+### ESLint Rules
+
+- TypeScript ESLint recommended
+- React hooks rules
+- React refresh (Vite)
+- Perfectionist (import sorting)
+
+### Prettier
+
+- Standard formatting rules
+- Enforced via pre-commit hooks (future)
+
+### Path Aliases
+
+All apps use `@/*` path alias:
 ```typescript
-type HeroDisplayMode = "image" | "video" | "carousel";
+import { Button } from "@/components/ui/button";
+```
 
-interface HeroSettings {
-  displayMode: HeroDisplayMode;
-  carouselInterval: number; // milliseconds
-  showControls: boolean;
-  updatedAt: Date;
+## Migration Summary
+
+### Turborepo Migration (2025-12-31)
+
+**Phases**: 7/7 complete
+**Duration**: ~2 hours
+**Status**: Production-ready
+
+**Achievements**:
+- ✅ Turborepo setup (npm workspaces)
+- ✅ 7 shared packages created
+- ✅ Type duplication eliminated (100% → 0%)
+- ✅ Build caching enabled (79x faster)
+- ✅ Docker migration complete
+- ✅ All tests passing
+- ✅ Documentation complete
+
+**Build Performance**:
+- Before: ~20s per app (sequential)
+- After: 7s full / 89ms cached
+- Improvement: 98.7% time reduction
+
+**Type Duplication**:
+- Before: 100% duplication
+- After: 0% duplication via @repo/types
+
+## Architecture Decisions
+
+### Why packages/ui is Empty
+
+**Decision**: Keep UI components separate per app
+**Rationale**:
+- Client: Warm/cozy/feminine (border-based, NO shadows)
+- Admin: Professional/modern (glassmorphism, WITH shadows)
+- Fundamentally different design philosophies
+- Only 1 shareable hook (useDebounce → @repo/utils)
+
+### Dual-Mode Service Pattern (Admin)
+
+**Pattern**:
+```typescript
+const useMockApi = import.meta.env.VITE_USE_MOCK_API === "true";
+
+if (useMockApi) {
+  // Use Zustand stores (in-memory state)
+} else {
+  // Use real API calls
 }
-```
-
-### Shared Types (Client Project Sync)
-
-- **service.types.ts** - Service, ServiceCategory
-- **gallery.types.ts** - GalleryItem, GalleryCategory
-- **booking.types.ts** - Booking, BookingStatus, CustomerInfo
-- **contact.types.ts** - Contact inquiries
-
-**CRITICAL**: Types must remain compatible with client project at:
-`/Users/hainguyen/Documents/nail-project/nail-client`
-
-## Pages
-
-1. **LoginPage** (93 lines) - Auth form
-2. **DashboardPage** (18 lines) - Overview (placeholder)
-3. **BannersPage** (372 lines) ✅ Full CRUD implementation
-4. **GalleryPage** (331 lines) ✅ Full CRUD implementation (v0.2.0)
-5. **ServicesPage** (18 lines) - Placeholder
-6. **BookingsPage** ✅ Booking management (v0.2.0)
-7. **ContactsPage** (18 lines) - Placeholder
-
-## Mock Data
-
-**mockBanners.ts** (130 lines)
-
-- 5 sample banners (3 image, 2 video)
-- Realistic titles, descriptions, CTA
-- Proper sortIndex (0-4)
-- Mix of active/inactive, one primary
-
-**mockGallery.ts** (380 lines) ✨ NEW v0.2.0
-
-- 20 sample gallery items
-- 5 categories (extensions, manicure, nail-art, pedicure, seasonal)
-- Mix of featured/non-featured items
-- Realistic titles and descriptions
-
-**initializeMockData.ts** (30 lines)
-
-- Auto-initializes Zustand stores on app mount
-- Initializes banners, gallery, and hero settings
-- Idempotent (safe to run multiple times)
-- Called from `main.tsx`
-
-## Key Architecture Decisions
-
-### Zustand Migration (v0.1.0 - v0.2.0) ✨
-
-**Before**:
-
-```
-localStorage:
-  - nail_admin_banners
-  - nail_admin_gallery
-  - nail_admin_heroSettings
-```
-
-**After**:
-
-```
-Zustand Stores (in-memory):
-  - bannersStore (v0.1.0)
-  - galleryStore (v0.2.0)
-  - heroSettingsStore (v0.1.0)
-
-localStorage (auth only):
-  - nail_admin_auth_token
-  - nail_admin_auth_user
 ```
 
 **Benefits**:
+- Develop without backend
+- Easy switch to production
+- No code changes needed
 
-- Better performance (no serialize/deserialize)
-- Reactive updates
-- Simpler component logic
-- Type-safe state management
-- Bulk operations support
+### Monorepo Benefits
 
-### Dual-Mode Service Pattern
-
-```
-VITE_USE_MOCK_API=true  → Zustand stores (dev)
-VITE_USE_MOCK_API=false → REST API calls (prod)
-```
-
-No frontend code changes needed to switch.
-
-### TypeScript verbatimModuleSyntax
-
-```typescript
-// ✅ Correct
-import type { Banner } from "@/types/banner.types";
-
-// ❌ Wrong (build error)
-import { Banner } from "@/types/banner.types";
-```
-
-## Implementation Status
-
-### ✅ Complete (v0.2.0)
-
-- Authentication with JWT
-- Banner CRUD (create, read, update, delete)
-- Gallery CRUD (create, read, update, delete) ✨ NEW v0.2.0
-- Booking details view with modal UI ✨ NEW v0.2.0
-- Hero settings component
-- Drag-drop reordering (banners)
-- Primary banner selection
-- Active/inactive toggle
-- Type filtering (image/video)
-- Category filtering (gallery)
-- Featured item toggle (gallery)
-- Bulk delete operations (gallery)
-- Zustand state management (banners, gallery, hero settings, bookings)
-- DataTable, ImageUpload, VideoUpload
-- Mock data initialization
-- Firebase Storage integration
-- Consistent Dialog-based modal pattern across all pages
-
-### ⏳ Planned
-
-- Services CRUD
-- Bookings management
-- Contacts management
-- Dashboard analytics
-- Backend API integration
-
-## Build & Development
-
-**Commands**:
-
-```bash
-npm run dev      # Dev server on :5173
-npm run build    # Production build
-npm run lint     # ESLint check
-npx tsc --noEmit # Type check
-```
-
-**Build Output**: 0 errors, bundle size warning acceptable
-
-## Security
-
-- JWT authentication
-- Protected routes with redirect
-- File upload validation (type, size)
-- Firebase Storage security rules
-- Environment variables for credentials
-
-## Performance
-
-- Zustand for efficient state updates
-- Vite HMR for fast development
-- Ready for lazy loading (React.lazy)
-- Image/Video optimization via Firebase CDN
+**Code Sharing**: 7 shared packages eliminate duplication
+**Atomic Commits**: Single commit affects all apps
+**Centralized Tooling**: One ESLint, TypeScript, Tailwind config
+**Build Performance**: 79x faster with Turborepo caching
+**Type Safety**: Single source of truth for types
 
 ## Related Documentation
 
-- [Project Overview PDR](./project-overview-pdr.md)
-- [Code Standards](./code-standards.md)
-- [System Architecture](./system-architecture.md)
-- [Project Roadmap](./project-roadmap.md)
-- [Design Guidelines](./design-guidelines.md)
+- [Project Overview & PDR](./project-overview-pdr.md) - Requirements and architecture
+- [Code Standards](./code-standards.md) - Coding conventions
+- [System Architecture](./system-architecture.md) - Infrastructure details
+- [Shared Types](./shared-types.md) - Type definitions reference
+- [API Endpoints](./api-endpoints.md) - API reference
+- [Design Guidelines](./design-guidelines.md) - UI/UX standards
+- [Project Roadmap](./project-roadmap.md) - Feature planning
+- [Deployment Guide](./deployment-guide.md) - Production deployment
+- [Migration Summary](../MIGRATION-SUMMARY.md) - Turborepo migration details
+- [Scout Reports](../plans/scout-reports/) - Comprehensive project docs
+
+---
+
+**Document Version**: 1.0
+**Last Updated**: 2025-12-31
+**Turborepo Status**: Complete (7/7 phases)

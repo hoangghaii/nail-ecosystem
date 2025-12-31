@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## 🚨 CRITICAL - Shared Type System
 
-**The admin panel and client share type definitions. Types MUST remain compatible across projects.**
+**All apps share type definitions via @repo/types package. Types MUST remain compatible.**
 
-**Rule**: Never modify shared types without updating both nail-client and nail-admin projects!
+**Rule**: Never modify shared types without verifying all apps (client, admin, API)!
 
 **Full reference**: See `./docs/shared-types.md`
 
@@ -22,13 +22,19 @@ Your role is to analyze user requirements across the entire ecosystem, delegate 
 
 ## Project Overview
 
-**Pink Nail Salon** is a complete nail salon business management system consisting of 3 interconnected applications:
+**Pink Nail Salon** is a complete nail salon business management system built as a Turborepo monorepo with 3 applications and 7 shared packages:
 
-1. **nail-client** - Customer-facing website (React + Vite)
-2. **nail-admin** - Admin dashboard (React + Vite)
-3. **nail-api** - Backend API (NestJS + MongoDB)
+**Applications**:
+1. **apps/client** - Customer-facing website (React + Vite)
+2. **apps/admin** - Admin dashboard (React + Vite)
+3. **apps/api** - Backend API (NestJS + MongoDB)
 
-All projects run together via Docker Compose with development and production configurations.
+**Shared Packages** (@repo/*):
+- types, utils, typescript-config, eslint-config, tailwind-config, prettier-config, ui
+
+**Build Performance**: 7s full / 89ms cached (79x faster with Turbo)
+
+All apps run together via Turborepo + Docker Compose.
 
 ---
 
@@ -70,9 +76,9 @@ All important docs are in `./docs` folder:
 **System**: Client (5173) + Admin (5174) → API (3000) → MongoDB/Redis/Cloudinary
 
 **Production**: Nginx reverse proxy routing:
-- `/` → nail-client (customer site)
-- `/admin` → nail-admin (dashboard)
-- `/api` → nail-api (backend)
+- `/` → client (customer site)
+- `/admin` → admin (dashboard)
+- `/api` → api (backend)
 
 **Full details**: See `./docs/system-architecture.md`
 
@@ -94,48 +100,59 @@ All important docs are in `./docs` folder:
 - class-validator + class-transformer
 - Cloudinary + @nestjs/throttler (rate limiting)
 
-### DevOps
+### DevOps & Build System
+- Turborepo 2.3 (build orchestration, caching)
+- npm workspaces (dependency management)
 - Docker + Docker Compose + Nginx
 - Health checks + logging
 - Ready for GitHub Actions CI/CD
 
 ---
 
-## Project Structure
+## Project Structure (Turborepo Monorepo)
 
 ```
-nail-project/
-├── nail-client/      # Customer site (React + Vite, port 5173)
-├── nail-admin/       # Admin dashboard (React + Vite, port 5174)
-├── nail-api/         # Backend API (NestJS, port 3000)
+pink-nail-salon/
+├── apps/
+│   ├── client/       # Customer site (React + Vite, port 5173)
+│   ├── admin/        # Admin dashboard (React + Vite, port 5174)
+│   └── api/          # Backend API (NestJS, port 3000)
+├── packages/
+│   ├── types/        # Shared TypeScript types
+│   ├── utils/        # Shared utilities (cn, formatters, hooks)
+│   ├── typescript-config/  # TS configs (base, react, nestjs)
+│   ├── eslint-config/      # ESLint rules (react, nestjs)
+│   ├── tailwind-config/    # Tailwind themes (client, admin)
+│   └── ui/           # UI components (intentionally empty)
+├── tooling/
+│   └── prettier-config/    # Code formatting
 ├── nginx/            # Nginx config (production reverse proxy)
 ├── docs/             # Project documentation
 ├── .claude/          # Claude workflows & skills
-├── docker-compose.yml       # Base config
-├── docker-compose.dev.yml   # Dev override (hot-reload)
-├── docker-compose.prod.yml  # Prod override (nginx)
+├── turbo.json        # Turborepo configuration
+├── package.json      # Root workspace config
+├── docker-compose*.yml  # Docker orchestration
 ├── CLAUDE.md         # This file
-├── README.md         # Project overview
-└── README-DOCKER.md  # Docker setup guide
+└── README.md         # Project overview
 ```
 
 ---
 
 ## Environment Configuration
 
-**Development**: See `.env.example` files in each project:
-- `nail-client/.env.example` - Client config (API URL)
-- `nail-admin/.env.example` - Admin config (API URL, mock mode)
-- `nail-api/.env.example` - API config (MongoDB, Redis, Cloudinary, JWT secrets)
+**Development**: See `.env.example` files in each app:
+- `apps/client/.env.example` - Client config (API URL)
+- `apps/admin/.env.example` - Admin config (API URL, mock mode)
+- `apps/api/.env.example` - API config (MongoDB, Redis, Cloudinary, JWT secrets)
 
 **Production**: Same files with production values (API URL = `/api`, no mock mode)
 
 **Setup**:
 ```bash
-cp nail-client/.env.example nail-client/.env
-cp nail-admin/.env.example nail-admin/.env
-cp nail-api/.env.example nail-api/.env
-# Edit nail-api/.env with real MongoDB/Redis/Cloudinary credentials
+cp apps/client/.env.example apps/client/.env
+cp apps/admin/.env.example apps/admin/.env
+cp apps/api/.env.example apps/api/.env
+# Edit apps/api/.env with real MongoDB/Redis/Cloudinary credentials
 ```
 
 ---
@@ -154,17 +171,37 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 # Access: Client (/), Admin (/admin), API (/api)
 ```
 
-**Full Docker documentation**: See `README-DOCKER.md`
+**Turborepo Commands**:
+```bash
+npm run dev        # Run all apps in parallel
+npm run build      # Build all apps (7s full, 89ms cached)
+npm run type-check # Type-check all apps
+npm run lint       # Lint all apps
+```
 
 ---
 
 ## Development Workflow
 
-### Project-Specific Work
+### Turborepo Workflow
 
-**Client**: `cd nail-client && npm run dev` (port 5173) | See `nail-client/CLAUDE.md`
-**Admin**: `cd nail-admin && npm run dev` (port 5174) | See `nail-admin/CLAUDE.md`
-**API**: `cd nail-api && npm run start:dev` (port 3000) | See `nail-api/CLAUDE.md`
+**All apps**: `npm run dev` (run from root, parallel execution)
+**Single app**: `npx turbo dev --filter=client|admin|api`
+**Build**: `npm run build` (7s full, 89ms cached with Turbo)
+**Type-check**: `npm run type-check` (all apps in parallel)
+
+### Working with Shared Packages
+
+```typescript
+// Import shared types
+import { Service } from "@repo/types/service";
+import { Booking } from "@repo/types/booking";
+
+// Import utilities
+import { cn } from "@repo/utils/cn";
+import { formatCurrency } from "@repo/utils/format";
+import { useDebounce } from "@repo/utils/hooks";
+```
 
 ### Docker Workflow
 
@@ -177,19 +214,21 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 ## Design System Differences
 
-**Client (nail-client)**:
+**Client (apps/client)**:
 - Theme: Warm, cozy, feminine, organic
 - Colors: Soft neutrals (beige, cream, warm grays)
 - Design: Border-based (NO shadows), organic shapes
 - Animations: Motion (Framer Motion)
+- Tailwind: Uses `@repo/tailwind-config/client-theme`
 
-**Admin (nail-admin)**:
+**Admin (apps/admin)**:
 - Theme: Professional, clean, modern
 - Colors: Blue theme (shadcn/ui default)
 - Design: Glassmorphism with shadows
 - Animations: Simple CSS transitions
+- Tailwind: Uses `@repo/tailwind-config/admin-theme`
 
-**CRITICAL**: Do NOT mix design systems between projects!
+**CRITICAL**: UI components NOT shared (packages/ui intentionally empty). Only shared: useDebounce hook in @repo/utils.
 
 ---
 
@@ -248,7 +287,8 @@ docker compose ps && docker compose logs -f nginx
 **Port conflicts**: `lsof -i :{5173,5174,3000} && kill -9 <PID>`
 **Hot-reload**: Check `CHOKIDAR_USEPOLLING=true` in docker-compose.dev.yml
 **API connection**: `docker compose ps && docker compose logs nail-api`
-**Type errors**: `npm run build` + check `import type` + verify shared types synced
+**Type errors**: `npm run type-check` + verify @repo/types imports
+**Turbo cache**: `npm run clean` to clear Turbo cache
 **Docker build**: `docker builder prune -a && docker compose build --no-cache`
 
 ---
@@ -265,35 +305,54 @@ When working on this project:
 6. **Update documentation** when adding major features
 7. **Use YAGNI-KISS-DRY** principles - avoid over-engineering
 
-### Multi-Project Changes
+### Multi-App Changes
 
-If change affects multiple projects:
+If change affects multiple apps:
 
-1. **Plan the change** across all affected projects
-2. **Update shared types** first (if needed) - see `docs/shared-types.md`
+1. **Plan the change** across all affected apps
+2. **Update shared packages** first (types, utils, configs)
 3. **Implement in order**: API → Admin → Client
-4. **Test integration** with Docker Compose
-5. **Update all affected CLAUDE.md files**
+4. **Verify with Turbo**: `npm run type-check && npm run build`
+5. **Test integration** with Docker Compose
+6. **Update documentation** when adding shared packages
+
+### Shared Package Updates
+
+When modifying packages/* or tooling/*:
+
+1. **Update package** in packages/[name]/
+2. **Verify all apps** use updated package correctly
+3. **Type-check**: `npm run type-check` (validates all apps)
+4. **Build**: `npm run build` (tests integration)
+5. **Document changes** in package README if adding features
 
 ---
 
 ## Quick Reference
 
 **Docs**: `./docs/{code-standards,shared-types,api-endpoints,system-architecture}.md`
-**Docker**: `README-DOCKER.md`
-**Project READMEs**: `{nail-client,nail-admin,nail-api}/{CLAUDE,README}.md`
+**Scout Reports**: `./plans/scout-reports/` (comprehensive project docs)
+**Migration**: `./MIGRATION-SUMMARY.md` (Turborepo migration details)
 
-**Commands**:
+**Turborepo Commands**:
 ```bash
-# Dev all: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-# Prod all: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Dev all: npm run dev
+# Build all: npm run build (7s full, 89ms cached)
+# Type-check: npm run type-check
+# Single app: npx turbo dev --filter=client|admin|api
+```
+
+**Docker Commands**:
+```bash
+# Dev: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Prod: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 # Logs: docker compose logs -f [service]
-# Shell: docker exec -it [container] sh
 ```
 
 ---
 
 **Last Updated**: 2025-12-31
-**Project Status**: Production-ready with Docker Compose setup
+**Project Status**: Production-ready Turborepo monorepo
 **Current Version**: 0.1.0
-**Context Optimized**: 2025-12-31 (context engineering applied)
+**Migration**: Turborepo complete (7/7 phases)
+**Build Performance**: 7s full / 89ms cached (79x faster)

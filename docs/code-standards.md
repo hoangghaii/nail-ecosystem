@@ -1,6 +1,6 @@
 # Code Standards
 
-Pink Nail Salon - Coding Conventions & Best Practices
+Pink Nail Salon - Turborepo Monorepo - Coding Conventions & Best Practices
 
 ---
 
@@ -9,6 +9,11 @@ Pink Nail Salon - Coding Conventions & Best Practices
 **YAGNI** - You Aren't Gonna Need It
 **KISS** - Keep It Simple, Stupid
 **DRY** - Don't Repeat Yourself
+
+**Monorepo-Specific**:
+- Share code via packages, not duplication
+- Single source of truth for types (@repo/types)
+- Centralized tooling configs
 
 ---
 
@@ -49,9 +54,155 @@ import { User, fetchUser } from './api'
 
 ### Path Aliases
 ```typescript
-// Use @ alias for src imports
+// Use @ alias for src imports (within apps)
 import { Button } from '@/components/ui/button'
-import type { Service } from '@/types/service'
+
+// Use @repo/* for shared packages
+import type { Service } from '@repo/types/service'
+import { cn } from '@repo/utils/cn'
+import { formatCurrency } from '@repo/utils/format'
+```
+
+---
+
+## Monorepo Standards (Turborepo)
+
+### Shared Package Imports
+
+**Critical**: Always import shared types from @repo/types:
+
+```typescript
+// ✅ Correct - import from shared package
+import type { Service, ServiceCategory } from '@repo/types/service'
+import type { Booking, BookingStatus } from '@repo/types/booking'
+import type { Gallery, GalleryCategory } from '@repo/types/gallery'
+
+// ❌ Wrong - DO NOT duplicate types in apps
+// apps/client/src/types/service.ts should re-export from @repo/types
+```
+
+### Shared Utilities
+
+```typescript
+// ✅ Use shared utilities instead of duplicating
+import { cn } from '@repo/utils/cn'
+import { formatCurrency, formatDate } from '@repo/utils/format'
+import { useDebounce } from '@repo/utils/hooks'
+
+// ❌ Wrong - DO NOT duplicate utility functions
+```
+
+### TypeScript Config Extension
+
+```json
+// apps/client/tsconfig.json
+{
+  "extends": "@repo/typescript-config/react",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] }
+  }
+}
+
+// apps/api/tsconfig.json
+{
+  "extends": "@repo/typescript-config/nestjs",
+  "compilerOptions": {
+    "paths": { "@/*": ["./src/*"] }
+  }
+}
+```
+
+### Tailwind Config Extension
+
+```typescript
+// apps/client/tailwind.config.ts
+import clientTheme from '@repo/tailwind-config/client-theme'
+
+export default {
+  content: ['./src/**/*.{ts,tsx}'],
+  ...clientTheme,
+}
+
+// apps/admin/tailwind.config.ts
+import adminTheme from '@repo/tailwind-config/admin-theme'
+
+export default {
+  content: ['./src/**/*.{ts,tsx}'],
+  ...adminTheme,
+}
+```
+
+### Adding New Shared Types
+
+1. Add to `packages/types/src/[module].ts`
+2. Update `packages/types/package.json` exports if new module:
+   ```json
+   {
+     "exports": {
+       "./service": "./src/service.ts",
+       "./your-new-module": "./src/your-new-module.ts"
+     }
+   }
+   ```
+3. Run `npm run type-check` from root to verify all apps
+4. Apps auto-import updated types (no changes needed)
+
+### Adding New Utilities
+
+1. Add to `packages/utils/src/[utility].ts`
+2. Update `packages/utils/package.json` exports:
+   ```json
+   {
+     "exports": {
+       "./your-util": "./src/your-util.ts"
+     }
+   }
+   ```
+3. Use in apps: `import { yourUtil } from '@repo/utils/your-util'`
+
+### Turborepo Task Naming
+
+```bash
+# Build all apps (respects dependency graph)
+npm run build
+
+# Type-check all apps (parallel)
+npm run type-check
+
+# Lint all apps (parallel)
+npm run lint
+
+# Build specific app only
+npx turbo build --filter=client
+npx turbo build --filter=admin
+npx turbo build --filter=api
+```
+
+### Package Dependencies
+
+**Shared packages** should:
+- Have minimal dependencies
+- Use peer dependencies for React/TypeScript
+- Not depend on app-specific code
+
+**Apps** should:
+- Depend on shared packages via workspace protocol
+- Not duplicate code that could be shared
+
+```json
+// apps/client/package.json
+{
+  "dependencies": {
+    "@repo/types": "*",
+    "@repo/utils": "*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "*",
+    "@repo/tailwind-config": "*"
+  }
+}
 ```
 
 ---
@@ -101,7 +252,25 @@ function useBookings() {
 ### Component-Specific Styles
 - Use Tailwind utilities first
 - Extract repeated patterns to components
-- Follow project design system (client vs admin)
+- **Critical**: Follow project design system (client vs admin)
+- **Do NOT** share UI components between client and admin (packages/ui intentionally empty)
+
+### Design System Separation
+
+**Client** (apps/client):
+- Warm, cozy, feminine theme
+- Borders YES, Shadows NO
+- Uses `@repo/tailwind-config/client-theme`
+
+**Admin** (apps/admin):
+- Professional, modern theme
+- Borders subtle, Shadows YES (glassmorphism)
+- Uses `@repo/tailwind-config/admin-theme`
+
+**Rationale for packages/ui being empty**:
+- Fundamentally different design philosophies
+- Sharing UI components would compromise design integrity
+- Only shared hook: `useDebounce` in `@repo/utils`
 
 ---
 
@@ -203,6 +372,23 @@ WIP
 feature/service-filtering
 fix/auth-token-expiration
 refactor/booking-validation
+feat/turborepo-migration
+```
+
+### Monorepo Commit Scope
+
+When committing changes affecting multiple apps/packages:
+
+```bash
+# ✅ Specify affected workspace
+feat(types): add new booking status enum
+fix(client): resolve service filter bug
+refactor(utils): optimize formatCurrency function
+chore(root): update Turborepo to 2.3.0
+
+# ✅ Multiple scopes for cross-cutting changes
+feat(client,admin): add new service category filter
+fix(types,api): align booking status types
 ```
 
 ---
@@ -220,6 +406,24 @@ refactor/booking-validation
 - Redis caching for frequently accessed data
 - Pagination for large datasets
 - Rate limiting to prevent abuse
+
+### Monorepo Build Performance
+- Turborepo caching enabled (89ms cached builds)
+- Parallel task execution across apps
+- BuildKit cache mounts in Docker
+- Dependency graph optimization
+
+**Commands**:
+```bash
+# Full build: 7s
+npm run build
+
+# Cached build: 89ms (FULL TURBO)
+npm run build
+
+# Clear cache if needed
+npm run clean
+```
 
 ---
 
@@ -265,4 +469,60 @@ async function getBookings(startDate: string, endDate: string): Promise<Booking[
 
 ---
 
+## Monorepo Best Practices
+
+### When to Create a Shared Package
+
+Create new package in `packages/` when:
+- Code is used by 2+ apps
+- Types must be shared across apps
+- Utility functions are app-agnostic
+- Configuration can be centralized
+
+**Do NOT** create shared package for:
+- App-specific business logic
+- UI components with different design systems
+- One-off utilities used by single app
+
+### Workspace Protocol
+
+Use workspace protocol for local dependencies:
+
+```json
+{
+  "dependencies": {
+    "@repo/types": "*",       // Always latest local version
+    "@repo/utils": "workspace:*"  // Explicit workspace protocol
+  }
+}
+```
+
+### Type Safety Across Workspaces
+
+**Always** use `import type` for @repo/types with verbatimModuleSyntax:
+
+```typescript
+// ✅ Correct
+import type { Service } from '@repo/types/service'
+
+// ❌ Wrong - build error with verbatimModuleSyntax
+import { Service } from '@repo/types/service'
+```
+
+### Shared Package Structure
+
+Standard structure for packages/*:
+
+```
+packages/[name]/
+├── src/
+│   └── index.ts         # Main export
+├── package.json         # With "exports" field
+├── tsconfig.json        # Extends @repo/typescript-config
+└── README.md            # Usage documentation
+```
+
+---
+
 **Last Updated**: 2025-12-31
+**Turborepo**: Complete (7/7 phases)
