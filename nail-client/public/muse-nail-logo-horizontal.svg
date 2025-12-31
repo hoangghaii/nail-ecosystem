@@ -1,0 +1,22 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Elegant Nail Icon in Dusty Rose -->
+  <path d="M40 15 C35 15, 30 20, 30 25 L30 55 C30 60, 33 63, 40 67 C47 63, 50 60, 50 55 L50 25 C50 20, 45 15, 40 15Z" fill="#D48C84"/>
+
+  <!-- Decorative Elements - Soft Gold Curves -->
+  <circle cx="40" cy="22" r="3" fill="#CFAE88" opacity="0.6"/>
+  <circle cx="40" cy="58" r="3" fill="#CFAE88" opacity="0.6"/>
+
+  <!-- Border Frame in Soft Gold -->
+  <rect x="25" y="10" width="30" height="60" rx="8" stroke="#CFAE88" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+  <!-- Text: PINK. NAIL -->
+  <text x="75" y="45" font-family="Georgia, serif" font-size="32" font-weight="600" fill="#D48C84" letter-spacing="3">
+    PINK.
+  </text>
+  <text x="75" y="62" font-family="Georgia, serif" font-size="14" font-weight="400" fill="#786B6B" letter-spacing="6">
+    N A I L
+  </text>
+
+  <!-- Decorative underline -->
+  <line x1="75" y1="68" x2="195" y2="68" stroke="#CFAE88" stroke-width="1" opacity="0.5"/>
+</svg>

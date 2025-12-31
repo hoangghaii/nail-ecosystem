@@ -1,0 +1,67 @@
+# ==========================================
+# BASE DOCKER COMPOSE CONFIGURATION
+# ==========================================
+# This file contains the base service definitions.
+# Use docker-compose.dev.yml or docker-compose.prod.yml for environment-specific configs.
+#
+# Usage:
+#   Development: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#   Production:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+# ==========================================
+
+services:
+  # ==========================================
+  # NAIL CLIENT (Customer-facing website)
+  # ==========================================
+  nail-client:
+    build:
+      context: ./nail-client
+      dockerfile: Dockerfile
+
+    container_name: nail-client
+    hostname: nail-client-host
+
+    restart: unless-stopped
+
+    networks:
+      - nail-network
+
+  # ==========================================
+  # NAIL ADMIN (Admin dashboard)
+  # ==========================================
+  nail-admin:
+    build:
+      context: ./nail-admin
+      dockerfile: Dockerfile
+
+    container_name: nail-admin
+    hostname: nail-admin-host
+
+    restart: unless-stopped
+
+    networks:
+      - nail-network
+
+  # ==========================================
+  # NAIL API (Backend - NestJS)
+  # ==========================================
+  nail-api:
+    build:
+      context: ./nail-api
+      dockerfile: Dockerfile
+
+    container_name: nail-api
+    hostname: nail-api-host
+
+    restart: unless-stopped
+
+    networks:
+      - nail-network
+
+# ==========================================
+# NETWORKS
+# ==========================================
+networks:
+  nail-network:
+    driver: bridge
+    name: nail-network

@@ -1,0 +1,118 @@
+# ==========================================
+# .dockerignore for Pink Nail Admin
+# ==========================================
+# Purpose: Exclude unnecessary files from Docker build context
+# Impact: 70-90% smaller context, faster builds, prevent secret leakage
+
+# ==========================================
+# Dependencies (Reinstalled in Container)
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# package-lock.json - KEEP THIS (required by npm ci)
+
+# ==========================================
+# Build Outputs (Generated in Container)
+# ==========================================
+dist/
+dist-ssr/
+build/
+.vite/
+*.local
+
+# ==========================================
+# Environment Files (NEVER COPY TO IMAGE!)
+# ==========================================
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+!.env.example
+
+# ==========================================
+# Git & Version Control
+# ==========================================
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# ==========================================
+# IDE & Editor Files
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Documentation (Not Needed at Runtime)
+# ==========================================
+*.md
+!README.md
+docs/
+.claude/
+
+# ==========================================
+# Testing & CI/CD
+# ==========================================
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+cypress/
+*.test.*
+*.spec.*
+**/__tests__/
+**/__mocks__/
+
+# ==========================================
+# Logs
+# ==========================================
+logs/
+*.log
+
+# ==========================================
+# Docker Files (Avoid Recursion)
+# ==========================================
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# ==========================================
+# Development Tools
+# ==========================================
+.eslintrc*
+.prettierrc*
+.editorconfig
+tsconfig*.json
+!tsconfig.json
+!tsconfig.app.json
+!tsconfig.node.json
+
+# ==========================================
+# Miscellaneous
+# ==========================================
+.cache/
+temp/
+tmp/
+*.tmp
+*.bak
+*.backup.*
+
+# ==========================================
+# Plans & Research
+# ==========================================
+plans/
+
+# ==========================================
+# Husky Hooks
+# ==========================================
+.husky/

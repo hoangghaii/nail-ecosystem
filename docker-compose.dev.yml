@@ -1,0 +1,137 @@
+# ==========================================
+# DEVELOPMENT DOCKER COMPOSE OVERRIDE
+# ==========================================
+# This file extends docker-compose.yml with development-specific configuration:
+# - Hot-reload via volume mounts
+# - Direct port exposure for each service
+# - Development build target
+# - Environment variables from .env files
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml down
+# ==========================================
+
+services:
+  # ==========================================
+  # NAIL CLIENT (Customer-facing website)
+  # ==========================================
+  nail-client:
+    build:
+      target: development
+      args:
+        NODE_VERSION: 24.12.0
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      # Mount source code for hot-reload
+      - ./nail-client:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+
+    env_file:
+      - ./nail-client/.env
+
+    environment:
+      NODE_ENV: development
+      # Enable file watching in Docker (required for hot-reload)
+      CHOKIDAR_USEPOLLING: "true"
+      # Vite-specific settings
+      VITE_HOST: 0.0.0.0
+      VITE_PORT: 5173
+
+    # Allow interactive terminal (useful for debugging)
+    stdin_open: true
+    tty: true
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # NAIL ADMIN (Admin dashboard)
+  # ==========================================
+  nail-admin:
+    build:
+      target: development
+      args:
+        NODE_VERSION: 24.12.0
+
+    ports:
+      - "5174:5174"
+
+    volumes:
+      # Mount source code for hot-reload
+      - ./nail-admin:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+
+    env_file:
+      - ./nail-admin/.env
+
+    environment:
+      NODE_ENV: development
+      # Enable file watching in Docker
+      CHOKIDAR_USEPOLLING: "true"
+      # Vite-specific settings
+      VITE_HOST: 0.0.0.0
+      VITE_PORT: 5174
+
+    stdin_open: true
+    tty: true
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5174"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # NAIL API (Backend - NestJS)
+  # ==========================================
+  nail-api:
+    build:
+      target: development
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      # Mount source code for hot-reload
+      - ./nail-api:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+      # Note: /app/dist volume removed to prevent EBUSY errors during production builds
+      # Hot-reload watches src/, not dist/, so no impact on development
+
+    env_file:
+      - ./nail-api/.env
+
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+
+    stdin_open: true
+    tty: true
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # API depends on nothing in dev (using external cloud services)
+    # If you add local MongoDB/Redis, add them here:
+    # depends_on:
+    #   - mongodb
+    #   - redis

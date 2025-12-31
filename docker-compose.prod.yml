@@ -1,0 +1,217 @@
+# ==========================================
+# PRODUCTION DOCKER COMPOSE OVERRIDE
+# ==========================================
+# This file extends docker-compose.yml with production-specific configuration:
+# - Nginx reverse proxy for routing
+# - Production build targets (optimized static builds)
+# - No volume mounts (images are self-contained)
+# - Resource limits
+# - Logging configuration
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+# ==========================================
+
+services:
+  # ==========================================
+  # NGINX REVERSE PROXY (Entry Point)
+  # ==========================================
+  # Routes traffic to appropriate services:
+  #   - / → nail-client (customer website)
+  #   - /admin → nail-admin (admin dashboard)
+  #   - /api → nail-api (backend API)
+  # ==========================================
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nail-nginx-proxy
+    hostname: nail-nginx-proxy-host
+
+    restart: always
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      # Mount nginx configuration
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+
+    networks:
+      - nail-network
+
+    depends_on:
+      nail-client:
+        condition: service_healthy
+      nail-admin:
+        condition: service_healthy
+      nail-api:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      com.nail.service: "reverse-proxy"
+      com.nail.environment: "production"
+
+  # ==========================================
+  # NAIL CLIENT (Customer-facing website)
+  # ==========================================
+  nail-client:
+    build:
+      target: production
+
+    image: nail-client:${VERSION:-latest}
+
+    restart: always
+
+    # No ports exposed - accessed via nginx
+    expose:
+      - "80"
+
+    env_file:
+      - ./nail-client/.env.production
+
+    environment:
+      NODE_ENV: production
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      com.nail.service: "client"
+      com.nail.environment: "production"
+
+  # ==========================================
+  # NAIL ADMIN (Admin dashboard)
+  # ==========================================
+  nail-admin:
+    build:
+      target: production
+
+    image: nail-admin:${VERSION:-latest}
+
+    restart: always
+
+    # No ports exposed - accessed via nginx
+    expose:
+      - "81"
+
+    env_file:
+      - ./nail-admin/.env.production
+
+    environment:
+      NODE_ENV: production
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:81"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      com.nail.service: "admin"
+      com.nail.environment: "production"
+
+  # ==========================================
+  # NAIL API (Backend - NestJS)
+  # ==========================================
+  nail-api:
+    build:
+      target: production
+
+    image: nail-api:${VERSION:-latest}
+
+    restart: always
+
+    # No ports exposed - accessed via nginx
+    expose:
+      - "3000"
+
+    env_file:
+      - ./nail-api/.env.production
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Override placeholder values for testing
+      REDIS_PORT: 6379
+      REDIS_HOST: redis
+      MONGODB_URI: mongodb://localhost:27017/nail-api
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      com.nail.service: "api"
+      com.nail.environment: "production"

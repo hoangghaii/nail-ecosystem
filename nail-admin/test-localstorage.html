@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LocalStorage Test - Nail Admin</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+      }
+      h2 {
+        color: #555;
+        margin-top: 0;
+      }
+      .status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .pass {
+        background: #d4edda;
+        color: #155724;
+      }
+      .fail {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+      pre {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+      ul {
+        margin: 10px 0;
+      }
+      li {
+        margin: 5px 0;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .clear-btn {
+        background: #dc3545;
+      }
+      .clear-btn:hover {
+        background: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>LocalStorage Implementation Test</h1>
+
+    <div class="test-section">
+      <h2>Test Controls</h2>
+      <button onclick="runAllTests()">Run All Tests</button>
+      <button class="clear-btn" onclick="clearLocalStorage()">
+        Clear All LocalStorage
+      </button>
+      <button onclick="location.reload()">Reload Page</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+      const EXPECTED_AUTH_KEYS = [
+        "nail_admin_auth_token",
+        "nail_admin_auth_user",
+      ];
+      const DEPRECATED_KEYS = [
+        "nail_admin_bookings",
+        "nail_admin_contacts",
+        "nail_admin_banners",
+        "nail_admin_galleries",
+        "nail_admin_services",
+      ];
+
+      function runAllTests() {
+        const results = document.getElementById("results");
+        results.innerHTML = "";
+
+        // Test 1: Check localStorage keys
+        results.innerHTML += testLocalStorageKeys();
+
+        // Test 2: Check for deprecated keys
+        results.innerHTML += testDeprecatedKeys();
+
+        // Test 3: Verify auth data structure
+        results.innerHTML += testAuthDataStructure();
+
+        // Test 4: Check localStorage size
+        results.innerHTML += testLocalStorageSize();
+      }
+
+      function testLocalStorageKeys() {
+        const allKeys = Object.keys(localStorage).filter((k) =>
+          k.startsWith("nail_admin_"),
+        );
+        const authKeys = allKeys.filter((k) => EXPECTED_AUTH_KEYS.includes(k));
+        const otherKeys = allKeys.filter(
+          (k) => !EXPECTED_AUTH_KEYS.includes(k),
+        );
+
+        const passed = otherKeys.length === 0;
+        const status = passed ? "PASS" : "FAIL";
+        const statusClass = passed ? "pass" : "fail";
+
+        return `
+        <div class="test-section">
+          <h2>Test 1: LocalStorage Keys <span class="status ${statusClass}">${status}</span></h2>
+          <p><strong>Expected:</strong> Only auth-related keys (token, user)</p>
+          <p><strong>Found ${allKeys.length} nail_admin_ keys:</strong></p>
+          <ul>
+            ${allKeys.map((k) => `<li>${k}${EXPECTED_AUTH_KEYS.includes(k) ? " ✓" : " ❌"}</li>`).join("")}
+          </ul>
+          ${
+            otherKeys.length > 0
+              ? `
+            <p style="color: #dc3545;"><strong>Unexpected keys found:</strong></p>
+            <ul>${otherKeys.map((k) => `<li>${k}</li>`).join("")}</ul>
+          `
+              : '<p style="color: #28a745;">✓ Only expected auth keys present</p>'
+          }
+        </div>
+      `;
+      }
+
+      function testDeprecatedKeys() {
+        const foundDeprecated = DEPRECATED_KEYS.filter(
+          (k) => localStorage.getItem(k) !== null,
+        );
+        const passed = foundDeprecated.length === 0;
+        const status = passed ? "PASS" : "FAIL";
+        const statusClass = passed ? "pass" : "fail";
+
+        return `
+        <div class="test-section">
+          <h2>Test 2: Deprecated Keys Cleanup <span class="status ${statusClass}">${status}</span></h2>
+          <p><strong>Expected:</strong> No deprecated data storage keys</p>
+          ${
+            foundDeprecated.length > 0
+              ? `
+            <p style="color: #dc3545;"><strong>Found ${foundDeprecated.length} deprecated keys:</strong></p>
+            <ul>${foundDeprecated.map((k) => `<li>${k}</li>`).join("")}</ul>
+          `
+              : '<p style="color: #28a745;">✓ All deprecated keys cleaned up</p>'
+          }
+        </div>
+      `;
+      }
+
+      function testAuthDataStructure() {
+        const token = localStorage.getItem("nail_admin_auth_token");
+        const userStr = localStorage.getItem("nail_admin_auth_user");
+
+        let passed = true;
+        let issues = [];
+
+        if (!token) {
+          issues.push("Auth token missing (expected after login)");
+        }
+
+        if (!userStr) {
+          issues.push("Auth user missing (expected after login)");
+        } else {
+          try {
+            const user = JSON.parse(userStr);
+            if (!user.id) issues.push("User.id missing");
+            if (!user.email) issues.push("User.email missing");
+            if (!user.name) issues.push("User.name missing");
+          } catch (e) {
+            issues.push("User data is not valid JSON");
+          }
+        }
+
+        passed = issues.length === 0;
+        const status = passed ? "PASS" : token || userStr ? "INFO" : "INFO";
+        const statusClass = passed
+          ? "pass"
+          : token || userStr
+            ? "info"
+            : "info";
+
+        return `
+        <div class="test-section">
+          <h2>Test 3: Auth Data Structure <span class="status ${statusClass}">${status}</span></h2>
+          <p><strong>Expected:</strong> Valid token and user data after login</p>
+          ${
+            issues.length > 0
+              ? `
+            <ul>${issues.map((i) => `<li>${i}</li>`).join("")}</ul>
+            <p class="status info">Login to populate auth data</p>
+          `
+              : `
+            <p style="color: #28a745;">✓ Auth data structure valid</p>
+            <pre>${JSON.stringify(JSON.parse(userStr), null, 2)}</pre>
+          `
+          }
+        </div>
+      `;
+      }
+
+      function testLocalStorageSize() {
+        const allNailAdminData = Object.keys(localStorage)
+          .filter((k) => k.startsWith("nail_admin_"))
+          .map((k) => ({ key: k, size: localStorage.getItem(k).length }));
+
+        const totalSize = allNailAdminData.reduce(
+          (sum, item) => sum + item.size,
+          0,
+        );
+        const sizeKB = (totalSize / 1024).toFixed(2);
+
+        // Should be minimal - just auth data
+        const passed = totalSize < 10240; // Less than 10KB
+        const status = passed ? "PASS" : "WARN";
+        const statusClass = passed ? "pass" : "info";
+
+        return `
+        <div class="test-section">
+          <h2>Test 4: LocalStorage Size <span class="status ${statusClass}">${status}</span></h2>
+          <p><strong>Expected:</strong> Minimal size (only auth data)</p>
+          <p><strong>Total size:</strong> ${sizeKB} KB (${totalSize} bytes)</p>
+          <ul>
+            ${allNailAdminData
+              .map(
+                (item) => `
+              <li>${item.key}: ${(item.size / 1024).toFixed(2)} KB</li>
+            `,
+              )
+              .join("")}
+          </ul>
+          ${
+            passed
+              ? '<p style="color: #28a745;">✓ Storage size is minimal as expected</p>'
+              : '<p style="color: #ffc107;">⚠ Storage size larger than expected (should be < 10KB)</p>'
+          }
+        </div>
+      `;
+      }
+
+      function clearLocalStorage() {
+        if (confirm("Clear all localStorage data?")) {
+          localStorage.clear();
+          alert("LocalStorage cleared!");
+          location.reload();
+        }
+      }
+
+      // Auto-run tests on load
+      window.addEventListener("load", runAllTests);
+    </script>
+  </body>
+</html>

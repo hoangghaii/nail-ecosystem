@@ -1,0 +1,333 @@
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+  --font-sans:
+    "Montserrat", "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair", ui-serif, Georgia, serif;
+}
+
+@theme inline {
+  /* Semantic Color Tokens */
+  /* ============================================
+     BORDER RADIUS HIERARCHY
+     ============================================ */
+  /* The Golden Rule: Parent radius > Child radius */
+  --radius-xl: 2.5rem; /* 40px - Large sections/containers */
+  --radius-lg: 2rem; /* 32px - Medium sections */
+  --radius-md: 1.5rem; /* 24px - Cards */
+  --radius-sm: 0.75rem; /* 12px - Buttons/inputs */
+  --radius-xs: 0.5rem; /* 8px - Small elements */
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-warm-sepia);
+  --color-card: var(--color-white);
+  --color-card-foreground: var(--color-warm-sepia);
+  --color-popover: var(--color-white);
+  --color-popover-foreground: var(--color-warm-sepia);
+  --color-primary: var(--color-dusty-rose);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--color-soft-gold);
+  --color-secondary-foreground: var(--color-warm-sepia);
+  --color-muted: var(--color-pale-pink);
+  --color-muted-foreground: var(--color-warm-taupe);
+  --color-accent: var(--color-soft-gold);
+  --color-accent-foreground: var(--color-warm-sepia);
+  --color-destructive: var(--destructive);
+  --color-border: var(--color-pale-pink);
+  --color-input: var(--color-pale-pink);
+  --color-ring: var(--color-dusty-rose);
+  --color-chart-1: oklch(0.646 0.222 41.116);
+  --color-chart-2: oklch(0.6 0.118 184.704);
+  --color-chart-3: oklch(0.398 0.07 227.392);
+  --color-chart-4: oklch(0.828 0.189 84.429);
+  --color-chart-5: oklch(0.769 0.188 70.08);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ============================================
+   ROOT VARIABLES - Map themed colors to CSS vars
+   ============================================ */
+:root {
+  /* ============================================
+     COLOR PALETTE - Warm & Earthy
+     ============================================ */
+
+  /* Base Colors */
+  --color-cream: oklch(0.9724 0.0059 59.65); /* #F9F5F2 */
+  --color-dusty-rose: oklch(0.7109 0.0895 26.49); /* #D48C84 */
+  --color-soft-gold: oklch(0.7706 0.0641 70.6); /* #CFAE88 */
+  --color-warm-sepia: oklch(0.3791 0.0153 17.85); /* #4A3F3F */
+  --color-warm-taupe: oklch(0.5399 0.0164 17.67); /* #786B6B */
+  --color-pale-pink: oklch(0.9002 0.0211 43.84); /* #EBDAD3 */
+  --color-white: oklch(1 0 0); /* #FFFFFF */
+
+  --radius: 1.25rem; /* 20px - Frame elements */
+  --background: var(--color-cream);
+  --foreground: var(--color-warm-sepia);
+  --card: var(--color-white);
+  --card-foreground: var(--color-warm-sepia);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-warm-sepia);
+  --primary: var(--color-dusty-rose);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-soft-gold);
+  --secondary-foreground: var(--color-warm-sepia);
+  --muted: var(--color-pale-pink);
+  --muted-foreground: var(--color-warm-taupe);
+  --accent: var(--color-soft-gold);
+  --accent-foreground: var(--color-warm-sepia);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: var(--color-white);
+  --border: var(--color-pale-pink);
+  --input: var(--color-pale-pink);
+  --ring: var(--color-dusty-rose);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif text-foreground;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+@layer utilities {
+  /* Typography Utilities */
+  .text-heading {
+    @apply font-serif text-foreground;
+  }
+
+  .text-h1 {
+    @apply font-serif text-5xl lg:text-6xl font-bold tracking-tight text-foreground;
+  }
+
+  .text-h2 {
+    @apply font-serif text-4xl lg:text-5xl font-semibold text-foreground;
+  }
+
+  .text-h3 {
+    @apply font-serif text-2xl lg:text-3xl font-semibold text-foreground;
+  }
+
+  .text-h4 {
+    @apply font-serif text-xl lg:text-2xl font-semibold text-foreground;
+  }
+
+  .text-body {
+    @apply font-sans text-base leading-relaxed text-muted-foreground;
+  }
+
+  .text-body-large {
+    @apply font-sans text-base lg:text-lg leading-relaxed text-muted-foreground;
+  }
+
+  .text-body-small {
+    @apply font-sans text-sm text-muted-foreground;
+  }
+
+  /* Focus States (No Shadows Allowed) */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+
+  /* Container Utilities */
+  .container-section {
+    @apply rounded-[32px] border border-border bg-background p-8;
+  }
+
+  .container-card {
+    @apply rounded-[24px] border border-border bg-card p-6;
+  }
+
+  /* Image Frame Utilities */
+  .frame-gold {
+    @apply rounded-[20px] border-2 border-secondary p-2 bg-card;
+  }
+
+  .frame-primary {
+    @apply rounded-[20px] border-2 border-primary p-2 bg-card;
+  }
+
+  .frame-image {
+    @apply rounded-[16px] w-full h-full object-cover;
+  }
+
+  /* Button Base */
+  .btn-base {
+    @apply inline-flex items-center justify-center rounded-[12px] font-sans font-medium transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-[12px] font-sans font-medium transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-[12px] font-sans font-medium transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-[12px] font-sans font-medium transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+
+    @apply border border-border bg-background hover:bg-muted;
+  }
+}
+
+.be-vietnam-pro-thin {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.be-vietnam-pro-extralight {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.be-vietnam-pro-light {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.be-vietnam-pro-regular {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.be-vietnam-pro-medium {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.be-vietnam-pro-semibold {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.be-vietnam-pro-bold {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.be-vietnam-pro-extrabold {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.be-vietnam-pro-black {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.be-vietnam-pro-thin-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.be-vietnam-pro-extralight-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.be-vietnam-pro-light-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.be-vietnam-pro-regular-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.be-vietnam-pro-medium-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.be-vietnam-pro-semibold-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.be-vietnam-pro-bold-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.be-vietnam-pro-extrabold-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+}
+
+.be-vietnam-pro-black-italic {
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}

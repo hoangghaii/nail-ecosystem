@@ -1,0 +1,50 @@
+# ==========================================
+# Base Docker Compose Configuration
+# ==========================================
+# This file defines the base services without environment-specific settings
+# Use with docker-compose.dev.yml or docker-compose.prod.yml for complete setup
+# ==========================================
+
+services:
+  # ========================================
+  # Client Service - Nail Salon Website
+  # ========================================
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Target will be overridden by environment-specific compose files
+      target: production
+
+    image: nail-client:${VERSION:-latest}
+
+    container_name: nail-client
+    hostname: nail-client-host
+
+    restart: unless-stopped
+
+    networks:
+      - nail-network
+
+    # Health check to ensure container is ready
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Security labels
+    labels:
+      com.nail.service: "client"
+      com.nail.description: "Pink Nail Salon Website - Client"
+
+# ========================================
+# Networks
+# ========================================
+networks:
+  nail-network:
+    driver: bridge
+    name: nail-network
+    labels:
+      com.nail.network: "main"
