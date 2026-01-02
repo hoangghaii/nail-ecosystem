@@ -8,7 +8,6 @@ import {
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 import type { Booking, BookingStatus } from "@repo/types/booking";
 
@@ -30,33 +29,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { bookingsService } from "@/services/bookings.service";
 import { BookingStatus as BookingStatusEnum } from "@repo/types/booking";
+import { useUpdateBookingStatus } from "@/hooks/api/useBookings";
 
 export type BookingDetailsModalProps = {
   booking?: Booking;
   onClose: () => void;
-  onSuccess?: () => void;
   open: boolean;
-};
-
-const STATUS_LABELS: Record<BookingStatus, string> = {
-  [BookingStatusEnum.CANCELLED]: "Cancelled",
-  [BookingStatusEnum.COMPLETED]: "Completed",
-  [BookingStatusEnum.CONFIRMED]: "Confirmed",
-  [BookingStatusEnum.PENDING]: "Pending",
 };
 
 export function BookingDetailsModal({
   booking,
   onClose,
-  onSuccess,
   open,
 }: BookingDetailsModalProps) {
+  const updateStatus = useUpdateBookingStatus();
   const [newStatus, setNewStatus] = useState<BookingStatus>(
     booking?.status || BookingStatusEnum.PENDING,
   );
-  const [isUpdating, setIsUpdating] = useState(false);
 
   // Sync newStatus with booking.status when booking changes or modal opens
   useEffect(() => {
@@ -73,21 +63,17 @@ export function BookingDetailsModal({
 
   const hasStatusChanged = newStatus !== booking.status;
 
-  const handleSaveChanges = async () => {
-    if (!hasStatusChanged) return;
+  const handleSaveChanges = () => {
+    if (!hasStatusChanged || !booking.id) return;
 
-    setIsUpdating(true);
-    try {
-      await bookingsService.updateStatus(booking.id!, newStatus);
-      toast.success(`Booking status updated to ${STATUS_LABELS[newStatus]}`);
-      onSuccess?.();
-      onClose();
-    } catch (error) {
-      console.error("Error updating booking status:", error);
-      toast.error("Failed to update booking status. Please try again.");
-    } finally {
-      setIsUpdating(false);
-    }
+    updateStatus.mutate(
+      { id: booking.id, status: newStatus },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      },
+    );
   };
 
   return (
@@ -226,15 +212,15 @@ export function BookingDetailsModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isUpdating}>
+          <Button variant="outline" onClick={onClose} disabled={updateStatus.isPending}>
             Close
           </Button>
           <Button
             variant={isCancellation ? "destructive" : "default"}
             onClick={handleSaveChanges}
-            disabled={isUpdating || !hasStatusChanged}
+            disabled={updateStatus.isPending || !hasStatusChanged}
           >
-            {isUpdating
+            {updateStatus.isPending
               ? "Saving..."
               : isCancellation
                 ? "Confirm Cancellation"

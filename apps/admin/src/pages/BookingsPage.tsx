@@ -1,14 +1,15 @@
-import type { ColumnDef } from "@tanstack/react-table";
-
-import { format } from "date-fns";
-import { Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-
 import type {
   Booking,
   BookingStatus as BookingStatusType,
 } from "@repo/types/booking";
+import type { ColumnDef } from "@tanstack/react-table";
+
+import { queryKeys } from "@repo/utils/api";
+import { useDebounce } from "@repo/utils/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { BookingDetailsModal, StatusFilter } from "@/components/bookings";
 import {
@@ -24,17 +25,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@repo/utils/hooks";
+import { useBookings } from "@/hooks/api/useBookings";
 import { bookingsService } from "@/services/bookings.service";
-import { useBookingsStore } from "@/store/bookingsStore";
 
 export function BookingsPage() {
-  const bookings = useBookingsStore((state) => state.bookings);
-  const initializeBookings = useBookingsStore(
-    (state) => state.initializeBookings,
-  );
+  const { data: bookings = [], isLoading } = useBookings();
+  const queryClient = useQueryClient();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState<Booking | undefined>();
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [activeStatus, setActiveStatus] = useState<BookingStatusType | "all">(
@@ -44,23 +41,16 @@ export function BookingsPage() {
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const loadBookings = async () => {
-    setIsLoading(true);
-    try {
-      const data = await bookingsService.getAll();
-      useBookingsStore.getState().setBookings(data);
-    } catch (error) {
-      console.error("Error loading bookings:", error);
-      toast.error("Failed to load bookings. Please try again.");
-    } finally {
-      setIsLoading(false);
+  // Prefetch booking details on row hover for instant modal display
+  const handleRowHover = (booking: Booking) => {
+    if (booking.id) {
+      queryClient.prefetchQuery({
+        queryFn: () => bookingsService.getById(booking.id!),
+        queryKey: queryKeys.bookings.detail(booking.id),
+        staleTime: 60_000, // Keep prefetched data fresh for 1 minute
+      });
     }
   };
-
-  useEffect(() => {
-    initializeBookings();
-    loadBookings();
-  }, [initializeBookings]);
 
   const handleRowClick = (booking: Booking) => {
     setSelectedBooking(booking);
@@ -260,6 +250,7 @@ export function BookingsPage() {
               columns={columns}
               data={filteredBookings}
               onRowClick={handleRowClick}
+              onRowHover={handleRowHover}
             />
           )}
         </CardContent>
@@ -269,7 +260,6 @@ export function BookingsPage() {
         booking={selectedBooking}
         open={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
-        onSuccess={loadBookings}
       />
     </div>
   );

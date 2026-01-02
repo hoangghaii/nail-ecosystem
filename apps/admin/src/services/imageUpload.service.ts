@@ -1,11 +1,10 @@
-import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
+/**
+ * Image Upload Service
+ *
+ * Handles file uploads to Cloudinary via API
+ */
 
-import { storage } from "@/lib/firebase";
+import { apiClient } from "@/lib/apiClient";
 
 export type UploadProgress = {
   error?: string;
@@ -19,31 +18,20 @@ export class ImageUploadService {
     folder: "banners" | "services" | "gallery",
     onProgress?: (progress: number) => void,
   ): Promise<string> {
-    const filename = `${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, `${folder}/${filename}`);
+    // Simulate progress start
+    onProgress?.(10);
 
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    try {
+      const url = await apiClient.upload(file, folder);
 
-    return new Promise((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          onProgress?.(progress);
-        },
-        (error) => reject(error),
-        async () => {
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve(url);
-        },
-      );
-    });
-  }
+      // Simulate progress completion
+      onProgress?.(100);
 
-  async deleteImage(imageUrl: string): Promise<void> {
-    const imageRef = ref(storage, imageUrl);
-    await deleteObject(imageRef);
+      return url;
+    } catch (error) {
+      onProgress?.(0);
+      throw error;
+    }
   }
 
   async uploadMultiple(
@@ -59,31 +47,20 @@ export class ImageUploadService {
     folder: "banners" | "services" | "gallery",
     onProgress?: (progress: number) => void,
   ): Promise<string> {
-    const filename = `${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, `${folder}/videos/${filename}`);
+    // Simulate progress start
+    onProgress?.(10);
 
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    try {
+      const url = await apiClient.upload(file, `${folder}/videos`);
 
-    return new Promise((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          onProgress?.(progress);
-        },
-        (error) => reject(error),
-        async () => {
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-          resolve(url);
-        },
-      );
-    });
-  }
+      // Simulate progress completion
+      onProgress?.(100);
 
-  async deleteVideo(videoUrl: string): Promise<void> {
-    const videoRef = ref(storage, videoUrl);
-    await deleteObject(videoRef);
+      return url;
+    } catch (error) {
+      onProgress?.(0);
+      throw error;
+    }
   }
 }
 

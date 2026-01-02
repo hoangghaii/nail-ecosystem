@@ -1,72 +1,35 @@
+/**
+ * Bookings Service
+ *
+ * Handles CRUD operations for bookings
+ */
+
 import type { Booking, BookingStatus } from "@repo/types/booking";
 
-import { useBookingsStore } from "@/store/bookingsStore";
+import { apiClient } from "@/lib/apiClient";
 
 export class BookingsService {
-  private useMockApi = import.meta.env.VITE_USE_MOCK_API === "true";
-
   async getAll(): Promise<Booking[]> {
-    if (this.useMockApi) {
-      return useBookingsStore.getState().bookings;
-    }
-
-    const response = await fetch("/api/bookings");
-    if (!response.ok) throw new Error("Failed to fetch bookings");
-    return response.json();
+    return apiClient.get<Booking[]>("/bookings");
   }
 
   async getById(id: string): Promise<Booking | null> {
-    if (this.useMockApi) {
-      const bookings = useBookingsStore.getState().bookings;
-      return bookings.find((booking) => booking.id === id) || null;
+    try {
+      return await apiClient.get<Booking>(`/bookings/${id}`);
+    } catch (error: any) {
+      if (error.statusCode === 404) return null;
+      throw error;
     }
-
-    const response = await fetch(`/api/bookings/${id}`);
-    if (!response.ok) {
-      if (response.status === 404) return null;
-      throw new Error("Failed to fetch booking");
-    }
-    return response.json();
   }
 
   async update(
     id: string,
     data: Partial<Omit<Booking, "id">>,
   ): Promise<Booking> {
-    if (this.useMockApi) {
-      const bookings = useBookingsStore.getState().bookings;
-      const booking = bookings.find((b) => b.id === id);
-      if (!booking) throw new Error("Booking not found");
-
-      const updatedBooking: Booking = {
-        ...booking,
-        ...data,
-      };
-      useBookingsStore.getState().updateBooking(id, data);
-      return updatedBooking;
-    }
-
-    const response = await fetch(`/api/bookings/${id}`, {
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-      method: "PATCH",
-    });
-    if (!response.ok) throw new Error("Failed to update booking");
-    return response.json();
+    return apiClient.patch<Booking>(`/bookings/${id}`, data);
   }
 
   async updateStatus(id: string, status: BookingStatus): Promise<Booking> {
-    if (this.useMockApi) {
-      const booking = await this.getById(id);
-      if (!booking) throw new Error("Booking not found");
-
-      useBookingsStore.getState().updateBookingStatus(id, status);
-      const updatedBooking = await this.getById(id);
-      if (!updatedBooking)
-        throw new Error("Booking not found after status update");
-      return updatedBooking;
-    }
-
     return this.update(id, { status });
   }
 

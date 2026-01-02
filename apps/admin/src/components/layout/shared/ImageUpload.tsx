@@ -94,17 +94,10 @@ export const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
       }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
       if (!value) return;
-
-      try {
-        await imageUploadService.deleteImage(value);
-        onChange("");
-        toast.success("Image removed successfully!");
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Failed to remove image. Please try again.");
-      }
+      onChange("");
+      toast.success("Image removed successfully!");
     };
 
     const handleReplace = () => {

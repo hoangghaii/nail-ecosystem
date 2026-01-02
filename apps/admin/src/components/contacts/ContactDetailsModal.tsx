@@ -3,7 +3,6 @@ import { format } from "date-fns";
 import { Calendar, Mail, Phone, User } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 import type { ContactStatusUpdate } from "@/lib/validations/contact.validation";
 import type { Contact } from "@/types/contact.types";
@@ -27,22 +26,22 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { contactStatusUpdateSchema } from "@/lib/validations/contact.validation";
-import { contactsService } from "@/services/contacts.service";
 import { ContactStatus } from "@/types/contact.types";
+import { useUpdateContactStatus } from "@/hooks/api/useContacts";
 
 type ContactDetailsModalProps = {
   contact: Contact | null;
   onClose: () => void;
-  onUpdate: () => void;
   open: boolean;
 };
 
 export function ContactDetailsModal({
   contact,
   onClose,
-  onUpdate,
   open,
 }: ContactDetailsModalProps) {
+  const updateStatus = useUpdateContactStatus();
+
   const {
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -71,22 +70,21 @@ export function ContactDetailsModal({
     }
   }, [contact, reset]);
 
-  const onSubmit = async (data: ContactStatusUpdate) => {
+  const onSubmit = (data: ContactStatusUpdate) => {
     if (!contact) return;
 
-    try {
-      await contactsService.updateStatus(
-        contact.id,
-        data.status,
-        data.adminNotes,
-      );
-      toast.success("Contact updated successfully");
-      onUpdate();
-      onClose();
-    } catch (error) {
-      toast.error("Failed to update contact");
-      console.error("Error updating contact:", error);
-    }
+    updateStatus.mutate(
+      {
+        adminNotes: data.adminNotes,
+        id: contact.id,
+        status: data.status,
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      },
+    );
   };
 
   if (!contact) return null;

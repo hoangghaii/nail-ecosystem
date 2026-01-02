@@ -2,7 +2,9 @@
   "name": "@repo/utils",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "exports": {
+    "./api": "./src/api/index.ts",
     "./cn": "./src/cn.ts",
     "./format": "./src/format.ts",
     "./hooks": "./src/hooks/use-debounce.ts"

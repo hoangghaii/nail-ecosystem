@@ -8,8 +8,7 @@ import {
   Star,
   Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 
 import type { Banner } from "@/types/banner.types";
 
@@ -41,57 +40,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { bannersService } from "@/services/banners.service";
-import { heroSettingsService } from "@/services/heroSettings.service";
-import { useBannersStore } from "@/store/bannersStore";
-import { useHeroSettingsStore } from "@/store/heroSettingsStore";
+import {
+  useBanners,
+  useToggleBannerActive,
+  useSetPrimaryBanner,
+  useReorderBanners,
+} from "@/hooks/api/useBanners";
+import { useHeroSettings } from "@/hooks/api/useHeroSettings";
 
 type BannerFilter = "all" | "active";
 
 export function BannersPage() {
-  const banners = useBannersStore((state) => state.banners);
-  const initializeBanners = useBannersStore((state) => state.initializeBanners);
-  const heroDisplayMode = useHeroSettingsStore(
-    (state) => state.settings.displayMode,
-  );
-  const initializeSettings = useHeroSettingsStore(
-    (state) => state.initializeSettings,
-  );
+  const { data: banners = [], isLoading } = useBanners();
+  const { data: heroSettings } = useHeroSettings();
+  const toggleActive = useToggleBannerActive();
+  const setPrimary = useSetPrimaryBanner();
+  const reorderBanners = useReorderBanners();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedBanner, setSelectedBanner] = useState<Banner | undefined>();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [bannerFilter, setBannerFilter] = useState<BannerFilter>("all");
 
-  const loadBanners = async () => {
-    setIsLoading(true);
-    try {
-      const data = await bannersService.getAll();
-      useBannersStore.getState().setBanners(data);
-    } catch (error) {
-      console.error("Error loading banners:", error);
-      toast.error("Failed to load banners. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadHeroSettings = async () => {
-    try {
-      await heroSettingsService.getSettings();
-    } catch (error) {
-      console.error("Error loading hero settings:", error);
-    }
-  };
-
-  useEffect(() => {
-    initializeBanners();
-    initializeSettings();
-    loadBanners();
-    loadHeroSettings();
-  }, [initializeBanners, initializeSettings]);
+  const heroDisplayMode = heroSettings?.displayMode;
 
   const handleCreate = () => {
     setSelectedBanner(undefined);
@@ -108,28 +80,12 @@ export function BannersPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSetPrimary = async (banner: Banner) => {
-    try {
-      await bannersService.setPrimary(banner.id);
-      toast.success("Primary banner updated successfully!");
-      loadBanners();
-    } catch (error) {
-      console.error("Error setting primary banner:", error);
-      toast.error("Failed to set primary banner. Please try again.");
-    }
+  const handleSetPrimary = (banner: Banner) => {
+    setPrimary.mutate(banner.id);
   };
 
-  const handleToggleActive = async (banner: Banner) => {
-    try {
-      await bannersService.toggleActive(banner.id);
-      toast.success(
-        `Banner ${banner.active ? "deactivated" : "activated"} successfully!`,
-      );
-      loadBanners();
-    } catch (error) {
-      console.error("Error toggling banner status:", error);
-      toast.error("Failed to update banner status. Please try again.");
-    }
+  const handleToggleActive = (banner: Banner) => {
+    toggleActive.mutate({ active: !banner.active, id: banner.id });
   };
 
   const handleDragStart = (index: number) => {
@@ -139,29 +95,18 @@ export function BannersPage() {
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === index) return;
-
-    const newBanners = [...banners];
-    const draggedBanner = newBanners[draggedIndex];
-    newBanners.splice(draggedIndex, 1);
-    newBanners.splice(index, 0, draggedBanner);
-
-    useBannersStore.getState().setBanners(newBanners);
     setDraggedIndex(index);
   };
 
-  const handleDragEnd = async () => {
+  const handleDragEnd = () => {
     if (draggedIndex === null) return;
 
-    try {
-      const bannerIds = banners.map((b) => b.id);
-      await bannersService.reorder(bannerIds);
-      toast.success("Banner order updated successfully!");
-      setDraggedIndex(null);
-    } catch (error) {
-      console.error("Error reordering banners:", error);
-      toast.error("Failed to reorder banners. Please try again.");
-      loadBanners();
-    }
+    const bannerIds = banners.map((b) => b.id);
+    reorderBanners.mutate(bannerIds, {
+      onSuccess: () => {
+        setDraggedIndex(null);
+      },
+    });
   };
 
   // Filter banners based on hero display mode AND user filter
@@ -296,7 +241,7 @@ export function BannersPage() {
         </Button>
       </div>
 
-      <HeroSettingsCard onSettingsChange={loadHeroSettings} />
+      <HeroSettingsCard />
 
       <Card>
         <CardHeader>
@@ -357,14 +302,12 @@ export function BannersPage() {
         banner={selectedBanner}
         open={isFormModalOpen}
         onOpenChange={setIsFormModalOpen}
-        onSuccess={loadBanners}
       />
 
       <DeleteBannerDialog
         banner={selectedBanner}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={loadBanners}
       />
     </div>
   );

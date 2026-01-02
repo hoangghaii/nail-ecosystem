@@ -23,10 +23,11 @@ export default defineConfig({
   },
 
   plugins: [react(), tailwindcss()],
+
   // Preview server (for testing production build)
   preview: {
     host: "0.0.0.0",
-    port: 4173,
+    port: 4174,
   },
 
   resolve: {

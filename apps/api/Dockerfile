@@ -1,7 +1,7 @@
 # ==========================================
 # BASE LAYER - Package Metadata
 # ==========================================
-FROM node:25-alpine AS base
+FROM node:24.12.0-alpine AS base
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
@@ -81,7 +81,7 @@ RUN --mount=type=cache,target=/root/.npm \
 # ==========================================
 # PRODUCTION LAYER - Final production image
 # ==========================================
-FROM node:25-alpine AS production
+FROM node:24.12.0-alpine AS production
 
 # Install dumb-init
 RUN apk add --no-cache dumb-init

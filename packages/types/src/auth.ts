@@ -7,9 +7,9 @@ export type User = {
 };
 
 export type AuthResponse = {
-  expiresAt: number;
-  token: string;
-  user: User;
+  accessToken: string;
+  admin: User;
+  refreshToken: string;
 };
 
 export type LoginCredentials = {

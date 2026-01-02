@@ -1,3 +1,10 @@
+import type {
+  GalleryItem,
+  GalleryCategory as GalleryCategoryType,
+} from "@repo/types/gallery";
+
+import { GalleryCategory } from "@repo/types/gallery";
+import { useDebounce } from "@repo/utils/hooks";
 import {
   Edit,
   MoreVertical,
@@ -7,13 +14,9 @@ import {
   StarOff,
   Trash2,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-
-import type {
-  GalleryItem,
-  GalleryCategory as GalleryCategoryType,
-} from "@repo/types/gallery";
+import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@repo/utils/api";
 
 import {
   CategoryFilter,
@@ -37,16 +40,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@repo/utils/hooks";
+import {
+  useGalleryItems,
+  useToggleGalleryFeatured,
+} from "@/hooks/api/useGallery";
 import { galleryService } from "@/services/gallery.service";
-import { useGalleryStore } from "@/store/galleryStore";
-import { GalleryCategory } from "@repo/types/gallery";
 
 export function GalleryPage() {
-  const galleryItems = useGalleryStore((state) => state.galleryItems);
-  const initializeGallery = useGalleryStore((state) => state.initializeGallery);
+  const { data: galleryItems = [], isLoading } = useGalleryItems();
+  const toggleFeatured = useToggleGalleryFeatured();
+  const queryClient = useQueryClient();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<GalleryItem | undefined>();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -57,23 +61,14 @@ export function GalleryPage() {
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const loadGallery = async () => {
-    setIsLoading(true);
-    try {
-      const data = await galleryService.getAll();
-      useGalleryStore.getState().setGalleryItems(data);
-    } catch (error) {
-      console.error("Error loading gallery:", error);
-      toast.error("Failed to load gallery. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+  // Prefetch gallery item details on hover for better perceived performance
+  const handleItemHover = (item: GalleryItem) => {
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.gallery.detail(item.id),
+      queryFn: () => galleryService.getById(item.id),
+      staleTime: 60_000, // Keep prefetched data fresh for 1 minute
+    });
   };
-
-  useEffect(() => {
-    initializeGallery();
-    loadGallery();
-  }, [initializeGallery]);
 
   const handleCreate = () => {
     setSelectedItem(undefined);
@@ -90,19 +85,8 @@ export function GalleryPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleToggleFeatured = async (item: GalleryItem) => {
-    try {
-      await galleryService.toggleFeatured(item.id);
-      toast.success(
-        item.featured
-          ? "Removed from featured items"
-          : "Added to featured items",
-      );
-      loadGallery();
-    } catch (error) {
-      console.error("Error toggling featured:", error);
-      toast.error("Failed to update featured status. Please try again.");
-    }
+  const handleToggleFeatured = (item: GalleryItem) => {
+    toggleFeatured.mutate({ featured: !item.featured, id: item.id });
   };
 
   // Filter and search logic
@@ -231,9 +215,10 @@ export function GalleryPage() {
                 <div
                   key={item.id}
                   className="group relative overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg"
+                  onMouseEnter={() => handleItemHover(item)}
                 >
                   {/* Image */}
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                  <div className="relative aspect-4/3 overflow-hidden bg-muted">
                     <img
                       src={item.imageUrl}
                       alt={item.title}
@@ -318,14 +303,12 @@ export function GalleryPage() {
         galleryItem={selectedItem}
         open={isFormModalOpen}
         onOpenChange={setIsFormModalOpen}
-        onSuccess={loadGallery}
       />
 
       <DeleteGalleryDialog
         galleryItem={selectedItem}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-        onConfirm={loadGallery}
       />
     </div>
   );

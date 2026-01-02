@@ -1,43 +1,25 @@
+/**
+ * Hero Settings Service
+ *
+ * Handles hero section carousel settings
+ */
+
 import type { HeroSettings } from "@/types/heroSettings.types";
 
-import { useHeroSettingsStore } from "@/store/heroSettingsStore";
+import { apiClient } from "@/lib/apiClient";
 
 export class HeroSettingsService {
-  private useMockApi = import.meta.env.VITE_USE_MOCK_API === "true";
-
   async getSettings(): Promise<HeroSettings> {
-    if (this.useMockApi) {
-      return useHeroSettingsStore.getState().settings;
-    }
-
-    const response = await fetch("/api/hero-settings");
-    if (!response.ok) throw new Error("Failed to fetch hero settings");
-    return response.json();
+    return apiClient.get<HeroSettings>("/hero-settings");
   }
 
   async updateSettings(
     data: Partial<Omit<HeroSettings, "updatedAt">>,
   ): Promise<HeroSettings> {
-    if (this.useMockApi) {
-      useHeroSettingsStore.getState().updateSettings(data);
-      return useHeroSettingsStore.getState().settings;
-    }
-
-    const response = await fetch("/api/hero-settings", {
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-      method: "PUT",
-    });
-    if (!response.ok) throw new Error("Failed to update hero settings");
-    return response.json();
+    return apiClient.put<HeroSettings>("/hero-settings", data);
   }
 
   async resetSettings(): Promise<HeroSettings> {
-    if (this.useMockApi) {
-      useHeroSettingsStore.getState().resetSettings();
-      return useHeroSettingsStore.getState().settings;
-    }
-
     return this.updateSettings({
       carouselInterval: 5000,
       displayMode: "carousel",

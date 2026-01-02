@@ -27,7 +27,7 @@ export function Header() {
             to="/"
             className="font-serif text-2xl font-bold text-foreground transition-opacity hover:opacity-80"
           >
-            Pink..
+            Pink.
           </Link>
 
           {/* Desktop Navigation */}

@@ -90,17 +90,10 @@ export const VideoUpload = React.forwardRef<HTMLDivElement, VideoUploadProps>(
       }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
       if (!value) return;
-
-      try {
-        await imageUploadService.deleteVideo(value);
-        onChange("");
-        toast.success("Video removed successfully!");
-      } catch (error) {
-        console.error("Delete error:", error);
-        toast.error("Failed to remove video. Please try again.");
-      }
+      onChange("");
+      toast.success("Video removed successfully!");
     };
 
     const handleReplace = () => {

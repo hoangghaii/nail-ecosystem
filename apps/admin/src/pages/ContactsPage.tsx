@@ -2,7 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { format } from "date-fns";
 import { Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { Contact, ContactStatus } from "@/types/contact.types";
 
@@ -20,32 +20,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@repo/utils/hooks";
-import { contactsService } from "@/services/contacts.service";
-import { useContactsStore } from "@/store/contactsStore";
+import { useContacts } from "@/hooks/api/useContacts";
 
 export function ContactsPage() {
-  const { initializeContacts } = useContactsStore();
+  const { data: allContacts = [] } = useContacts();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">(
     "all",
   );
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
-
-  // Initialize contacts on mount
-  useEffect(() => {
-    initializeContacts();
-  }, [initializeContacts]);
-
-  // Fetch contacts from service
-  const [allContacts, setAllContacts] = useState<Contact[]>([]);
-  useEffect(() => {
-    const loadContacts = async () => {
-      const data = await contactsService.getAll();
-      setAllContacts(data);
-    };
-    loadContacts();
-  }, []);
 
   // Filter and search contacts
   const filteredContacts = useMemo(() => {
@@ -114,11 +98,6 @@ export function ContactsPage() {
     ],
     [],
   );
-
-  const handleContactUpdate = async () => {
-    const data = await contactsService.getAll();
-    setAllContacts(data);
-  };
 
   return (
     <div className="space-y-6">
@@ -191,7 +170,6 @@ export function ContactsPage() {
         contact={selectedContact}
         open={!!selectedContact}
         onClose={() => setSelectedContact(null)}
-        onUpdate={handleContactUpdate}
       />
     </div>
   );

@@ -16,6 +16,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowClick?: (row: TData) => void;
+  onRowHover?: (row: TData) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -23,6 +24,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   onRowClick,
+  onRowHover,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -71,6 +73,7 @@ export function DataTable<TData, TValue>({
                     "cursor-pointer hover:bg-accent hover:bg-opacity-50",
                 )}
                 onClick={() => onRowClick?.(row.original)}
+                onMouseEnter={() => onRowHover?.(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-4 py-3 text-sm">

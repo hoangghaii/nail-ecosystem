@@ -15,13 +15,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useBanners } from "@/hooks/api/useBanners";
+import { useBookings } from "@/hooks/api/useBookings";
+import { useGalleryItems } from "@/hooks/api/useGallery";
+import { useServices } from "@/hooks/api/useServices";
 
 export function DashboardPage() {
+  // Poll banners and bookings every 30s for real-time dashboard updates
+  // Services and gallery update less frequently, use default cache
+  const { data: banners } = useBanners({ refetchInterval: 30_000 });
+  const { data: services } = useServices();
+  const { data: galleryItems } = useGalleryItems();
+  const { data: bookings } = useBookings({
+    refetchInterval: 30_000, // Real-time booking updates
+    status: "pending",
+  });
+
   const stats = [
-    { icon: Image, label: "Total Banners", value: "3" },
-    { icon: Scissors, label: "Total Services", value: "10" },
-    { icon: Images, label: "Gallery Items", value: "18" },
-    { icon: Calendar, label: "Pending Bookings", value: "5" },
+    {
+      icon: Image,
+      label: "Total Banners",
+      value: banners?.length?.toString() || "0",
+    },
+    {
+      icon: Scissors,
+      label: "Total Services",
+      value: services?.length?.toString() || "0",
+    },
+    {
+      icon: Images,
+      label: "Gallery Items",
+      value: galleryItems?.length?.toString() || "0",
+    },
+    {
+      icon: Calendar,
+      label: "Pending Bookings",
+      value: bookings?.length?.toString() || "0",
+    },
   ];
 
   const quickActions = [
