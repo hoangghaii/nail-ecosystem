@@ -11,11 +11,15 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -31,6 +35,7 @@ import { QueryBannersDto } from './dto/query-banners.dto';
 import { UploadBannerDto } from './dto/upload-banner.dto';
 import { StorageService } from '../storage/storage.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { MediaUploadPipe } from '../../common/pipes/media-upload.pipe';
 
 @ApiTags('Banners')
 @Controller('banners')
@@ -44,7 +49,10 @@ export class BannersController {
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Create a new banner with image upload' })
+  @ApiOperation({
+    summary: 'Create a new banner with image upload (DEPRECATED)',
+    deprecated: true,
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -90,7 +98,10 @@ export class BannersController {
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('video'))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Create a new banner with video upload' })
+  @ApiOperation({
+    summary: 'Create a new banner with video upload (DEPRECATED)',
+    deprecated: true,
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -139,12 +150,79 @@ export class BannersController {
 
   @Post()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create a banner with existing URLs' })
-  @ApiResponse({ status: 201, description: 'Banner successfully created' })
-  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'image', maxCount: 1 },
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Create banner with image (required) and video (optional)',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['image', 'title', 'type'],
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Banner image file (max 10MB, jpg/jpeg/png/webp)',
+        },
+        video: {
+          type: 'string',
+          format: 'binary',
+          description: 'Banner video file (max 100MB, mp4/webm, optional)',
+        },
+        title: { type: 'string', example: 'Welcome Banner' },
+        type: {
+          type: 'string',
+          enum: ['image', 'video'],
+          example: 'image',
+        },
+        isPrimary: { type: 'boolean', example: false },
+        active: { type: 'boolean', example: true },
+        sortIndex: { type: 'number', example: 1 },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Banner created successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input or file' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async create(@Body() createBannerDto: CreateBannerDto) {
-    return this.bannersService.create(createBannerDto);
+  @ApiResponse({ status: 413, description: 'File too large' })
+  async create(
+    @UploadedFiles(new MediaUploadPipe())
+    files: {
+      image: Express.Multer.File[];
+      video?: Express.Multer.File[];
+    },
+    @Body() uploadBannerDto: UploadBannerDto,
+  ) {
+    // Upload image (required)
+    const imageUrl = await this.storageService.uploadFile(
+      files.image[0],
+      'banners',
+    );
+
+    // Upload video (optional)
+    let videoUrl: string | undefined;
+    if (files.video && files.video.length > 0) {
+      videoUrl = await this.storageService.uploadFile(
+        files.video[0],
+        'banners',
+      );
+    }
+
+    // Create banner
+    return this.bannersService.create({
+      ...uploadBannerDto,
+      imageUrl,
+      videoUrl,
+    });
   }
 
   @Get()

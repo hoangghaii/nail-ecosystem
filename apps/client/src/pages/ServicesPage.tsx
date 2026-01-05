@@ -47,7 +47,7 @@ export function ServicesPage() {
         {/* Services Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredServices.map((service, index) => (
-            <ServiceCard key={service.id} index={index} service={service} />
+            <ServiceCard key={service._id} index={index} service={service} />
           ))}
         </div>
 

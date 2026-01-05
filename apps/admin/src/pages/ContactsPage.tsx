@@ -1,5 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
+import { useDebounce } from "@repo/utils/hooks";
 import { format } from "date-fns";
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -19,7 +20,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@repo/utils/hooks";
 import { useContacts } from "@/hooks/api/useContacts";
 
 export function ContactsPage() {

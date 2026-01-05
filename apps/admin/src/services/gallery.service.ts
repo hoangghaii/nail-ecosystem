@@ -5,27 +5,27 @@
  */
 
 import type { GalleryItem } from "@repo/types/gallery";
+import type { PaginationResponse } from "@repo/types/pagination";
 
 import { apiClient } from "@/lib/apiClient";
 
 export class GalleryService {
-  async getAll(): Promise<GalleryItem[]> {
-    return apiClient.get<GalleryItem[]>("/gallery");
+  async getAll(): Promise<PaginationResponse<GalleryItem>> {
+    return apiClient.get<PaginationResponse<GalleryItem>>("/gallery");
   }
 
   async getById(id: string): Promise<GalleryItem | null> {
     try {
       return await apiClient.get<GalleryItem>(`/gallery/${id}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.statusCode === 404) return null;
       throw error;
     }
   }
 
-  async create(
-    data: Omit<GalleryItem, "id" | "createdAt">,
-  ): Promise<GalleryItem> {
-    return apiClient.post<GalleryItem>("/gallery", data);
+  async create(formData: FormData): Promise<GalleryItem> {
+    return apiClient.post<GalleryItem>("/gallery", formData);
   }
 
   async createMultiple(
@@ -58,14 +58,24 @@ export class GalleryService {
   }
 
   async getFeatured(): Promise<GalleryItem[]> {
-    const items = await this.getAll();
-    return items.filter((item) => item.featured);
+    try {
+      const items = await this.getAll();
+      return items?.data?.filter((item) => item.featured) || [];
+    } catch (error) {
+      console.error("Failed to get featured gallery items:", error);
+      return [];
+    }
   }
 
   async getByCategory(category: string): Promise<GalleryItem[]> {
-    const items = await this.getAll();
-    if (category === "all") return items;
-    return items.filter((item) => item.category === category);
+    try {
+      const items = await this.getAll();
+      if (category === "all") return items?.data || [];
+      return items?.data?.filter((item) => item.category === category) || [];
+    } catch (error) {
+      console.error("Failed to get gallery items by category:", error);
+      return [];
+    }
   }
 }
 

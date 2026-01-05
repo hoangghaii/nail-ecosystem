@@ -1,8 +1,7 @@
-import { AlertTriangle } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-
 import type { GalleryItem } from "@repo/types/gallery";
+
+import { AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { galleryService } from "@/services/gallery.service";
+import { useDeleteGalleryItem } from "@/hooks/api/useGallery";
 
 export type DeleteGalleryDialogProps = {
   galleryItem?: GalleryItem;
@@ -28,23 +27,20 @@ export function DeleteGalleryDialog({
   onOpenChange,
   open,
 }: DeleteGalleryDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const deleteGalleryItem = useDeleteGalleryItem();
 
   const handleDelete = async () => {
     if (!galleryItem) return;
 
-    setIsDeleting(true);
-    try {
-      await galleryService.delete(galleryItem.id);
-      toast.success("Gallery item deleted successfully!");
-      onConfirm?.();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error deleting gallery item:", error);
-      toast.error("Failed to delete gallery item. Please try again.");
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteGalleryItem.mutate(galleryItem._id, {
+      onError: () => {
+        toast.error("Failed to delete gallery item. Please try again.");
+      },
+      onSuccess: () => {
+        onConfirm?.();
+        onOpenChange(false);
+      },
+    });
   };
 
   return (
@@ -90,7 +86,7 @@ export function DeleteGalleryDialog({
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isDeleting}
+            disabled={deleteGalleryItem.isPending}
           >
             Cancel
           </Button>
@@ -98,9 +94,9 @@ export function DeleteGalleryDialog({
             type="button"
             variant="destructive"
             onClick={handleDelete}
-            disabled={isDeleting}
+            disabled={deleteGalleryItem.isPending}
           >
-            {isDeleting ? "Deleting..." : "Delete Item"}
+            {deleteGalleryItem.isPending ? "Deleting..." : "Delete Item"}
           </Button>
         </DialogFooter>
       </DialogContent>

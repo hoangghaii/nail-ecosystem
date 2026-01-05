@@ -25,9 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useUpdateContactStatus } from "@/hooks/api/useContacts";
 import { contactStatusUpdateSchema } from "@/lib/validations/contact.validation";
 import { ContactStatus } from "@/types/contact.types";
-import { useUpdateContactStatus } from "@/hooks/api/useContacts";
 
 type ContactDetailsModalProps = {
   contact: Contact | null;
@@ -76,7 +76,7 @@ export function ContactDetailsModal({
     updateStatus.mutate(
       {
         adminNotes: data.adminNotes,
-        id: contact.id,
+        id: contact._id,
         status: data.status,
       },
       {

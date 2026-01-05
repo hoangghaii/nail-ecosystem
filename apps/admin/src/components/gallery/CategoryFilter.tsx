@@ -1,7 +1,8 @@
 import type { GalleryCategory as GalleryCategoryType } from "@repo/types/gallery";
 
-import { Button } from "@/components/ui/button";
 import { GalleryCategory } from "@repo/types/gallery";
+
+import { Button } from "@/components/ui/button";
 
 export type CategoryFilterProps = {
   activeCategory: GalleryCategoryType;

@@ -16,6 +16,7 @@ export class ContactsService {
   async getById(id: string): Promise<Contact | null> {
     try {
       return await apiClient.get<Contact>(`/contacts/${id}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.statusCode === 404) return null;
       throw error;
@@ -38,8 +39,13 @@ export class ContactsService {
   }
 
   async getByStatus(status: ContactStatus): Promise<Contact[]> {
-    const contacts = await this.getAll();
-    return contacts.filter((c) => c.status === status);
+    try {
+      const contacts = await this.getAll();
+      return contacts?.filter((c) => c.status === status) || [];
+    } catch (error) {
+      console.error("Failed to get contacts by status:", error);
+      return [];
+    }
   }
 }
 

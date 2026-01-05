@@ -7,7 +7,8 @@
     "./service": "./src/service.ts",
     "./gallery": "./src/gallery.ts",
     "./booking": "./src/booking.ts",
-    "./auth": "./src/auth.ts"
+    "./auth": "./src/auth.ts",
+    "./pagination": "./src/pagination.ts"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",

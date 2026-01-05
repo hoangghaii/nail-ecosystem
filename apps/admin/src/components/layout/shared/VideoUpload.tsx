@@ -48,7 +48,8 @@ export const VideoUpload = React.forwardRef<HTMLDivElement, VideoUploadProps>(
         const url = await imageUploadService.uploadVideo(
           file,
           folder,
-          (progress) => {
+          undefined, // metadata - not provided in this generic component
+          (progress: number) => {
             setUploadProgress(progress);
           },
         );

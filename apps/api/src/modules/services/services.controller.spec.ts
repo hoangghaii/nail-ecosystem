@@ -63,8 +63,13 @@ describe('ServicesController', () => {
   });
 
   describe('create', () => {
-    it('should create a service', async () => {
-      const createDto: CreateServiceDto = {
+    it('should create a service with file upload', async () => {
+      const file = {
+        mimetype: 'image/jpeg',
+        size: 5 * 1024 * 1024,
+      } as Express.Multer.File;
+
+      const uploadDto = {
         name: 'Pedicure',
         description: 'Relaxing pedicure',
         price: 35,
@@ -72,15 +77,26 @@ describe('ServicesController', () => {
         category: ServiceCategory.MANICURE,
       };
 
-      mockServicesService.create.mockResolvedValue({
-        ...createDto,
+      const expectedResult = {
+        ...uploadDto,
+        imageUrl: 'uploaded-image-url',
         _id: '507f1f77bcf86cd799439012',
-      });
+      };
 
-      const result = await controller.create(createDto);
+      mockStorageService.uploadFile.mockResolvedValue('uploaded-image-url');
+      mockServicesService.create.mockResolvedValue(expectedResult);
+
+      const result = await controller.create(file, uploadDto as any);
 
       expect(result).toBeDefined();
-      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(mockStorageService.uploadFile).toHaveBeenCalledWith(
+        file,
+        'services',
+      );
+      expect(service.create).toHaveBeenCalledWith({
+        ...uploadDto,
+        imageUrl: 'uploaded-image-url',
+      });
     });
   });
 

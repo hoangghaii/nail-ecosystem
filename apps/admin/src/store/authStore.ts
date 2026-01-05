@@ -1,12 +1,13 @@
-import { create } from "zustand";
-
 import type { User } from "@repo/types/auth";
+
+import { create } from "zustand";
 
 import { storage } from "@/services/storage.service";
 
 type AuthState = {
   initializeAuth: () => void;
   isAuthenticated: boolean;
+  isInitialized: boolean;
   login: (user: User, token: string, refreshToken: string) => void;
   logout: () => void;
   refreshToken: string | null;
@@ -21,22 +22,43 @@ export const useAuthStore = create<AuthState>((set) => ({
     const user = storage.get<User | null>("auth_user", null);
 
     if (token && refreshToken && user) {
-      set({ isAuthenticated: true, refreshToken, token, user });
+      set({
+        isAuthenticated: true,
+        isInitialized: true,
+        refreshToken,
+        token,
+        user,
+      });
+    } else {
+      set({ isInitialized: true });
     }
   },
   isAuthenticated: false,
+  isInitialized: false,
   login: (user, token, refreshToken) => {
     storage.set("auth_token", token);
     storage.set("refresh_token", refreshToken);
     storage.set("auth_user", user);
-    set({ isAuthenticated: true, refreshToken, token, user });
+    set({
+      isAuthenticated: true,
+      isInitialized: true,
+      refreshToken,
+      token,
+      user,
+    });
   },
 
   logout: () => {
     storage.remove("auth_token");
     storage.remove("refresh_token");
     storage.remove("auth_user");
-    set({ isAuthenticated: false, refreshToken: null, token: null, user: null });
+    set({
+      isAuthenticated: false,
+      isInitialized: true,
+      refreshToken: null,
+      token: null,
+      user: null,
+    });
   },
 
   refreshToken: null,

@@ -16,9 +16,11 @@ import { useAuthStore } from "./store/authStore";
 function App() {
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
 
+  // Initialize auth on mount only - no dependencies needed
   useEffect(() => {
     initializeAuth();
-  }, [initializeAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <BrowserRouter>

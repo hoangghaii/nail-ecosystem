@@ -7,6 +7,7 @@ Modern admin dashboard for managing Pink Nail Salon's business operations, built
 ## Features
 
 ### Core Functionality
+
 - **Authentication** - JWT-based auth with auto token refresh
 - **Services Management** - CRUD operations for nail services
 - **Gallery Management** - Upload and organize portfolio images
@@ -17,6 +18,7 @@ Modern admin dashboard for managing Pink Nail Salon's business operations, built
 - **Hero Settings** - Configure homepage carousel behavior
 
 ### Technical Features
+
 - **Real-time API Integration** - NestJS backend with auto JWT refresh
 - **Image Upload** - Cloudinary integration via API
 - **Type Safety** - Shared types via `@repo/types`
@@ -43,6 +45,7 @@ Modern admin dashboard for managing Pink Nail Salon's business operations, built
 ## Prerequisites
 
 **Running Services Required**:
+
 - ✅ API backend on `localhost:3000` (NestJS)
 - ✅ MongoDB connected
 - ✅ Redis connected
@@ -92,7 +95,7 @@ npm run dev
 npm run dev
 ```
 
-Admin dashboard will be available at: **http://localhost:5174**
+Admin dashboard will be available at: **<http://localhost:5174>**
 
 ---
 
@@ -199,6 +202,7 @@ try {
 ### Default Credentials
 
 **Development**:
+
 ```
 Email: admin@pinknail.com
 Password: (create in API database)
@@ -231,6 +235,7 @@ This app uses monorepo shared packages:
 - **@repo/tailwind-config** - Tailwind theme (admin-theme.js)
 
 **Import Example**:
+
 ```typescript
 import { Service, ServiceCategory } from "@repo/types/service";
 import { ApiError } from "@repo/utils/api";
@@ -265,6 +270,7 @@ dist/
 ### Environment Configuration
 
 **Production `.env`**:
+
 ```bash
 VITE_API_BASE_URL=/api
 ```
@@ -356,11 +362,11 @@ npm run build
 
 ```bash
 # Clear browser storage
-localStorage.clear()
+storage.clear()
 
 # Check tokens
-localStorage.getItem('auth_token')
-localStorage.getItem('refresh_token')
+storage.getItem('auth_token')
+storage.getItem('refresh_token')
 
 # Verify API auth endpoint
 curl -X POST http://localhost:3000/auth/login \
@@ -415,12 +421,14 @@ git commit -m "docs(readme): update API integration guide"
 ### Manual Testing Checklist
 
 **Authentication**:
+
 - [ ] Login with valid credentials
 - [ ] Login with invalid credentials (error shown)
 - [ ] Token auto-refresh on 401
 - [ ] Logout clears tokens
 
 **Services CRUD**:
+
 - [ ] List all services
 - [ ] Create new service
 - [ ] Update service
@@ -428,12 +436,14 @@ git commit -m "docs(readme): update API integration guide"
 - [ ] Toggle featured status
 
 **Gallery**:
+
 - [ ] Upload single image
 - [ ] Upload multiple images
 - [ ] Delete image
 - [ ] Toggle featured
 
 **Bookings**:
+
 - [ ] View all bookings
 - [ ] Update booking status
 - [ ] Filter by status
@@ -450,6 +460,7 @@ Private - Pink Nail Salon
 ## Support
 
 For issues or questions:
+
 - Check troubleshooting section above
 - Review main project README: `/README.md`
 - Check API documentation: `/docs/api-endpoints.md`

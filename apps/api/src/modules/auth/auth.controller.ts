@@ -27,13 +27,13 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  @Throttle({ default: { limit: 3, ttl: 3600000 } })
+  @Throttle({ default: { limit: 20, ttl: 3600000 } })
   @ApiOperation({ summary: 'Register new admin user' })
   @ApiResponse({ status: 201, description: 'Admin successfully registered' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
   @ApiResponse({
     status: 429,
-    description: 'Too many registration attempts (3 per hour)',
+    description: 'Too many registration attempts (20 per hour)',
   })
   register(@Body() dto: RegisterAdminDto) {
     return this.authService.register(dto);
@@ -42,7 +42,7 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @Throttle({ default: { limit: 5, ttl: 900000 } })
+  @Throttle({ default: { limit: 100, ttl: 60000 } })
   @ApiOperation({ summary: 'Login admin user' })
   @ApiResponse({
     status: 200,
@@ -52,7 +52,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiResponse({
     status: 429,
-    description: 'Too many login attempts (5 per 15 min)',
+    description: 'Too many login attempts (100 per minute)',
   })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);

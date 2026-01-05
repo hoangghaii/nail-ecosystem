@@ -76,11 +76,11 @@ class ApiClient {
   }
 
   private getAuthToken(): string | null {
-    return localStorage.getItem('auth_token')
+    return localStorage.getItem('nail_admin_auth_token')
   }
 
   private getRefreshToken(): string | null {
-    return localStorage.getItem('refresh_token')
+    return localStorage.getItem('nail_admin_refresh_token')
   }
 
   private async refreshAccessToken(): Promise<void> {
@@ -103,16 +103,16 @@ class ApiClient {
 
       if (!response.ok) {
         // Refresh failed - clear tokens and redirect to login
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('auth_user')
+        localStorage.removeItem('nail_admin_auth_token')
+        localStorage.removeItem('nail_admin_refresh_token')
+        localStorage.removeItem('nail_admin_auth_user')
         window.location.href = '/login'
         throw new ApiError('Session expired', 401)
       }
 
       const data = await response.json()
-      localStorage.setItem('auth_token', data.accessToken)
-      localStorage.setItem('refresh_token', data.refreshToken)
+      localStorage.setItem('nail_admin_auth_token', data.accessToken)
+      localStorage.setItem('nail_admin_refresh_token', data.refreshToken)
     })()
 
     try {
@@ -251,23 +251,23 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
 
   login: (user, token, refreshToken) => { // UPDATE
-    storage.set('auth_token', token)
-    storage.set('refresh_token', refreshToken) // ADD
-    storage.set('auth_user', user)
+    storage.set('nail_admin_auth_token', token)
+    storage.set('nail_admin_refresh_token', refreshToken) // ADD
+    storage.set('nail_admin_auth_user', user)
     set({ user, token, refreshToken, isAuthenticated: true }) // UPDATE
   },
 
   logout: () => {
-    storage.remove('auth_token')
-    storage.remove('refresh_token') // ADD
-    storage.remove('auth_user')
+    storage.remove('nail_admin_auth_token')
+    storage.remove('nail_admin_refresh_token') // ADD
+    storage.remove('nail_admin_auth_user')
     set({ user: null, token: null, refreshToken: null, isAuthenticated: false }) // UPDATE
   },
 
   initializeAuth: () => {
-    const token = storage.get<string | null>('auth_token', null)
-    const refreshToken = storage.get<string | null>('refresh_token', null) // ADD
-    const user = storage.get<User | null>('auth_user', null)
+    const token = storage.get<string | null>('nail_admin_auth_token', null)
+    const refreshToken = storage.get<string | null>('nail_admin_refresh_token', null) // ADD
+    const user = storage.get<User | null>('nail_admin_auth_user', null)
 
     if (token && refreshToken && user) { // UPDATE
       set({ user, token, refreshToken, isAuthenticated: true }) // UPDATE

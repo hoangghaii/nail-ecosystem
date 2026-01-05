@@ -1,9 +1,9 @@
 export type User = {
   avatar?: string;
   email: string;
-  id: string;
+  _id: string;
   name: string;
-  role: "admin" | "staff";
+  role: 'admin' | 'staff';
 };
 
 export type AuthResponse = {

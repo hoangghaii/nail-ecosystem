@@ -27,10 +27,11 @@ export function BusinessInfoForm() {
   const { businessInfo, initializeBusinessInfo } = useBusinessInfoStore();
   const [isEditing, setIsEditing] = useState(false);
 
-  // Initialize business info on mount
+  // Initialize business info on mount only
   useEffect(() => {
     initializeBusinessInfo();
-  }, [initializeBusinessInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     control,

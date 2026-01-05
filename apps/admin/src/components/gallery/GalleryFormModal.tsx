@@ -1,12 +1,12 @@
+import type { GalleryItem } from "@repo/types/gallery";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GalleryCategory } from "@repo/types/gallery";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import type { GalleryItem } from "@repo/types/gallery";
-
-import { ImageUpload } from "@/components/layout/shared/ImageUpload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,10 +27,16 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { galleryService } from "@/services/gallery.service";
-import { GalleryCategory } from "@repo/types/gallery";
+import {
+  useCreateGalleryItem,
+  useUpdateGalleryItem,
+} from "@/hooks/api/useGallery";
 
 const gallerySchema = z.object({
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title must be 100 characters or less"),
   category: z.enum([
     "extensions",
     "manicure",
@@ -42,17 +48,12 @@ const gallerySchema = z.object({
     .string()
     .max(500, "Description must be 500 characters or less")
     .optional(),
+  price: z.string().max(20, "Price must be 20 characters or less").optional(),
   duration: z
     .string()
     .max(20, "Duration must be 20 characters or less")
     .optional(),
   featured: z.boolean(),
-  imageUrl: z.string().min(1, "Image is required"),
-  price: z.string().max(20, "Price must be 20 characters or less").optional(),
-  title: z
-    .string()
-    .min(3, "Title must be at least 3 characters")
-    .max(100, "Title must be 100 characters or less"),
 });
 
 type GalleryFormData = z.infer<typeof gallerySchema>;
@@ -70,8 +71,13 @@ export function GalleryFormModal({
   onSuccess,
   open,
 }: GalleryFormModalProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+
   const isEditMode = !!galleryItem;
+
+  const createGalleryItem = useCreateGalleryItem();
+  const updateGalleryItem = useUpdateGalleryItem();
 
   const {
     formState: { errors },
@@ -82,84 +88,129 @@ export function GalleryFormModal({
     watch,
   } = useForm<GalleryFormData>({
     defaultValues: {
+      title: "",
       category: "manicure",
       description: "",
+      price: "",
       duration: "",
       featured: false,
-      imageUrl: "",
-      price: "",
-      title: "",
     },
     resolver: zodResolver(gallerySchema),
   });
 
-  const imageUrl = watch("imageUrl");
   const category = watch("category");
   const featured = watch("featured");
 
   useEffect(() => {
     if (galleryItem) {
       reset({
+        title: galleryItem.title,
         category: galleryItem.category as GalleryFormData["category"],
         description: galleryItem.description || "",
+        price: galleryItem.price || "",
         duration: galleryItem.duration || "",
         featured: galleryItem.featured || false,
-        imageUrl: galleryItem.imageUrl,
-        price: galleryItem.price || "",
-        title: galleryItem.title,
       });
+      setImagePreview(galleryItem.imageUrl);
     } else {
       reset({
+        title: "",
         category: "manicure",
         description: "",
+        price: "",
         duration: "",
         featured: false,
-        imageUrl: "",
-        price: "",
-        title: "",
       });
+      setImageFile(null);
+      setImagePreview("");
     }
   }, [galleryItem, reset]);
 
-  const onSubmit = async (data: GalleryFormData) => {
-    setIsSubmitting(true);
-    try {
-      if (isEditMode) {
-        await galleryService.update(galleryItem.id, {
-          category: data.category,
-          description: data.description || undefined,
-          duration: data.duration || undefined,
-          featured: data.featured,
-          imageUrl: data.imageUrl,
-          price: data.price || undefined,
-          title: data.title,
-        });
-        toast.success("Gallery item updated successfully!");
-      } else {
-        await galleryService.create({
-          category: data.category,
-          description: data.description || undefined,
-          duration: data.duration || undefined,
-          featured: data.featured,
-          imageUrl: data.imageUrl,
-          price: data.price || undefined,
-          title: data.title,
-        });
-        toast.success("Gallery item created successfully!");
-      }
+  // Cleanup form data when modal closes
+  useEffect(() => {
+    if (!open) {
+      reset({
+        title: "",
+        category: "manicure",
+        description: "",
+        price: "",
+        duration: "",
+        featured: false,
+      });
+      setImageFile(null);
+      setImagePreview("");
+    }
+  }, [open, reset]);
 
-      onSuccess?.();
-      onOpenChange(false);
-      reset();
-    } catch (error) {
-      console.error("Error saving gallery item:", error);
-      toast.error(
-        isEditMode
-          ? "Failed to update gallery item. Please try again."
-          : "Failed to create gallery item. Please try again.",
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onSubmit = (data: GalleryFormData) => {
+    // Validate image required for create mode
+    if (!isEditMode && !imageFile) {
+      toast.error("Image is required");
+      return;
+    }
+
+    if (isEditMode) {
+      // Edit mode - use update mutation with JSON
+      updateGalleryItem.mutate(
+        {
+          id: galleryItem._id,
+          data: {
+            title: data.title,
+            category: data.category,
+            description: data.description || undefined,
+            price: data.price || undefined,
+            duration: data.duration || undefined,
+            featured: data.featured,
+          },
+        },
+        {
+          onSuccess: () => {
+            onSuccess?.();
+            onOpenChange(false);
+            reset();
+            setImageFile(null);
+            setImagePreview("");
+          },
+        },
       );
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      // Create mode - use create mutation with FormData
+      const formData = new FormData();
+
+      // File
+      formData.append("image", imageFile!);
+
+      // Metadata
+      formData.append("title", data.title);
+      formData.append("category", data.category);
+      if (data.description) formData.append("description", data.description);
+      if (data.price) formData.append("price", data.price);
+      if (data.duration) formData.append("duration", data.duration);
+      formData.append("featured", String(data.featured));
+      formData.append("isActive", "true");
+      formData.append("sortIndex", "0");
+
+      createGalleryItem.mutate(formData, {
+        onSuccess: () => {
+          onSuccess?.();
+          onOpenChange(false);
+          reset();
+          setImageFile(null);
+          setImagePreview("");
+        },
+      });
     }
   };
 
@@ -206,6 +257,7 @@ export function GalleryFormModal({
                 onValueChange={(value) =>
                   setValue("category", value as GalleryFormData["category"])
                 }
+                disabled={isEditMode}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
@@ -237,18 +289,43 @@ export function GalleryFormModal({
 
             {/* Image Upload */}
             <div className="space-y-2">
-              <Label>
-                Image <span className="text-destructive">*</span>
+              <Label htmlFor="image">
+                Image {!isEditMode && <span className="text-destructive">*</span>}
               </Label>
-              <ImageUpload
-                folder="gallery"
-                value={imageUrl}
-                onChange={(url) => setValue("imageUrl", url)}
-              />
-              {errors.imageUrl && (
-                <p className="text-xs text-destructive">
-                  {errors.imageUrl.message}
-                </p>
+              {isEditMode && imagePreview && (
+                <div className="mb-2 rounded-lg border border-border overflow-hidden">
+                  <img
+                    src={imagePreview}
+                    alt="Current gallery image"
+                    className="w-full h-48 object-cover"
+                  />
+                  <p className="text-xs text-muted-foreground p-2 bg-muted">
+                    Current image. To change image, please delete and create a new item.
+                  </p>
+                </div>
+              )}
+              {!isEditMode && (
+                <>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleImageChange}
+                    className="cursor-pointer"
+                  />
+                  {imagePreview && (
+                    <div className="mt-2 rounded-lg border border-border overflow-hidden">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-48 object-cover"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Max 10MB, formats: JPG, PNG, WebP
+                  </p>
+                </>
               )}
             </div>
 
@@ -320,12 +397,15 @@ export function GalleryFormModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
+              disabled={createGalleryItem.isPending || updateGalleryItem.isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting
+            <Button
+              type="submit"
+              disabled={createGalleryItem.isPending || updateGalleryItem.isPending}
+            >
+              {createGalleryItem.isPending || updateGalleryItem.isPending
                 ? isEditMode
                   ? "Updating..."
                   : "Creating..."

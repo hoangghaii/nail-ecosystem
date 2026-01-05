@@ -1,16 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { queryKeys } from '@repo/utils/api';
-import type { HeroSettings } from '@/types/heroSettings.types';
-import { heroSettingsService } from '@/services/heroSettings.service';
+import { queryKeys } from "@repo/utils/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import type { HeroSettings } from "@/types/heroSettings.types";
+
+import { heroSettingsService } from "@/services/heroSettings.service";
+import { storage } from "@/services/storage.service";
 
 /**
  * Query: Get hero settings (singleton)
  */
 export function useHeroSettings() {
   return useQuery({
-    queryKey: queryKeys.heroSettings.detail(),
+    // Don't run query if no auth token (prevents 401 errors on mount)
+    enabled: !!storage.get("auth_token", ""),
     queryFn: () => heroSettingsService.getSettings(),
+    queryKey: queryKeys.heroSettings.detail(),
   });
 }
 
@@ -21,11 +26,11 @@ export function useUpdateHeroSettings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<Omit<HeroSettings, 'updatedAt'>>) =>
+    mutationFn: (data: Partial<Omit<HeroSettings, "updatedAt">>) =>
       heroSettingsService.updateSettings(data),
     onSuccess: (updated) => {
       queryClient.setQueryData(queryKeys.heroSettings.detail(), updated);
-      toast.success('Hero settings updated successfully');
+      toast.success("Hero settings updated successfully");
     },
   });
 }
@@ -40,7 +45,7 @@ export function useResetHeroSettings() {
     mutationFn: () => heroSettingsService.resetSettings(),
     onSuccess: (updated) => {
       queryClient.setQueryData(queryKeys.heroSettings.detail(), updated);
-      toast.success('Hero settings reset to defaults');
+      toast.success("Hero settings reset to defaults");
     },
   });
 }

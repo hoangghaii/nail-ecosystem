@@ -1,7 +1,8 @@
 import type { BookingStatus as BookingStatusType } from "@repo/types/booking";
 
-import { Button } from "@/components/ui/button";
 import { BookingStatus } from "@repo/types/booking";
+
+import { Button } from "@/components/ui/button";
 
 export type StatusFilterProps = {
   activeStatus: BookingStatusType | "all";

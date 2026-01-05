@@ -1,6 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { imageUploadService } from '@/services/imageUpload.service';
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import {
+  imageUploadService,
+  type UploadFolder,
+  type UploadMetadata,
+} from "@/services/imageUpload.service";
 
 /**
  * Mutation: Upload image with progress tracking
@@ -10,14 +15,16 @@ export function useUploadImage() {
     mutationFn: ({
       file,
       folder,
+      metadata,
       onProgress,
     }: {
       file: File;
-      folder: 'banners' | 'services' | 'gallery';
+      folder: UploadFolder;
+      metadata?: UploadMetadata;
       onProgress?: (progress: number) => void;
-    }) => imageUploadService.uploadImage(file, folder, onProgress),
+    }) => imageUploadService.uploadImage(file, folder, metadata, onProgress),
     onError: () => {
-      toast.error('Failed to upload image');
+      toast.error("Failed to upload image");
     },
   });
 }
@@ -30,15 +37,17 @@ export function useUploadMultipleImages() {
     mutationFn: ({
       files,
       folder,
+      metadataArray,
     }: {
       files: File[];
-      folder: 'banners' | 'services' | 'gallery';
-    }) => imageUploadService.uploadMultiple(files, folder),
+      folder: UploadFolder;
+      metadataArray?: UploadMetadata[];
+    }) => imageUploadService.uploadMultiple(files, folder, metadataArray),
+    onError: () => {
+      toast.error("Failed to upload images");
+    },
     onSuccess: (urls) => {
       toast.success(`${urls.length} image(s) uploaded successfully`);
-    },
-    onError: () => {
-      toast.error('Failed to upload images');
     },
   });
 }
@@ -51,14 +60,16 @@ export function useUploadVideo() {
     mutationFn: ({
       file,
       folder,
+      metadata,
       onProgress,
     }: {
       file: File;
-      folder: 'banners' | 'services' | 'gallery';
+      folder: UploadFolder;
+      metadata?: UploadMetadata;
       onProgress?: (progress: number) => void;
-    }) => imageUploadService.uploadVideo(file, folder, onProgress),
+    }) => imageUploadService.uploadVideo(file, folder, metadata, onProgress),
     onError: () => {
-      toast.error('Failed to upload video');
+      toast.error("Failed to upload video");
     },
   });
 }

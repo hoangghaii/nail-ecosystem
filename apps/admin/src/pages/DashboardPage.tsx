@@ -35,22 +35,22 @@ export function DashboardPage() {
     {
       icon: Image,
       label: "Total Banners",
-      value: banners?.length?.toString() || "0",
+      value: banners?.data?.length?.toString() || "0",
     },
     {
       icon: Scissors,
       label: "Total Services",
-      value: services?.length?.toString() || "0",
+      value: services?.data?.length?.toString() || "0",
     },
     {
       icon: Images,
       label: "Gallery Items",
-      value: galleryItems?.length?.toString() || "0",
+      value: galleryItems?.data?.length?.toString() || "0",
     },
     {
       icon: Calendar,
       label: "Pending Bookings",
-      value: bookings?.length?.toString() || "0",
+      value: bookings?.data?.length?.toString() || "0",
     },
   ];
 

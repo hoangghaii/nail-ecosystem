@@ -1,5 +1,4 @@
 import { AlertTriangle } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import type { Banner } from "@/types/banner.types";
@@ -13,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { bannersService } from "@/services/banners.service";
+import { useDeleteBanner } from "@/hooks/api/useBanners";
 
 export type DeleteBannerDialogProps = {
   banner?: Banner;
@@ -28,23 +27,20 @@ export function DeleteBannerDialog({
   onOpenChange,
   open,
 }: DeleteBannerDialogProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const deleteBanner = useDeleteBanner();
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!banner) return;
 
-    setIsDeleting(true);
-    try {
-      await bannersService.delete(banner.id);
-      toast.success("Banner deleted successfully!");
-      onConfirm?.();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error deleting banner:", error);
-      toast.error("Failed to delete banner. Please try again.");
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteBanner.mutate(banner._id, {
+      onError: () => {
+        toast.error("Failed to delete banner. Please try again.");
+      },
+      onSuccess: () => {
+        onConfirm?.();
+        onOpenChange(false);
+      },
+    });
   };
 
   return (
@@ -85,7 +81,7 @@ export function DeleteBannerDialog({
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isDeleting}
+            disabled={deleteBanner.isPending}
           >
             Cancel
           </Button>
@@ -93,9 +89,9 @@ export function DeleteBannerDialog({
             type="button"
             variant="destructive"
             onClick={handleDelete}
-            disabled={isDeleting}
+            disabled={deleteBanner.isPending}
           >
-            {isDeleting ? "Deleting..." : "Delete Banner"}
+            {deleteBanner.isPending ? "Deleting..." : "Delete Banner"}
           </Button>
         </DialogFooter>
       </DialogContent>

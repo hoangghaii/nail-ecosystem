@@ -147,10 +147,10 @@ export function BookingPage() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {servicesData.map((service) => (
                     <button
-                      key={service.id}
+                      key={service._id}
                       onClick={() => handleServiceSelect(service)}
                       className={`rounded-[16px] border-2 p-4 text-left transition-all duration-200 ${
-                        selectedService?.id === service.id
+                        selectedService?._id === service._id
                           ? "border-primary bg-primary/5"
                           : "border-border bg-background hover:border-secondary"
                       }`}

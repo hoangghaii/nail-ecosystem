@@ -44,7 +44,10 @@ export class GalleryController {
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload a new gallery image with file' })
+  @ApiOperation({
+    summary: 'Upload a new gallery image with file (DEPRECATED)',
+    deprecated: true,
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -112,15 +115,57 @@ export class GalleryController {
 
   @Post()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create a gallery item with existing image URL' })
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Create gallery item with image upload' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['image', 'title', 'price', 'duration'],
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Gallery image (max 10MB, jpg/jpeg/png/webp)',
+        },
+        title: { type: 'string', example: 'Summer Floral Design' },
+        description: {
+          type: 'string',
+          example: 'Beautiful floral nail art design',
+        },
+        categoryId: {
+          type: 'string',
+          example: '507f1f77bcf86cd799439011',
+        },
+        price: { type: 'string', example: '$45' },
+        duration: { type: 'string', example: '60 minutes' },
+        featured: { type: 'boolean', example: false },
+        isActive: { type: 'boolean', example: true },
+        sortIndex: { type: 'number', example: 1 },
+      },
+    },
+  })
   @ApiResponse({
     status: 201,
     description: 'Gallery item successfully created',
   })
-  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or file' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async create(@Body() createGalleryDto: CreateGalleryDto) {
-    return this.galleryService.create(createGalleryDto);
+  @ApiResponse({ status: 413, description: 'File too large' })
+  async create(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body() uploadGalleryDto: UploadGalleryDto,
+  ) {
+    const imageUrl = await this.storageService.uploadFile(file, 'gallery');
+    return this.galleryService.create({ ...uploadGalleryDto, imageUrl });
   }
 
   @Get()

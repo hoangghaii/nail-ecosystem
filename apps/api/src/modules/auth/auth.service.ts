@@ -67,8 +67,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Generate tokens
-    const tokens = await this.generateTokens(admin._id.toString(), admin.email);
+    // Generate tokens with extended expiry if rememberMe is true
+    const tokens = await this.generateTokens(
+      admin._id.toString(),
+      admin.email,
+      dto.rememberMe,
+    );
 
     // Save refresh token
     await this.updateRefreshToken(admin._id.toString(), tokens.refreshToken);
@@ -112,7 +116,11 @@ export class AuthService {
     return tokens;
   }
 
-  private async generateTokens(adminId: string, email: string) {
+  private async generateTokens(
+    adminId: string,
+    email: string,
+    rememberMe?: boolean,
+  ) {
     const accessSecret = this.configService.get<string>('jwt.accessSecret');
     const refreshSecret = this.configService.get<string>('jwt.refreshSecret');
     const accessExpiry = this.configService.get<string>('jwt.accessExpiry');
@@ -122,16 +130,21 @@ export class AuthService {
       throw new Error('JWT secrets not configured');
     }
 
+    // Use extended expiry if rememberMe is true
+    // rememberMe: true -> 30 days, false/undefined -> 24 hours (or config default)
+    const finalAccessExpiry = rememberMe ? '30d' : accessExpiry || '24h';
+    const finalRefreshExpiry = rememberMe ? '30d' : refreshExpiry || '7d';
+
     const payload = { sub: adminId, email };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: accessSecret,
-        expiresIn: accessExpiry || '15m',
+        expiresIn: finalAccessExpiry,
       } as any),
       this.jwtService.signAsync(payload, {
         secret: refreshSecret,
-        expiresIn: refreshExpiry || '7d',
+        expiresIn: finalRefreshExpiry,
       } as any),
     ]);
 

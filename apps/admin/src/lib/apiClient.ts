@@ -10,6 +10,8 @@
 
 import { ApiError } from "@repo/utils/api";
 
+import { storage } from "@/services/storage.service";
+
 type RequestOptions = {
   body?: unknown;
 } & Omit<RequestInit, "body">;
@@ -23,11 +25,11 @@ class ApiClient {
   }
 
   private getAuthToken(): string | null {
-    return localStorage.getItem("auth_token");
+    return storage.get("auth_token", "");
   }
 
   private getRefreshToken(): string | null {
-    return localStorage.getItem("refresh_token");
+    return storage.get("refresh_token", "");
   }
 
   private async refreshAccessToken(): Promise<void> {
@@ -50,16 +52,16 @@ class ApiClient {
 
       if (!response.ok) {
         // Refresh failed - clear tokens and redirect to login
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("auth_user");
+        storage.remove("auth_token");
+        storage.remove("refresh_token");
+        storage.remove("auth_user");
         window.location.href = "/login";
         throw new ApiError("Session expired", 401);
       }
 
       const data = await response.json();
-      localStorage.setItem("auth_token", data.accessToken);
-      localStorage.setItem("refresh_token", data.refreshToken);
+      storage.set("auth_token", data.accessToken);
+      storage.set("refresh_token", data.refreshToken);
     })();
 
     try {
@@ -161,18 +163,6 @@ class ApiClient {
 
   async delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: "DELETE" });
-  }
-
-  async upload(file: File, folder: string): Promise<string> {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folder", folder);
-
-    const response = await this.post<{ url: string }>(
-      "/storage/upload",
-      formData,
-    );
-    return response.url;
   }
 }
 

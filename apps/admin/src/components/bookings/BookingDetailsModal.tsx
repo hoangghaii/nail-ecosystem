@@ -1,3 +1,6 @@
+import type { Booking, BookingStatus } from "@repo/types/booking";
+
+import { BookingStatus as BookingStatusEnum } from "@repo/types/booking";
 import { format } from "date-fns";
 import {
   AlertTriangle,
@@ -8,8 +11,6 @@ import {
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
-import type { Booking, BookingStatus } from "@repo/types/booking";
 
 import { StatusBadge } from "@/components/layout/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BookingStatus as BookingStatusEnum } from "@repo/types/booking";
 import { useUpdateBookingStatus } from "@/hooks/api/useBookings";
 
 export type BookingDetailsModalProps = {
@@ -51,6 +51,7 @@ export function BookingDetailsModal({
   // Sync newStatus with booking.status when booking changes or modal opens
   useEffect(() => {
     if (booking?.status) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewStatus(booking.status);
     }
   }, [booking?.status, open]);
@@ -212,7 +213,11 @@ export function BookingDetailsModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={updateStatus.isPending}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={updateStatus.isPending}
+          >
             Close
           </Button>
           <Button

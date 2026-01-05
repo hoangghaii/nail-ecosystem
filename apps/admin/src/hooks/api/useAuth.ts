@@ -1,9 +1,11 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import type { LoginCredentials } from '@repo/types/auth';
-import { authService } from '@/services/auth.service';
-import { useAuthStore } from '@/store/authStore';
+import type { LoginCredentials } from "@repo/types/auth";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
+import { authService } from "@/services/auth.service";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Login mutation hook
@@ -14,12 +16,13 @@ export function useLogin() {
   const login = useAuthStore((state) => state.login);
 
   return useMutation({
-    mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
+    mutationFn: (credentials: LoginCredentials) =>
+      authService.login(credentials),
     onSuccess: (response) => {
       // Sync with Zustand store
       login(response.admin, response.accessToken, response.refreshToken);
-      toast.success('Login successful');
-      navigate('/');
+      toast.success("Login successful");
+      navigate("/");
     },
   });
 }
@@ -40,8 +43,8 @@ export function useLogout() {
       logout();
       // Clear all React Query cache
       queryClient.clear();
-      toast.success('Logged out successfully');
-      navigate('/login');
+      toast.success("Logged out successfully");
+      navigate("/login");
     },
   });
 }

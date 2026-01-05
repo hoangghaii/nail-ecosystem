@@ -52,7 +52,8 @@ export const ImageUpload = React.forwardRef<HTMLDivElement, ImageUploadProps>(
         const url = await imageUploadService.uploadImage(
           file,
           folder,
-          (progress) => {
+          undefined, // metadata - not provided in this generic component
+          (progress: number) => {
             setUploadProgress(progress);
           },
         );

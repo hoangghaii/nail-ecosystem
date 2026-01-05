@@ -8,7 +8,7 @@ import {
   Star,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { Banner } from "@/types/banner.types";
 
@@ -51,7 +51,8 @@ import { useHeroSettings } from "@/hooks/api/useHeroSettings";
 type BannerFilter = "all" | "active";
 
 export function BannersPage() {
-  const { data: banners = [], isLoading } = useBanners();
+  const { data, isLoading } = useBanners();
+  const banners = useMemo(() => data?.data ?? [], [data]);
   const { data: heroSettings } = useHeroSettings();
   const toggleActive = useToggleBannerActive();
   const setPrimary = useSetPrimaryBanner();
@@ -81,11 +82,11 @@ export function BannersPage() {
   };
 
   const handleSetPrimary = (banner: Banner) => {
-    setPrimary.mutate(banner.id);
+    setPrimary.mutate(banner._id);
   };
 
   const handleToggleActive = (banner: Banner) => {
-    toggleActive.mutate({ active: !banner.active, id: banner.id });
+    toggleActive.mutate({ active: !banner.active, id: banner._id });
   };
 
   const handleDragStart = (index: number) => {
@@ -99,9 +100,9 @@ export function BannersPage() {
   };
 
   const handleDragEnd = () => {
-    if (draggedIndex === null) return;
+    if (draggedIndex === null || !banners) return;
 
-    const bannerIds = banners.map((b) => b.id);
+    const bannerIds = banners.map((b) => b._id);
     reorderBanners.mutate(bannerIds, {
       onSuccess: () => {
         setDraggedIndex(null);
@@ -261,7 +262,7 @@ export function BannersPage() {
                   setBannerFilter(value as BannerFilter)
                 }
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-45">
                   <SelectValue placeholder="Filter banners" />
                 </SelectTrigger>
                 <SelectContent>

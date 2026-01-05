@@ -1,16 +1,21 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { queryKeys } from '@repo/utils/api';
-import type { GalleryItem } from '@repo/types/gallery';
-import { galleryService } from '@/services/gallery.service';
+import type { GalleryItem } from "@repo/types/gallery";
+
+import { queryKeys } from "@repo/utils/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { galleryService } from "@/services/gallery.service";
+import { storage } from "@/services/storage.service";
 
 /**
  * Query: Get all gallery items
  */
 export function useGalleryItems() {
   return useQuery({
-    queryKey: queryKeys.gallery.lists(),
+    // Don't run query if no auth token (prevents 401 errors on mount)
+    enabled: !!storage.get("auth_token", ""),
     queryFn: () => galleryService.getAll(),
+    queryKey: queryKeys.gallery.lists(),
   });
 }
 
@@ -19,9 +24,9 @@ export function useGalleryItems() {
  */
 export function useGalleryItem(id: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.gallery.detail(id!),
-    queryFn: () => galleryService.getById(id!),
     enabled: !!id,
+    queryFn: () => galleryService.getById(id!),
+    queryKey: queryKeys.gallery.detail(id!),
   });
 }
 
@@ -32,11 +37,10 @@ export function useCreateGalleryItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Omit<GalleryItem, 'id' | 'createdAt'>) =>
-      galleryService.create(data),
+    mutationFn: (formData: FormData) => galleryService.create(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.gallery.all });
-      toast.success('Gallery item created successfully');
+      toast.success("Gallery item created successfully");
     },
   });
 }
@@ -49,16 +53,16 @@ export function useUpdateGalleryItem() {
 
   return useMutation({
     mutationFn: ({
-      id,
       data,
+      id,
     }: {
+      data: Partial<Omit<GalleryItem, "id" | "createdAt">>;
       id: string;
-      data: Partial<Omit<GalleryItem, 'id' | 'createdAt'>>;
     }) => galleryService.update(id, data),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.gallery.lists() });
-      queryClient.setQueryData(queryKeys.gallery.detail(updated.id), updated);
-      toast.success('Gallery item updated successfully');
+      queryClient.setQueryData(queryKeys.gallery.detail(updated._id), updated);
+      toast.success("Gallery item updated successfully");
     },
   });
 }
@@ -73,7 +77,7 @@ export function useDeleteGalleryItem() {
     mutationFn: (id: string) => galleryService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.gallery.all });
-      toast.success('Gallery item deleted successfully');
+      toast.success("Gallery item deleted successfully");
     },
   });
 }
@@ -85,36 +89,45 @@ export function useToggleGalleryFeatured() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
+    mutationFn: ({ featured, id }: { featured: boolean; id: string }) =>
       galleryService.update(id, { featured }),
 
+    // Rollback on error
+    onError: (
+      _err,
+      _variables,
+      context: { previousItems?: GalleryItem[] } | undefined,
+    ) => {
+      if (context?.previousItems) {
+        queryClient.setQueryData(
+          queryKeys.gallery.lists(),
+          context.previousItems,
+        );
+      }
+      toast.error("Failed to update gallery item");
+    },
+
     // Optimistic update
-    onMutate: async ({ id, featured }) => {
+    onMutate: async ({ featured, id }) => {
       // Cancel outgoing queries
       await queryClient.cancelQueries({ queryKey: queryKeys.gallery.all });
 
       // Snapshot previous value
       const previousItems = queryClient.getQueryData<GalleryItem[]>(
-        queryKeys.gallery.lists()
+        queryKeys.gallery.lists(),
       );
 
       // Optimistically update cache
       if (previousItems) {
         queryClient.setQueryData<GalleryItem[]>(
           queryKeys.gallery.lists(),
-          previousItems.map((item) => (item.id === id ? { ...item, featured } : item))
+          previousItems.map((item) =>
+            item._id === id ? { ...item, featured } : item,
+          ),
         );
       }
 
       return { previousItems };
-    },
-
-    // Rollback on error
-    onError: (_err, _variables, context) => {
-      if (context?.previousItems) {
-        queryClient.setQueryData(queryKeys.gallery.lists(), context.previousItems);
-      }
-      toast.error('Failed to update gallery item');
     },
 
     // Always refetch after error or success

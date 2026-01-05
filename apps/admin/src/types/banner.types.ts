@@ -1,9 +1,9 @@
 export type BannerType = "image" | "video";
 
 export type Banner = {
+  _id: string;
   active: boolean;
   createdAt: Date;
-  id: string;
   imageUrl: string;
   isPrimary: boolean;
   sortIndex: number;

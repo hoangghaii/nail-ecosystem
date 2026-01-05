@@ -1,21 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { queryKeys } from '@repo/utils/api';
-import type { ContactStatus } from '@/types/contact.types';
-import { contactsService } from '@/services/contacts.service';
+import { queryKeys } from "@repo/utils/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import type { ContactStatus } from "@/types/contact.types";
+
+import { contactsService } from "@/services/contacts.service";
+import { storage } from "@/services/storage.service";
 
 /**
  * Query: Get all contacts with optional status filter
  */
 export function useContacts(filters?: { status?: ContactStatus }) {
   return useQuery({
-    queryKey: queryKeys.contacts.list(filters),
+    // Don't run query if no auth token (prevents 401 errors on mount)
+    enabled: !!storage.get("auth_token", ""),
     queryFn: async () => {
       if (filters?.status) {
         return contactsService.getByStatus(filters.status);
       }
       return contactsService.getAll();
     },
+    queryKey: queryKeys.contacts.list(filters),
   });
 }
 
@@ -24,9 +29,9 @@ export function useContacts(filters?: { status?: ContactStatus }) {
  */
 export function useContact(id: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.contacts.detail(id!),
-    queryFn: () => contactsService.getById(id!),
     enabled: !!id,
+    queryFn: () => contactsService.getById(id!),
+    queryKey: queryKeys.contacts.detail(id!),
   });
 }
 
@@ -38,18 +43,18 @@ export function useUpdateContactStatus() {
 
   return useMutation({
     mutationFn: ({
+      adminNotes,
       id,
       status,
-      adminNotes,
     }: {
+      adminNotes?: string;
       id: string;
       status: ContactStatus;
-      adminNotes?: string;
     }) => contactsService.updateStatus(id, status, adminNotes),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contacts.lists() });
-      queryClient.setQueryData(queryKeys.contacts.detail(updated.id), updated);
-      toast.success('Contact status updated successfully');
+      queryClient.setQueryData(queryKeys.contacts.detail(updated._id), updated);
+      toast.success("Contact status updated successfully");
     },
   });
 }
@@ -61,12 +66,12 @@ export function useUpdateContactNotes() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, adminNotes }: { id: string; adminNotes: string }) =>
+    mutationFn: ({ adminNotes, id }: { adminNotes: string; id: string }) =>
       contactsService.updateAdminNotes(id, adminNotes),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contacts.lists() });
-      queryClient.setQueryData(queryKeys.contacts.detail(updated.id), updated);
-      toast.success('Admin notes updated successfully');
+      queryClient.setQueryData(queryKeys.contacts.detail(updated._id), updated);
+      toast.success("Admin notes updated successfully");
     },
   });
 }
@@ -78,11 +83,11 @@ export function useMarkContactAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => contactsService.updateStatus(id, 'read'),
+    mutationFn: (id: string) => contactsService.updateStatus(id, "read"),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.contacts.lists() });
-      queryClient.setQueryData(queryKeys.contacts.detail(updated.id), updated);
-      toast.success('Contact marked as read');
+      queryClient.setQueryData(queryKeys.contacts.detail(updated._id), updated);
+      toast.success("Contact marked as read");
     },
   });
 }

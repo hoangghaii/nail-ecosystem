@@ -53,7 +53,7 @@ export function GalleryPage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredGallery.map((item, index) => (
             <GalleryCard
-              key={item.id}
+              key={item._id}
               index={index}
               item={item}
               onImageClick={() => handleImageClick(item, index)}

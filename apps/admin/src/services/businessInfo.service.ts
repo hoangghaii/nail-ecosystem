@@ -12,6 +12,7 @@ export class BusinessInfoService {
   async get(): Promise<BusinessInfo | null> {
     try {
       return await apiClient.get<BusinessInfo>("/business-info");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.statusCode === 404) return null;
       throw error;

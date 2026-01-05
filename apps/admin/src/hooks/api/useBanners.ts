@@ -1,17 +1,34 @@
-import { useQuery, useMutation, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { queryKeys } from '@repo/utils/api';
-import type { Banner } from '@/types/banner.types';
-import { bannersService } from '@/services/banners.service';
-import type { ApiError } from '@repo/utils/api';
+import type { PaginationResponse } from "@repo/types/pagination";
+import type { ApiError } from "@repo/utils/api";
+
+import { queryKeys } from "@repo/utils/api";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import type { Banner } from "@/types/banner.types";
+
+import { bannersService } from "@/services/banners.service";
+import { storage } from "@/services/storage.service";
 
 /**
  * Query: Get all banners
  */
-export function useBanners(options?: Omit<UseQueryOptions<Banner[], ApiError>, 'queryKey' | 'queryFn'>) {
+export function useBanners(
+  options?: Omit<
+    UseQueryOptions<PaginationResponse<Banner>, ApiError>,
+    "queryKey" | "queryFn"
+  >,
+) {
   return useQuery({
-    queryKey: queryKeys.banners.lists(),
+    // Don't run query if no auth token (prevents 401 errors on mount)
+    enabled: options?.enabled !== false && !!storage.get("auth_token", ""),
     queryFn: () => bannersService.getAll(),
+    queryKey: queryKeys.banners.lists(),
     ...options,
   });
 }
@@ -21,9 +38,9 @@ export function useBanners(options?: Omit<UseQueryOptions<Banner[], ApiError>, '
  */
 export function useBanner(id: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.banners.detail(id!),
-    queryFn: () => bannersService.getById(id!),
     enabled: !!id,
+    queryFn: () => bannersService.getById(id!),
+    queryKey: queryKeys.banners.detail(id!),
   });
 }
 
@@ -34,11 +51,10 @@ export function useCreateBanner() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Omit<Banner, 'id' | 'createdAt' | 'updatedAt'>) =>
-      bannersService.create(data),
+    mutationFn: (formData: FormData) => bannersService.create(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners.all });
-      toast.success('Banner created successfully');
+      toast.success("Banner created successfully");
     },
   });
 }
@@ -51,16 +67,16 @@ export function useUpdateBanner() {
 
   return useMutation({
     mutationFn: ({
-      id,
       data,
+      id,
     }: {
+      data: Partial<Omit<Banner, "id" | "createdAt">>;
       id: string;
-      data: Partial<Omit<Banner, 'id' | 'createdAt'>>;
     }) => bannersService.update(id, data),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners.lists() });
-      queryClient.setQueryData(queryKeys.banners.detail(updated.id), updated);
-      toast.success('Banner updated successfully');
+      queryClient.setQueryData(queryKeys.banners.detail(updated._id), updated);
+      toast.success("Banner updated successfully");
     },
   });
 }
@@ -75,7 +91,7 @@ export function useDeleteBanner() {
     mutationFn: (id: string) => bannersService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners.all });
-      toast.success('Banner deleted successfully');
+      toast.success("Banner deleted successfully");
     },
   });
 }
@@ -87,34 +103,44 @@ export function useToggleBannerActive() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, active }: { id: string; active: boolean }) =>
+    mutationFn: ({ active, id }: { active: boolean; id: string }) =>
       bannersService.update(id, { active }),
 
+    onError: (
+      _err,
+      _variables,
+      context: { previousBanners?: PaginationResponse<Banner> } | undefined,
+    ) => {
+      if (context?.previousBanners) {
+        queryClient.setQueryData(
+          queryKeys.banners.lists(),
+          context.previousBanners,
+        );
+      }
+      toast.error("Failed to update banner");
+    },
+
     // Optimistic update
-    onMutate: async ({ id, active }) => {
+    onMutate: async ({ active, id }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.banners.all });
 
-      const previousBanners = queryClient.getQueryData<Banner[]>(
-        queryKeys.banners.lists()
+      const previousData = queryClient.getQueryData<PaginationResponse<Banner>>(
+        queryKeys.banners.lists(),
       );
 
-      if (previousBanners) {
-        queryClient.setQueryData<Banner[]>(
+      if (previousData?.data) {
+        queryClient.setQueryData<PaginationResponse<Banner>>(
           queryKeys.banners.lists(),
-          previousBanners.map((banner) =>
-            banner.id === id ? { ...banner, active } : banner
-          )
+          {
+            ...previousData,
+            data: previousData.data.map((banner) =>
+              banner._id === id ? { ...banner, active } : banner,
+            ),
+          },
         );
       }
 
-      return { previousBanners };
-    },
-
-    onError: (_err, _variables, context) => {
-      if (context?.previousBanners) {
-        queryClient.setQueryData(queryKeys.banners.lists(), context.previousBanners);
-      }
-      toast.error('Failed to update banner');
+      return { previousBanners: previousData };
     },
 
     onSettled: () => {
@@ -133,7 +159,7 @@ export function useSetPrimaryBanner() {
     mutationFn: (id: string) => bannersService.setPrimary(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners.all });
-      toast.success('Primary banner updated successfully');
+      toast.success("Primary banner updated successfully");
     },
   });
 }
@@ -148,7 +174,7 @@ export function useReorderBanners() {
     mutationFn: (bannerIds: string[]) => bannersService.reorder(bannerIds),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.banners.all });
-      toast.success('Banners reordered successfully');
+      toast.success("Banners reordered successfully");
     },
   });
 }

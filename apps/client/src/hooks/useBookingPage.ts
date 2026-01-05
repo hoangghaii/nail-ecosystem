@@ -60,7 +60,7 @@ export function useBookingPage() {
         )
       : null;
 
-  const initialServiceId = matchingService?.id ?? "";
+  const initialServiceId = matchingService?._id ?? "";
   const initialStep = state?.fromGallery && matchingService ? 2 : 1;
 
   const [currentStep, setCurrentStep] = useState(initialStep);
@@ -157,7 +157,7 @@ export function useBookingPage() {
 
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
-    form.setValue("serviceId", service.id, { shouldValidate: true });
+    form.setValue("serviceId", service._id, { shouldValidate: true });
   };
 
   const handleDateSelect = (date: Date | undefined) => {

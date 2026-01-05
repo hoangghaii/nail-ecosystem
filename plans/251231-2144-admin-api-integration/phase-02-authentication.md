@@ -105,7 +105,7 @@ import { ApiError } from '@/lib/apiError'
 1. Open admin app: http://localhost:5174/login
 2. Enter test credentials
 3. Click login
-4. Verify: localStorage has auth_token, refresh_token
+4. Verify: localStorage has nail_admin_auth_token, nail_admin_refresh_token
 5. Verify: Redirected to /dashboard
 6. Verify: authStore.isAuthenticated === true
 

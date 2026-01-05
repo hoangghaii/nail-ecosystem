@@ -4,7 +4,9 @@ import type {
 } from "@repo/types/gallery";
 
 import { GalleryCategory } from "@repo/types/gallery";
+import { queryKeys } from "@repo/utils/api";
 import { useDebounce } from "@repo/utils/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Edit,
   MoreVertical,
@@ -15,8 +17,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "@repo/utils/api";
 
 import {
   CategoryFilter,
@@ -47,7 +47,8 @@ import {
 import { galleryService } from "@/services/gallery.service";
 
 export function GalleryPage() {
-  const { data: galleryItems = [], isLoading } = useGalleryItems();
+  const { data, isLoading } = useGalleryItems();
+  const galleryItems = useMemo(() => data?.data ?? [], [data]);
   const toggleFeatured = useToggleGalleryFeatured();
   const queryClient = useQueryClient();
 
@@ -64,8 +65,8 @@ export function GalleryPage() {
   // Prefetch gallery item details on hover for better perceived performance
   const handleItemHover = (item: GalleryItem) => {
     queryClient.prefetchQuery({
-      queryKey: queryKeys.gallery.detail(item.id),
-      queryFn: () => galleryService.getById(item.id),
+      queryFn: () => galleryService.getById(item._id),
+      queryKey: queryKeys.gallery.detail(item._id),
       staleTime: 60_000, // Keep prefetched data fresh for 1 minute
     });
   };
@@ -86,7 +87,7 @@ export function GalleryPage() {
   };
 
   const handleToggleFeatured = (item: GalleryItem) => {
-    toggleFeatured.mutate({ featured: !item.featured, id: item.id });
+    toggleFeatured.mutate({ featured: !item.featured, id: item._id });
   };
 
   // Filter and search logic
@@ -122,10 +123,6 @@ export function GalleryPage() {
       [GalleryCategory.PEDICURE]: 0,
       [GalleryCategory.SEASONAL]: 0,
     };
-
-    galleryItems.forEach((item) => {
-      counts[item.category as GalleryCategoryType]++;
-    });
 
     return counts;
   }, [galleryItems]);
@@ -213,7 +210,7 @@ export function GalleryPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredItems.map((item) => (
                 <div
-                  key={item.id}
+                  key={item._id}
                   className="group relative overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg"
                   onMouseEnter={() => handleItemHover(item)}
                 >

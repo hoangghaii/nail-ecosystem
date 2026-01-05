@@ -4,19 +4,19 @@ export type GalleryItem = {
   description?: string;
   duration?: string; // e.g., "45 min", "1.5 hrs"
   featured?: boolean;
-  id: string;
+  _id: string;
   imageUrl: string;
   price?: string; // e.g., "$45", "$60-80"
   title: string;
 };
 
 export const GalleryCategory = {
-  ALL: "all",
-  EXTENSIONS: "extensions",
-  MANICURE: "manicure",
-  NAIL_ART: "nail-art",
-  PEDICURE: "pedicure",
-  SEASONAL: "seasonal",
+  ALL: 'all',
+  EXTENSIONS: 'extensions',
+  MANICURE: 'manicure',
+  NAIL_ART: 'nail-art',
+  PEDICURE: 'pedicure',
+  SEASONAL: 'seasonal',
 } as const;
 
 export type GalleryCategory =

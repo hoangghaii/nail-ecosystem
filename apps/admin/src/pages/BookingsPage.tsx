@@ -29,8 +29,11 @@ import { useBookings } from "@/hooks/api/useBookings";
 import { bookingsService } from "@/services/bookings.service";
 
 export function BookingsPage() {
-  const { data: bookings = [], isLoading } = useBookings();
+  const { data: response, isLoading } = useBookings();
   const queryClient = useQueryClient();
+
+  // Extract bookings array from pagination response
+  const bookings = response?.data || [];
 
   const [selectedBooking, setSelectedBooking] = useState<Booking | undefined>();
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -92,7 +95,9 @@ export function BookingsPage() {
     };
 
     bookings.forEach((booking) => {
-      counts[booking.status]++;
+      if (booking.status in counts) {
+        counts[booking.status as BookingStatusType]++;
+      }
     });
 
     return counts;

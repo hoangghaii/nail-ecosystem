@@ -59,7 +59,7 @@ export function ServicesOverview() {
         >
           {featuredServices.slice(0, 3).map((service) => (
             <motion.div
-              key={service.id}
+              key={service._id}
               variants={itemVariants}
               whileHover={{ y: -8 }}
               transition={{ duration: 0.3 }}

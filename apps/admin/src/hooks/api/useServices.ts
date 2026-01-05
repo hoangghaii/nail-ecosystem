@@ -1,16 +1,46 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { queryKeys } from '@repo/utils/api';
-import type { Service, ServiceCategory } from '@repo/types/service';
-import { servicesService } from '@/services/services.service';
+import type { Service, ServiceCategory } from "@repo/types/service";
+import type { GetServicesParams } from "@/services/services.service";
+
+import { queryKeys } from "@repo/utils/api";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
+
+import { servicesService } from "@/services/services.service";
+import { storage } from "@/services/storage.service";
 
 /**
- * Query: Get all services
+ * Query: Get all services (paginated)
  */
-export function useServices() {
+export function useServices(params: GetServicesParams = {}) {
   return useQuery({
-    queryKey: queryKeys.services.lists(),
-    queryFn: () => servicesService.getAll(),
+    // Don't run query if no auth token (prevents 401 errors on mount)
+    enabled: !!storage.get("auth_token", ""),
+    queryFn: () => servicesService.getAll(params),
+    queryKey: queryKeys.services.list(params),
+  });
+}
+
+/**
+ * Query: Get all services with infinite scroll
+ */
+export function useInfiniteServices(params: Omit<GetServicesParams, "page"> = {}) {
+  return useInfiniteQuery({
+    enabled: !!storage.get("auth_token", ""),
+    queryFn: ({ pageParam = 1 }) =>
+      servicesService.getAll({ ...params, page: pageParam }),
+    queryKey: queryKeys.services.list(params),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.page < lastPage.pagination.totalPages) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
 }
 
@@ -19,9 +49,9 @@ export function useServices() {
  */
 export function useService(id: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.services.detail(id!),
-    queryFn: () => servicesService.getById(id!),
     enabled: !!id,
+    queryFn: () => servicesService.getById(id!),
+    queryKey: queryKeys.services.detail(id!),
   });
 }
 
@@ -30,9 +60,9 @@ export function useService(id: string | undefined) {
  */
 export function useServicesByCategory(category: ServiceCategory | undefined) {
   return useQuery({
-    queryKey: queryKeys.services.list({ category }),
-    queryFn: () => servicesService.getByCategory(category!),
     enabled: !!category,
+    queryFn: () => servicesService.getByCategory(category!),
+    queryKey: queryKeys.services.list({ category }),
   });
 }
 
@@ -43,10 +73,10 @@ export function useCreateService() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Omit<Service, 'id'>) => servicesService.create(data),
+    mutationFn: (formData: FormData) => servicesService.create(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.services.all });
-      toast.success('Service created successfully');
+      toast.success("Service created successfully");
     },
   });
 }
@@ -58,12 +88,12 @@ export function useUpdateService() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Service> }) =>
+    mutationFn: ({ data, id }: { data: Partial<Service>; id: string }) =>
       servicesService.update(id, data),
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.services.lists() });
-      queryClient.setQueryData(queryKeys.services.detail(updated.id), updated);
-      toast.success('Service updated successfully');
+      queryClient.setQueryData(queryKeys.services.detail(updated._id), updated);
+      toast.success("Service updated successfully");
     },
   });
 }
@@ -78,7 +108,7 @@ export function useDeleteService() {
     mutationFn: (id: string) => servicesService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.services.all });
-      toast.success('Service deleted successfully');
+      toast.success("Service deleted successfully");
     },
   });
 }
@@ -90,36 +120,43 @@ export function useToggleServiceFeatured() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, featured }: { id: string; featured: boolean }) =>
+    mutationFn: ({ featured, id }: { featured: boolean; id: string }) =>
       servicesService.toggleFeatured(id, featured),
 
+    // Rollback on error
+    onError: (
+      _err,
+      _variables,
+      context: { previousServices?: Service[] } | undefined,
+    ) => {
+      if (context?.previousServices) {
+        queryClient.setQueryData(
+          queryKeys.services.lists(),
+          context.previousServices,
+        );
+      }
+      toast.error("Failed to update service");
+    },
+
     // Optimistic update
-    onMutate: async ({ id, featured }) => {
+    onMutate: async ({ featured, id }) => {
       // Cancel outgoing queries
       await queryClient.cancelQueries({ queryKey: queryKeys.services.all });
 
       // Snapshot previous value
       const previousServices = queryClient.getQueryData<Service[]>(
-        queryKeys.services.lists()
+        queryKeys.services.lists(),
       );
 
       // Optimistically update cache
       if (previousServices) {
         queryClient.setQueryData<Service[]>(
           queryKeys.services.lists(),
-          previousServices.map((s) => (s.id === id ? { ...s, featured } : s))
+          previousServices.map((s) => (s._id === id ? { ...s, featured } : s)),
         );
       }
 
       return { previousServices };
-    },
-
-    // Rollback on error
-    onError: (_err, _variables, context) => {
-      if (context?.previousServices) {
-        queryClient.setQueryData(queryKeys.services.lists(), context.previousServices);
-      }
-      toast.error('Failed to update service');
     },
 
     // Always refetch after error or success

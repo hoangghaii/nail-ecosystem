@@ -16,7 +16,7 @@ export class HeroSettingsService {
   async updateSettings(
     data: Partial<Omit<HeroSettings, "updatedAt">>,
   ): Promise<HeroSettings> {
-    return apiClient.put<HeroSettings>("/hero-settings", data);
+    return apiClient.patch<HeroSettings>("/hero-settings", data);
   }
 
   async resetSettings(): Promise<HeroSettings> {

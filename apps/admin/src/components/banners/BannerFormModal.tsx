@@ -6,8 +6,6 @@ import { z } from "zod";
 
 import type { Banner, BannerType } from "@/types/banner.types";
 
-import { ImageUpload } from "@/components/layout/shared/ImageUpload";
-import { VideoUpload } from "@/components/layout/shared/VideoUpload";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,18 +25,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useCreateBanner, useUpdateBanner } from "@/hooks/api/useBanners";
 import { cn } from "@/lib/utils";
-import { bannersService } from "@/services/banners.service";
 
 const bannerSchema = z.object({
   active: z.boolean(),
-  imageUrl: z.string().min(1, "Image is required"),
   title: z
     .string()
     .min(3, "Title must be at least 3 characters")
     .max(100, "Title must be 100 characters or less"),
   type: z.enum(["image", "video"]),
-  videoUrl: z.string().optional(),
 });
 
 type BannerFormData = z.infer<typeof bannerSchema>;
@@ -56,8 +52,15 @@ export function BannerFormModal({
   onSuccess,
   open,
 }: BannerFormModalProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [videoPreview, setVideoPreview] = useState<string>("");
+
   const isEditMode = !!banner;
+
+  const createBanner = useCreateBanner();
+  const updateBanner = useUpdateBanner();
 
   const {
     formState: { errors },
@@ -69,82 +72,134 @@ export function BannerFormModal({
   } = useForm<BannerFormData>({
     defaultValues: {
       active: true,
-      imageUrl: "",
       title: "",
       type: "image",
-      videoUrl: "",
     },
     resolver: zodResolver(bannerSchema),
   });
 
-  const imageUrl = watch("imageUrl");
-  const videoUrl = watch("videoUrl");
-  const active = watch("active");
   const type = watch("type");
+  const active = watch("active");
 
   useEffect(() => {
     if (banner) {
       reset({
         active: banner.active,
-        imageUrl: banner.imageUrl,
         title: banner.title,
         type: banner.type,
-        videoUrl: banner.videoUrl || "",
       });
+      setImagePreview(banner.imageUrl);
+      setVideoPreview(banner.videoUrl || "");
     } else {
       reset({
         active: true,
-        imageUrl: "",
         title: "",
         type: "image",
-        videoUrl: "",
       });
+      setImageFile(null);
+      setVideoFile(null);
+      setImagePreview("");
+      setVideoPreview("");
     }
   }, [banner, reset]);
 
-  const onSubmit = async (data: BannerFormData) => {
-    setIsSubmitting(true);
-    try {
-      if (isEditMode) {
-        await bannersService.update(banner.id, {
-          active: data.active,
-          imageUrl: data.imageUrl,
-          title: data.title,
-          type: data.type,
-          videoUrl: data.videoUrl || undefined,
-        });
-        toast.success("Banner updated successfully!");
-      } else {
-        const banners = await bannersService.getAll();
-        const maxSortIndex =
-          banners.length > 0
-            ? Math.max(...banners.map((b) => b.sortIndex))
-            : -1;
+  // Cleanup form data when modal closes
+  useEffect(() => {
+    if (!open) {
+      reset({
+        active: true,
+        title: "",
+        type: "image",
+      });
+      setImageFile(null);
+      setVideoFile(null);
+      setImagePreview("");
+      setVideoPreview("");
+    }
+  }, [open, reset]);
 
-        await bannersService.create({
-          active: data.active,
-          imageUrl: data.imageUrl,
-          isPrimary: false,
-          sortIndex: maxSortIndex + 1,
-          title: data.title,
-          type: data.type,
-          videoUrl: data.videoUrl || undefined,
-        });
-        toast.success("Banner created successfully!");
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setVideoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setVideoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onSubmit = (data: BannerFormData) => {
+    // Validate image required for create mode
+    if (!isEditMode && !imageFile) {
+      toast.error("Image is required");
+      return;
+    }
+
+    if (isEditMode) {
+      // Edit mode - use update mutation with JSON
+      updateBanner.mutate(
+        {
+          data: {
+            active: data.active,
+            title: data.title,
+            type: data.type,
+          },
+          id: banner._id,
+        },
+        {
+          onSuccess: () => {
+            onSuccess?.();
+            onOpenChange(false);
+            reset();
+            setImageFile(null);
+            setVideoFile(null);
+            setImagePreview("");
+            setVideoPreview("");
+          },
+        },
+      );
+    } else {
+      // Create mode - use create mutation with FormData
+      const formData = new FormData();
+
+      // Files
+      formData.append("image", imageFile!);
+      if (data.type === "video" && videoFile) {
+        formData.append("video", videoFile);
       }
 
-      onSuccess?.();
-      onOpenChange(false);
-      reset();
-    } catch (error) {
-      console.error("Error saving banner:", error);
-      toast.error(
-        isEditMode
-          ? "Failed to update banner. Please try again."
-          : "Failed to create banner. Please try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
+      // Metadata
+      formData.append("title", data.title);
+      formData.append("type", data.type);
+      formData.append("active", String(data.active));
+      formData.append("sortIndex", "0");
+      formData.append("isPrimary", "false");
+
+      createBanner.mutate(formData, {
+        onSuccess: () => {
+          onSuccess?.();
+          onOpenChange(false);
+          reset();
+          setImageFile(null);
+          setVideoFile(null);
+          setImagePreview("");
+          setVideoPreview("");
+        },
+      });
     }
   };
 
@@ -190,6 +245,7 @@ export function BannerFormModal({
               <Select
                 value={type}
                 onValueChange={(value) => setValue("type", value as BannerType)}
+                disabled={isEditMode}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select banner type" />
@@ -212,38 +268,85 @@ export function BannerFormModal({
 
             {/* Image Upload */}
             <div className="space-y-2">
-              <Label>
-                Banner Image <span className="text-destructive">*</span>
+              <Label htmlFor="image">
+                Banner Image{" "}
+                {!isEditMode && <span className="text-destructive">*</span>}
               </Label>
-              <ImageUpload
-                folder="banners"
-                value={imageUrl}
-                onChange={(url) => setValue("imageUrl", url)}
-              />
-              {errors.imageUrl && (
-                <p className="text-xs text-destructive">
-                  {errors.imageUrl.message}
-                </p>
+              {isEditMode && imagePreview && (
+                <div className="mb-2 rounded-lg border border-border overflow-hidden">
+                  <img
+                    src={imagePreview}
+                    alt="Current banner"
+                    className="w-full h-48 object-cover"
+                  />
+                  <p className="text-xs text-muted-foreground p-2 bg-muted">
+                    Current image. To change image/video, please delete and
+                    create a new banner.
+                  </p>
+                </div>
+              )}
+              {!isEditMode && (
+                <>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleImageChange}
+                    className="cursor-pointer"
+                  />
+                  {imagePreview && (
+                    <div className="mt-2 rounded-lg border border-border overflow-hidden">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-48 object-cover"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Max 10MB, formats: JPG, PNG, WebP
+                  </p>
+                </>
               )}
             </div>
 
             {/* Video Upload */}
-            <div className="space-y-2">
-              <Label>Banner Video (Optional)</Label>
-              <VideoUpload
-                folder="banners"
-                value={videoUrl}
-                onChange={(url) => setValue("videoUrl", url)}
-              />
-              {errors.videoUrl && (
-                <p className="text-xs text-destructive">
-                  {errors.videoUrl.message}
+            {type === "video" && !isEditMode && (
+              <div className="space-y-2">
+                <Label htmlFor="video">Banner Video (Optional)</Label>
+                <Input
+                  id="video"
+                  type="file"
+                  accept="video/mp4,video/webm"
+                  onChange={handleVideoChange}
+                  className="cursor-pointer"
+                />
+                {videoPreview && (
+                  <div className="mt-2 rounded-lg border border-border overflow-hidden">
+                    <video
+                      src={videoPreview}
+                      className="w-full h-48 object-cover"
+                      controls
+                    />
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Max 100MB, formats: MP4, WebM
                 </p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Add a background video for the banner (optional)
-              </p>
-            </div>
+              </div>
+            )}
+            {type === "video" && isEditMode && videoPreview && (
+              <div className="space-y-2">
+                <Label>Current Video</Label>
+                <div className="rounded-lg border border-border overflow-hidden">
+                  <video
+                    src={videoPreview}
+                    className="w-full h-48 object-cover"
+                    controls
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Active Toggle */}
             <div className="flex items-center justify-between rounded-lg border border-border p-4">
@@ -266,12 +369,15 @@ export function BannerFormModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
+              disabled={createBanner.isPending || updateBanner.isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting
+            <Button
+              type="submit"
+              disabled={createBanner.isPending || updateBanner.isPending}
+            >
+              {createBanner.isPending || updateBanner.isPending
                 ? isEditMode
                   ? "Updating..."
                   : "Creating..."

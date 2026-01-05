@@ -24,7 +24,7 @@ Body:
 Response: 201 Created
 {
   "accessToken": "jwt_token",
-  "refreshToken": "refresh_token"
+  "refreshToken": "nail_admin_refresh_token"
 }
 ```
 
@@ -42,7 +42,7 @@ Body:
 Response: 200 OK
 {
   "accessToken": "jwt_token",
-  "refreshToken": "refresh_token"
+  "refreshToken": "nail_admin_refresh_token"
 }
 ```
 
@@ -53,7 +53,7 @@ Content-Type: application/json
 
 Body:
 {
-  "refreshToken": "refresh_token"
+  "refreshToken": "nail_admin_refresh_token"
 }
 
 Response: 200 OK

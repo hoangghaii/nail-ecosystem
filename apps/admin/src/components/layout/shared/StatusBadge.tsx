@@ -1,3 +1,5 @@
+import type { BookingStatus } from "@repo/types/booking";
+
 import { cva, type VariantProps } from "class-variance-authority";
 import {
   Archive,
@@ -13,7 +15,6 @@ import {
 } from "lucide-react";
 import * as React from "react";
 
-import type { BookingStatus } from "@repo/types/booking";
 import type { ContactStatus } from "@/types/contact.types";
 
 import { cn } from "@/lib/utils";

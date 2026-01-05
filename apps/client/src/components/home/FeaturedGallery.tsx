@@ -73,7 +73,7 @@ export function FeaturedGallery() {
         >
           {featuredItems.map((item, index) => (
             <motion.div
-              key={item.id}
+              key={item._id}
               variants={itemVariants}
               whileHover={{ y: -4 }}
               transition={{ duration: 0.3 }}

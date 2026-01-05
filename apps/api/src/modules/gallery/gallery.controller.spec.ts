@@ -65,25 +65,39 @@ describe('GalleryController', () => {
   });
 
   describe('create', () => {
-    it('should create a gallery item', async () => {
-      const createDto: CreateGalleryDto = {
-        imageUrl: 'https://example.com/new-image.jpg',
+    it('should create a gallery item with file upload', async () => {
+      const file = {
+        mimetype: 'image/jpeg',
+        size: 5 * 1024 * 1024,
+      } as Express.Multer.File;
+
+      const uploadDto = {
         title: 'Elegant Design',
         description: 'French manicure',
-        category: GalleryCategory.NAIL_ART,
         price: '$45',
         duration: '60 minutes',
       };
 
-      mockGalleryService.create.mockResolvedValue({
-        ...createDto,
+      const expectedResult = {
+        ...uploadDto,
+        imageUrl: 'uploaded-image-url',
         _id: '507f1f77bcf86cd799439012',
-      });
+      };
 
-      const result = await controller.create(createDto);
+      mockStorageService.uploadFile.mockResolvedValue('uploaded-image-url');
+      mockGalleryService.create.mockResolvedValue(expectedResult);
+
+      const result = await controller.create(file, uploadDto as any);
 
       expect(result).toBeDefined();
-      expect(service.create).toHaveBeenCalledWith(createDto);
+      expect(mockStorageService.uploadFile).toHaveBeenCalledWith(
+        file,
+        'gallery',
+      );
+      expect(service.create).toHaveBeenCalledWith({
+        ...uploadDto,
+        imageUrl: 'uploaded-image-url',
+      });
     });
   });
 

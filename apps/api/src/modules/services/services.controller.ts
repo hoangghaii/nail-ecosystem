@@ -44,7 +44,10 @@ export class ServicesController {
   @ApiBearerAuth('JWT-auth')
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Create a new service with file upload' })
+  @ApiOperation({
+    summary: 'Create a new service with file upload (DEPRECATED)',
+    deprecated: true,
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -105,12 +108,55 @@ export class ServicesController {
 
   @Post()
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create a service with existing image URL' })
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Create service with image upload' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['image', 'name', 'description', 'price', 'duration', 'category'],
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Service image (max 10MB, jpg/jpeg/png/webp)',
+        },
+        name: { type: 'string', example: 'Classic Manicure' },
+        description: {
+          type: 'string',
+          example: 'Professional nail care with shaping and polish',
+        },
+        price: { type: 'number', example: 25.99 },
+        duration: { type: 'number', example: 45 },
+        category: {
+          type: 'string',
+          enum: ['extensions', 'manicure', 'nail-art', 'pedicure', 'spa'],
+          example: 'manicure',
+        },
+        featured: { type: 'boolean', example: false },
+        isActive: { type: 'boolean', example: true },
+        sortIndex: { type: 'number', example: 1 },
+      },
+    },
+  })
   @ApiResponse({ status: 201, description: 'Service successfully created' })
-  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or file' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async create(@Body() createServiceDto: CreateServiceDto) {
-    return this.servicesService.create(createServiceDto);
+  @ApiResponse({ status: 413, description: 'File too large' })
+  async create(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: /(jpg|jpeg|png|webp)$/ }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Body() uploadServiceDto: UploadServiceDto,
+  ) {
+    const imageUrl = await this.storageService.uploadFile(file, 'services');
+    return this.servicesService.create({ ...uploadServiceDto, imageUrl });
   }
 
   @Get()

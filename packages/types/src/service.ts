@@ -1,20 +1,20 @@
 export type Service = {
-  category: ServiceCategory;
-  description: string;
-  duration: number; // in minutes
-  featured?: boolean;
-  id: string;
-  imageUrl?: string;
+  _id: string;
   name: string;
+  description: string;
   price: number;
+  duration: number; // in minutes
+  category: ServiceCategory;
+  imageUrl?: string;
+  featured?: boolean;
 };
 
 export const ServiceCategory = {
-  EXTENSIONS: "extensions",
-  MANICURE: "manicure",
-  NAIL_ART: "nail-art",
-  PEDICURE: "pedicure",
-  SPA: "spa",
+  EXTENSIONS: 'extensions',
+  MANICURE: 'manicure',
+  NAIL_ART: 'nail-art',
+  PEDICURE: 'pedicure',
+  SPA: 'spa',
 } as const;
 
 export type ServiceCategory =
@@ -22,5 +22,5 @@ export type ServiceCategory =
 
 export type ServiceCardProps = {
   service: Service;
-  variant?: "default" | "featured" | "compact";
+  variant?: 'default' | 'featured' | 'compact';
 };

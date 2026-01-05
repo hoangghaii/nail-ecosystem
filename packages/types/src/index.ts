@@ -2,3 +2,4 @@ export * from './service';
 export * from './gallery';
 export * from './booking';
 export * from './auth';
+export * from './pagination';

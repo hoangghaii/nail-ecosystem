@@ -38,6 +38,9 @@ describe('BannersController', () => {
 
     controller = module.get<BannersController>(BannersController);
     service = module.get<BannersService>(BannersService);
+
+    // Reset mocks
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -45,18 +48,68 @@ describe('BannersController', () => {
   });
 
   describe('create', () => {
-    it('should create a banner', async () => {
-      const createBannerDto: CreateBannerDto = {
+    it('should create a banner with image only', async () => {
+      const files = {
+        image: [
+          {
+            mimetype: 'image/jpeg',
+            size: 5 * 1024 * 1024,
+          } as Express.Multer.File,
+        ],
+      };
+      const uploadBannerDto = {
         title: 'Test Banner',
-        imageUrl: 'https://example.com/banner.jpg',
         type: BannerType.IMAGE,
       };
-      const result = { id: '1', ...createBannerDto };
+      const result = { id: '1', ...uploadBannerDto, imageUrl: 'image-url' };
 
+      mockStorageService.uploadFile.mockResolvedValue('image-url');
       jest.spyOn(service, 'create').mockResolvedValue(result as any);
 
-      expect(await controller.create(createBannerDto)).toBe(result);
-      expect(service.create).toHaveBeenCalledWith(createBannerDto);
+      expect(await controller.create(files, uploadBannerDto as any)).toBe(
+        result,
+      );
+      expect(mockStorageService.uploadFile).toHaveBeenCalledWith(
+        files.image[0],
+        'banners',
+      );
+    });
+
+    it('should create a banner with image and video', async () => {
+      const files = {
+        image: [
+          {
+            mimetype: 'image/jpeg',
+            size: 5 * 1024 * 1024,
+          } as Express.Multer.File,
+        ],
+        video: [
+          {
+            mimetype: 'video/mp4',
+            size: 50 * 1024 * 1024,
+          } as Express.Multer.File,
+        ],
+      };
+      const uploadBannerDto = {
+        title: 'Test Banner',
+        type: BannerType.VIDEO,
+      };
+      const result = {
+        id: '1',
+        ...uploadBannerDto,
+        imageUrl: 'image-url',
+        videoUrl: 'video-url',
+      };
+
+      mockStorageService.uploadFile
+        .mockResolvedValueOnce('image-url')
+        .mockResolvedValueOnce('video-url');
+      jest.spyOn(service, 'create').mockResolvedValue(result as any);
+
+      expect(await controller.create(files, uploadBannerDto as any)).toBe(
+        result,
+      );
+      expect(mockStorageService.uploadFile).toHaveBeenCalledTimes(2);
     });
   });
 
