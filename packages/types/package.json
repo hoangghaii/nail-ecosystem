@@ -6,6 +6,7 @@
   "exports": {
     "./service": "./src/service.ts",
     "./gallery": "./src/gallery.ts",
+    "./gallery-category": "./src/gallery-category.ts",
     "./booking": "./src/booking.ts",
     "./auth": "./src/auth.ts",
     "./pagination": "./src/pagination.ts"

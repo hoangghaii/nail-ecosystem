@@ -1,16 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { GalleryItem } from "@/types";
 
-import { galleryData, GalleryCategory } from "@/data/gallery";
-
-const categories = [
-  { label: "Tất Cả", value: "all" },
-  { label: "Làm Móng Tay", value: GalleryCategory.MANICURE },
-  { label: "Làm Móng Chân", value: GalleryCategory.PEDICURE },
-  { label: "Nghệ Thuật Nail", value: GalleryCategory.NAIL_ART },
-  { label: "Nối Móng", value: GalleryCategory.EXTENSIONS },
-];
+import { useGalleryItems } from "./api/useGallery";
+import { useGalleryCategories } from "./useGalleryCategories";
 
 export function useGalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -18,10 +11,15 @@ export function useGalleryPage() {
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const filteredGallery =
-    selectedCategory === "all"
-      ? galleryData
-      : galleryData.filter((item) => item.category === selectedCategory);
+  // Fetch gallery items and categories from API
+  const { data: galleryItems = [], isLoading: isLoadingItems } =
+    useGalleryItems();
+  const { categories, isLoading: isLoadingCategories } = useGalleryCategories();
+
+  const filteredGallery = useMemo(() => {
+    if (selectedCategory === "all") return galleryItems;
+    return galleryItems.filter((item: GalleryItem) => item.category === selectedCategory);
+  }, [galleryItems, selectedCategory]);
 
   const handleImageClick = (item: GalleryItem, index: number) => {
     setSelectedImage(item);
@@ -55,6 +53,7 @@ export function useGalleryPage() {
     handleImageClick,
     handleNext,
     handlePrevious,
+    isLoading: isLoadingItems || isLoadingCategories,
     lightboxOpen,
     selectedCategory,
     selectedImage,

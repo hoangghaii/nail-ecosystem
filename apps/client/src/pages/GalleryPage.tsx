@@ -1,5 +1,7 @@
 import { motion } from "motion/react";
 
+import type { GalleryItem } from "@/types";
+
 import { GalleryCard } from "@/components/gallery/GalleryCard";
 import { ImageLightbox } from "@/components/gallery/ImageLightbox";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
@@ -14,6 +16,7 @@ export function GalleryPage() {
     handleImageClick,
     handleNext,
     handlePrevious,
+    isLoading,
     lightboxOpen,
     selectedCategory,
     selectedImage,
@@ -33,13 +36,13 @@ export function GalleryPage() {
         <div className="mb-12 flex flex-wrap justify-center gap-3">
           {categories.map((category) => (
             <motion.button
-              key={category.value}
+              key={category.slug}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               transition={{ damping: 30, stiffness: 300, type: "spring" }}
-              onClick={() => setSelectedCategory(category.value)}
+              onClick={() => setSelectedCategory(category.slug)}
               className={`rounded-[12px] px-6 py-3 font-sans font-medium transition-colors duration-200 ${
-                selectedCategory === category.value
+                selectedCategory === category.slug
                   ? "bg-primary text-primary-foreground"
                   : "border border-border bg-card text-foreground hover:border-secondary"
               }`}
@@ -50,16 +53,25 @@ export function GalleryPage() {
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredGallery.map((item, index) => (
-            <GalleryCard
-              key={item._id}
-              index={index}
-              item={item}
-              onImageClick={() => handleImageClick(item, index)}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="py-12 text-center">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            <p className="mt-4 font-sans text-lg text-muted-foreground">
+              Đang tải thư viện...
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredGallery.map((item: GalleryItem, index: number) => (
+              <GalleryCard
+                key={item._id}
+                index={index}
+                item={item}
+                onImageClick={() => handleImageClick(item, index)}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Image Lightbox */}
         <ImageLightbox
@@ -73,7 +85,7 @@ export function GalleryPage() {
         />
 
         {/* No results message */}
-        {filteredGallery.length === 0 && (
+        {!isLoading && filteredGallery.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

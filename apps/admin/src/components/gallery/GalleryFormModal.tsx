@@ -1,7 +1,7 @@
 import type { GalleryItem } from "@repo/types/gallery";
+import type { GalleryCategoryItem } from "@repo/types/gallery-category";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GalleryCategory } from "@repo/types/gallery";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,13 +37,7 @@ const gallerySchema = z.object({
     .string()
     .min(3, "Title must be at least 3 characters")
     .max(100, "Title must be 100 characters or less"),
-  category: z.enum([
-    "extensions",
-    "manicure",
-    "nail-art",
-    "pedicure",
-    "seasonal",
-  ]),
+  category: z.string().min(1, "Category is required"),
   description: z
     .string()
     .max(500, "Description must be 500 characters or less")
@@ -59,6 +53,7 @@ const gallerySchema = z.object({
 type GalleryFormData = z.infer<typeof gallerySchema>;
 
 export type GalleryFormModalProps = {
+  categories: GalleryCategoryItem[];
   galleryItem?: GalleryItem;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
@@ -66,6 +61,7 @@ export type GalleryFormModalProps = {
 };
 
 export function GalleryFormModal({
+  categories,
   galleryItem,
   onOpenChange,
   onSuccess,
@@ -263,21 +259,14 @@ export function GalleryFormModal({
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={GalleryCategory.EXTENSIONS}>
-                    Extensions
-                  </SelectItem>
-                  <SelectItem value={GalleryCategory.MANICURE}>
-                    Manicure
-                  </SelectItem>
-                  <SelectItem value={GalleryCategory.NAIL_ART}>
-                    Nail Art
-                  </SelectItem>
-                  <SelectItem value={GalleryCategory.PEDICURE}>
-                    Pedicure
-                  </SelectItem>
-                  <SelectItem value={GalleryCategory.SEASONAL}>
-                    Seasonal
-                  </SelectItem>
+                  {categories
+                    .filter((c) => c.isActive)
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((category) => (
+                      <SelectItem key={category._id} value={category.slug}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               {errors.category && (

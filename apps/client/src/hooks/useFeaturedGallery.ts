@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { GalleryItem } from "@/types";
 
-import { getFeaturedGallery } from "@/data/gallery";
+import { useFeaturedGalleryItems } from "./api/useGallery";
 
 export function useFeaturedGallery() {
-  const featuredItems = getFeaturedGallery();
+  const { data: featuredData = [], isLoading } = useFeaturedGalleryItems();
+  const featuredItems = useMemo(
+    () => featuredData.slice(0, 8),
+    [featuredData],
+  );
+
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,6 +46,7 @@ export function useFeaturedGallery() {
     handleImageClick,
     handleNext,
     handlePrevious,
+    isLoading,
     lightboxOpen,
     selectedImage,
   };

@@ -100,7 +100,15 @@ Pink Nail Salon - Turborepo Monorepo
 
 ## Current Focus
 
-### Phase 3: Post-Migration Optimization (In Progress)
+### Phase 3: Post-Migration Optimization & Feature Development (In Progress)
+
+**Completed Features**:
+- ✅ Gallery Categories CRUD (2026-01-10)
+  - Admin UI with tabs, modals, form validation
+  - Dynamic category management (create, read, update, delete, toggle active)
+  - Delete protection for categories in use
+  - Vietnamese labels in client app
+  - API-driven categories (hardcoded enum replaced)
 
 **Testing & Validation**:
 - 🔄 Docker dev mode hot-reload testing
@@ -329,7 +337,22 @@ Pink Nail Salon - Turborepo Monorepo
 
 ## Version History
 
-### v0.1.0 (2025-12-31) - Current
+### v0.1.1 (2026-01-10)
+
+**Gallery Categories CRUD**:
+- ✅ Implemented gallery categories CRUD in admin dashboard
+- ✅ Dynamic category management (create, read, update, delete)
+- ✅ Toggle category active/inactive status
+- ✅ Delete protection for categories in use
+- ✅ Tabs UI (Gallery Items | Categories)
+- ✅ Form validation with Zod
+- ✅ Vietnamese labels in client app
+- ✅ API-driven categories (replaced hardcoded enum)
+- ✅ 11/11 acceptance criteria met
+- ✅ Type-check passing across monorepo
+- **Known Issues**: Toggle UI not wired, GalleryPage.tsx exceeds LOC limit (453), sortIndex unused
+
+### v0.1.0 (2025-12-31)
 
 **Turborepo Monorepo**:
 - Migrated to Turborepo monorepo
@@ -401,6 +424,6 @@ Pink Nail Salon - Turborepo Monorepo
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2025-12-31
+**Document Version**: 1.1
+**Last Updated**: 2026-01-10
 **Next Review**: Q2 2025

@@ -30,6 +30,15 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.gallery.details(), id] as const,
   },
 
+  // Gallery categories
+  galleryCategories: {
+    all: ['gallery-categories'] as const,
+    lists: () => [...queryKeys.galleryCategories.all, 'list'] as const,
+    details: () => [...queryKeys.galleryCategories.all, 'detail'] as const,
+    detail: (id: string) =>
+      [...queryKeys.galleryCategories.details(), id] as const,
+  },
+
   // Bookings
   bookings: {
     all: ['bookings'] as const,

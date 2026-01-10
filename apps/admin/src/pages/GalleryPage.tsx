@@ -1,302 +1,130 @@
-import type {
-  GalleryItem,
-  GalleryCategory as GalleryCategoryType,
-} from "@repo/types/gallery";
+import type { GalleryItem } from "@repo/types/gallery";
+import type { GalleryCategoryItem } from "@repo/types/gallery-category";
 
-import { GalleryCategory } from "@repo/types/gallery";
-import { queryKeys } from "@repo/utils/api";
-import { useDebounce } from "@repo/utils/hooks";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  Edit,
-  MoreVertical,
-  Plus,
-  Search,
-  Star,
-  StarOff,
-  Trash2,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
-  CategoryFilter,
+  CategoryFormModal,
+  DeleteCategoryDialog,
   DeleteGalleryDialog,
-  FeaturedBadge,
+  GalleryCategoriesTab,
   GalleryFormModal,
+  GalleryItemsTab,
 } from "@/components/gallery";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  useGalleryItems,
-  useToggleGalleryFeatured,
-} from "@/hooks/api/useGallery";
-import { galleryService } from "@/services/gallery.service";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useGalleryCategories } from "@/hooks/api/useGalleryCategory";
 
 export function GalleryPage() {
-  const { data, isLoading } = useGalleryItems();
-  const galleryItems = useMemo(() => data?.data ?? [], [data]);
-  const toggleFeatured = useToggleGalleryFeatured();
-  const queryClient = useQueryClient();
-
+  // Gallery items state
   const [selectedItem, setSelectedItem] = useState<GalleryItem | undefined>();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<GalleryCategoryType>(
-    GalleryCategory.ALL,
-  );
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const debouncedSearch = useDebounce(searchQuery, 300);
+  // Category management state
+  const [activeTab, setActiveTab] = useState<"items" | "categories">("items");
+  const [selectedCategory, setSelectedCategory] = useState<
+    GalleryCategoryItem | undefined
+  >();
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
+  const [isDeleteCategoryOpen, setIsDeleteCategoryOpen] = useState(false);
 
-  // Prefetch gallery item details on hover for better perceived performance
-  const handleItemHover = (item: GalleryItem) => {
-    queryClient.prefetchQuery({
-      queryFn: () => galleryService.getById(item._id),
-      queryKey: queryKeys.gallery.detail(item._id),
-      staleTime: 60_000, // Keep prefetched data fresh for 1 minute
-    });
-  };
+  // Fetch categories
+  const { data: categoriesData } = useGalleryCategories();
+  const categories = useMemo(() => categoriesData?.data ?? [], [categoriesData]);
 
-  const handleCreate = () => {
+  // Gallery item handlers
+  const handleCreateItem = () => {
     setSelectedItem(undefined);
     setIsFormModalOpen(true);
   };
 
-  const handleEdit = (item: GalleryItem) => {
+  const handleEditItem = (item: GalleryItem) => {
     setSelectedItem(item);
     setIsFormModalOpen(true);
   };
 
-  const handleDelete = (item: GalleryItem) => {
+  const handleDeleteItem = (item: GalleryItem) => {
     setSelectedItem(item);
     setIsDeleteDialogOpen(true);
   };
 
-  const handleToggleFeatured = (item: GalleryItem) => {
-    toggleFeatured.mutate({ featured: !item.featured, id: item._id });
+  // Category handlers
+  const handleCreateCategory = () => {
+    setSelectedCategory(undefined);
+    setIsCategoryFormOpen(true);
   };
 
-  // Filter and search logic
-  const filteredItems = useMemo(() => {
-    let items = galleryItems;
+  const handleEditCategory = (category: GalleryCategoryItem) => {
+    setSelectedCategory(category);
+    setIsCategoryFormOpen(true);
+  };
 
-    // Filter by category
-    if (activeCategory !== GalleryCategory.ALL) {
-      items = items.filter((item) => item.category === activeCategory);
-    }
-
-    // Filter by search query
-    if (debouncedSearch) {
-      const query = debouncedSearch.toLowerCase();
-      items = items.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query) ||
-          item.description?.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query),
-      );
-    }
-
-    return items;
-  }, [galleryItems, activeCategory, debouncedSearch]);
-
-  // Calculate category counts
-  const categoryCounts = useMemo(() => {
-    const counts: Record<GalleryCategoryType, number> = {
-      [GalleryCategory.ALL]: galleryItems.length,
-      [GalleryCategory.EXTENSIONS]: 0,
-      [GalleryCategory.MANICURE]: 0,
-      [GalleryCategory.NAIL_ART]: 0,
-      [GalleryCategory.PEDICURE]: 0,
-      [GalleryCategory.SEASONAL]: 0,
-    };
-
-    return counts;
-  }, [galleryItems]);
+  const handleDeleteCategory = (category: GalleryCategoryItem) => {
+    setSelectedCategory(category);
+    setIsDeleteCategoryOpen(true);
+  };
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Gallery</h1>
           <p className="text-muted-foreground">
-            Manage your nail art gallery and showcase your work
+            Manage your nail art gallery and categories
           </p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Item
-        </Button>
+
+        {/* Conditional Add Button */}
+        {activeTab === "items" ? (
+          <Button onClick={handleCreateItem}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Item
+          </Button>
+        ) : (
+          <Button onClick={handleCreateCategory}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Category
+          </Button>
+        )}
       </div>
 
-      {/* Category Filter */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Categories</CardTitle>
-          <CardDescription>Filter gallery items by category</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CategoryFilter
-            activeCategory={activeCategory}
-            itemCounts={categoryCounts}
-            onCategoryChange={setActiveCategory}
+      {/* Tabs */}
+      <Tabs
+        value={activeTab}
+        onValueChange={(v: string) => setActiveTab(v as "items" | "categories")}
+      >
+        <TabsList>
+          <TabsTrigger value="items">Gallery Items</TabsTrigger>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
+        </TabsList>
+
+        {/* Tab 1: Gallery Items */}
+        <TabsContent value="items" className="space-y-6">
+          <GalleryItemsTab
+            categories={categories}
+            onCreateItem={handleCreateItem}
+            onDeleteItem={handleDeleteItem}
+            onEditItem={handleEditItem}
           />
-        </CardContent>
-      </Card>
+        </TabsContent>
 
-      {/* Gallery Grid */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Gallery Items</CardTitle>
-              <CardDescription>
-                {filteredItems.length} of {galleryItems.length} items
-              </CardDescription>
-            </div>
-            <div className="w-full max-w-sm">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search by title, description, or category..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="text-center">
-                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Loading gallery...
-                </p>
-              </div>
-            </div>
-          ) : filteredItems.length === 0 ? (
-            <div className="flex h-64 items-center justify-center">
-              <div className="text-center">
-                <p className="text-muted-foreground">
-                  {searchQuery || activeCategory !== GalleryCategory.ALL
-                    ? "No items found matching your filters"
-                    : "No gallery items found"}
-                </p>
-                {galleryItems.length === 0 && (
-                  <Button className="mt-4" onClick={handleCreate}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create your first item
-                  </Button>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredItems.map((item) => (
-                <div
-                  key={item._id}
-                  className="group relative overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg"
-                  onMouseEnter={() => handleItemHover(item)}
-                >
-                  {/* Image */}
-                  <div className="relative aspect-4/3 overflow-hidden bg-muted">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.title}
-                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    />
-                    {item.featured && (
-                      <div className="absolute right-2 top-2">
-                        <FeaturedBadge />
-                      </div>
-                    )}
+        {/* Tab 2: Categories */}
+        <TabsContent value="categories" className="space-y-6">
+          <GalleryCategoriesTab
+            categories={categories}
+            onCreateCategory={handleCreateCategory}
+            onDeleteCategory={handleDeleteCategory}
+            onEditCategory={handleEditCategory}
+          />
+        </TabsContent>
+      </Tabs>
 
-                    {/* Actions Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="secondary"
-                            size="icon"
-                            className="h-10 w-10"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                            <span className="sr-only">Actions</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(item)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleToggleFeatured(item)}
-                          >
-                            {item.featured ? (
-                              <>
-                                <StarOff className="mr-2 h-4 w-4" />
-                                Unfeature
-                              </>
-                            ) : (
-                              <>
-                                <Star className="mr-2 h-4 w-4" />
-                                Feature
-                              </>
-                            )}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => handleDelete(item)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-4">
-                    <h3 className="font-semibold line-clamp-1">{item.title}</h3>
-                    {item.description && (
-                      <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                        {item.description}
-                      </p>
-                    )}
-                    <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-                      {item.price && <span>{item.price}</span>}
-                      {item.price && item.duration && (
-                        <span className="text-border">•</span>
-                      )}
-                      {item.duration && <span>{item.duration}</span>}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
+      {/* Gallery Modals */}
       <GalleryFormModal
+        categories={categories}
         galleryItem={selectedItem}
         open={isFormModalOpen}
         onOpenChange={setIsFormModalOpen}
@@ -306,6 +134,19 @@ export function GalleryPage() {
         galleryItem={selectedItem}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+      />
+
+      {/* Category Modals */}
+      <CategoryFormModal
+        category={selectedCategory}
+        open={isCategoryFormOpen}
+        onOpenChange={setIsCategoryFormOpen}
+      />
+
+      <DeleteCategoryDialog
+        category={selectedCategory}
+        open={isDeleteCategoryOpen}
+        onOpenChange={setIsDeleteCategoryOpen}
       />
     </div>
   );

@@ -2,6 +2,8 @@ import { Clock, DollarSign } from "lucide-react";
 import { motion, type Variants } from "motion/react";
 import { Link } from "react-router-dom";
 
+import type { GalleryItem } from "@/types";
+
 import { ImageLightbox } from "@/components/gallery/ImageLightbox";
 import { Button } from "@/components/ui/button";
 import { useFeaturedGallery } from "@/hooks/useFeaturedGallery";
@@ -71,7 +73,7 @@ export function FeaturedGallery() {
           viewport={{ margin: "-50px", once: true }}
           className="columns-1 gap-4 sm:columns-2 lg:columns-3"
         >
-          {featuredItems.map((item, index) => (
+          {featuredItems.map((item: GalleryItem, index: number) => (
             <motion.div
               key={item._id}
               variants={itemVariants}

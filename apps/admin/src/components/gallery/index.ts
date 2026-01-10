@@ -1,8 +1,16 @@
 export { CategoryFilter } from "./CategoryFilter";
 export type { CategoryFilterProps } from "./CategoryFilter";
+export { CategoryFormModal } from "./CategoryFormModal";
+export type { CategoryFormModalProps } from "./CategoryFormModal";
+export { DeleteCategoryDialog } from "./DeleteCategoryDialog";
+export type { DeleteCategoryDialogProps } from "./DeleteCategoryDialog";
 export { DeleteGalleryDialog } from "./DeleteGalleryDialog";
 export type { DeleteGalleryDialogProps } from "./DeleteGalleryDialog";
 export { FeaturedBadge } from "./FeaturedBadge";
 export type { FeaturedBadgeProps } from "./FeaturedBadge";
+export { GalleryCategoriesTab } from "./gallery-categories-tab";
+export type { GalleryCategoriesTabProps } from "./gallery-categories-tab";
 export { GalleryFormModal } from "./GalleryFormModal";
 export type { GalleryFormModalProps } from "./GalleryFormModal";
+export { GalleryItemsTab } from "./gallery-items-tab";
+export type { GalleryItemsTabProps } from "./gallery-items-tab";

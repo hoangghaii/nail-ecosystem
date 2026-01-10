@@ -1,5 +1,5 @@
 export type GalleryItem = {
-  category: GalleryCategory;
+  category: string; // Changed from enum to string for dynamic categories (category slug)
   createdAt?: Date;
   description?: string;
   duration?: string; // e.g., "45 min", "1.5 hrs"
