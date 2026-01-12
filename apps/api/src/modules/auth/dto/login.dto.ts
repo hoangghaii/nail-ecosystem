@@ -1,4 +1,10 @@
-import { IsEmail, IsString, MinLength, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
@@ -19,7 +25,8 @@ export class LoginDto {
   password: string;
 
   @ApiProperty({
-    description: 'Remember me for extended session (30 days instead of 24 hours)',
+    description:
+      'Remember me for extended session (30 days instead of 24 hours)',
     example: true,
     required: false,
   })

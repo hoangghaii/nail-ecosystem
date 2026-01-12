@@ -160,7 +160,9 @@ export class GalleryService {
         await this.storageService.deleteFile(gallery.imageUrl);
       } catch (error) {
         // Log error but continue with deletion
-        console.warn(`Failed to delete image from storage: ${(error as Error).message}`);
+        console.warn(
+          `Failed to delete image from storage: ${(error as Error).message}`,
+        );
       }
     }
 

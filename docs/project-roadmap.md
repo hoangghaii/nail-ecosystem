@@ -2,7 +2,7 @@
 
 Pink Nail Salon - Turborepo Monorepo
 
-**Last Updated**: 2025-12-31
+**Last Updated**: 2026-01-12
 **Current Version**: 0.1.0
 **Status**: Production-ready
 
@@ -109,6 +109,14 @@ Pink Nail Salon - Turborepo Monorepo
   - Delete protection for categories in use
   - Vietnamese labels in client app
   - API-driven categories (hardcoded enum replaced)
+
+- ✅ Contact Notes Endpoint (2026-01-12)
+  - `PATCH /contacts/:id/notes` backend endpoint
+  - Granular notes-only update (status unchanged)
+  - UpdateContactNotesDto validation
+  - Full Swagger documentation
+  - 10/10 tests passed, 9.5/10 code review score
+  - Production-ready
 
 **Testing & Validation**:
 - 🔄 Docker dev mode hot-reload testing
@@ -336,6 +344,20 @@ Pink Nail Salon - Turborepo Monorepo
 ---
 
 ## Version History
+
+### v0.1.2 (2026-01-12)
+
+**Contact Notes Endpoint**:
+- ✅ Added `PATCH /contacts/:id/notes` backend endpoint
+- ✅ UpdateContactNotesDto with validation (required, string, 1-1000 chars)
+- ✅ ContactsService.updateNotes() method (SRP-compliant)
+- ✅ ContactsController endpoint with Swagger docs
+- ✅ API documentation updated with endpoint details
+- ✅ All acceptance criteria met (10/10)
+- ✅ Type-check passing (0 errors)
+- ✅ Tests passing (10/10, 100% success)
+- ✅ Code review approved (9.5/10, 0 critical issues)
+- ✅ Production-ready
 
 ### v0.1.1 (2026-01-10)
 

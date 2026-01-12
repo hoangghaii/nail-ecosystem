@@ -1,9 +1,6 @@
 import { validateImageFile, validateVideoFile } from './file-validators';
 
-function createMockFile(
-  mimetype: string,
-  size: number,
-): Express.Multer.File {
+function createMockFile(mimetype: string, size: number): Express.Multer.File {
   return {
     mimetype,
     size,

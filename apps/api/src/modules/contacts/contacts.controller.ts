@@ -16,6 +16,7 @@ import {
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
+import { UpdateContactNotesDto } from './dto/update-contact-notes.dto';
 import { QueryContactsDto } from './dto/query-contacts.dto';
 import { Public } from '../auth/decorators/public.decorator';
 
@@ -78,5 +79,25 @@ export class ContactsController {
     @Body() updateContactStatusDto: UpdateContactStatusDto,
   ) {
     return this.contactsService.updateStatus(id, updateContactStatusDto);
+  }
+
+  @Patch(':id/notes')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update contact admin notes' })
+  @ApiResponse({
+    status: 200,
+    description: 'Contact admin notes successfully updated',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid contact ID' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Contact not found' })
+  async updateNotes(
+    @Param('id') id: string,
+    @Body() updateContactNotesDto: UpdateContactNotesDto,
+  ) {
+    return this.contactsService.updateNotes(
+      id,
+      updateContactNotesDto.adminNotes,
+    );
   }
 }

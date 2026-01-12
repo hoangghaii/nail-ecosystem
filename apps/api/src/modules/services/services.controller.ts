@@ -114,7 +114,14 @@ export class ServicesController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['image', 'name', 'description', 'price', 'duration', 'category'],
+      required: [
+        'image',
+        'name',
+        'description',
+        'price',
+        'duration',
+        'category',
+      ],
       properties: {
         image: {
           type: 'string',

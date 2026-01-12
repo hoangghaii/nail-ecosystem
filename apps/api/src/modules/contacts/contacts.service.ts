@@ -98,4 +98,27 @@ export class ContactsService {
 
     return contact;
   }
+
+  async updateNotes(id: string, adminNotes: string): Promise<Contact> {
+    // Validate MongoDB ObjectId format
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid contact ID');
+    }
+
+    // Update only adminNotes field
+    const contact = await this.contactModel
+      .findByIdAndUpdate(
+        id,
+        { adminNotes },
+        { new: true }, // Return updated document
+      )
+      .exec();
+
+    // Handle not found
+    if (!contact) {
+      throw new NotFoundException(`Contact with ID ${id} not found`);
+    }
+
+    return contact;
+  }
 }

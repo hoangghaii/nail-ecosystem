@@ -46,7 +46,8 @@ export class CreateGalleryDto {
   description?: string;
 
   @ApiPropertyOptional({
-    description: 'Gallery category ID (defaults to "all" category if not provided)',
+    description:
+      'Gallery category ID (defaults to "all" category if not provided)',
     example: '507f1f77bcf86cd799439011',
   })
   @IsString()

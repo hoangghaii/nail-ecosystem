@@ -114,7 +114,9 @@ export class ServicesService {
         await this.storageService.deleteFile(service.imageUrl);
       } catch (error) {
         // Log error but continue with deletion
-        console.warn(`Failed to delete image from storage: ${(error as Error).message}`);
+        console.warn(
+          `Failed to delete image from storage: ${(error as Error).message}`,
+        );
       }
     }
 

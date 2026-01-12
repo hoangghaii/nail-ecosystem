@@ -54,9 +54,15 @@ import { AccessTokenGuard } from './modules/auth/guards/access-token.guard';
         uri: configService.get<string>('database.uri'),
         maxPoolSize: configService.get<number>('database.maxPoolSize'),
         tls: configService.get<boolean>('database.tls'),
-        tlsAllowInvalidCertificates: configService.get<boolean>('database.tlsAllowInvalidCertificates'),
-        tlsAllowInvalidHostnames: configService.get<boolean>('database.tlsAllowInvalidHostnames'),
-        serverSelectionTimeoutMS: configService.get<number>('database.serverSelectionTimeoutMS'),
+        tlsAllowInvalidCertificates: configService.get<boolean>(
+          'database.tlsAllowInvalidCertificates',
+        ),
+        tlsAllowInvalidHostnames: configService.get<boolean>(
+          'database.tlsAllowInvalidHostnames',
+        ),
+        serverSelectionTimeoutMS: configService.get<number>(
+          'database.serverSelectionTimeoutMS',
+        ),
         socketTimeoutMS: configService.get<number>('database.socketTimeoutMS'),
         retryAttempts: configService.get<number>('database.retryAttempts'),
         retryDelay: configService.get<number>('database.retryDelay'),

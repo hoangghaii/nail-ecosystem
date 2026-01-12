@@ -223,9 +223,7 @@ describe('GalleryCategory (e2e)', () => {
     });
 
     it('should be public (no auth required)', async () => {
-      await request(app.getHttpServer())
-        .get('/gallery-categories')
-        .expect(200);
+      await request(app.getHttpServer()).get('/gallery-categories').expect(200);
     });
 
     it('should sort by sortIndex and createdAt', async () => {

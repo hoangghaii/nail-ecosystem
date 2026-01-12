@@ -101,7 +101,9 @@ export class BannersService {
       try {
         await this.storageService.deleteFile(banner.imageUrl);
       } catch (error) {
-        console.warn(`Failed to delete image from storage: ${(error as Error).message}`);
+        console.warn(
+          `Failed to delete image from storage: ${(error as Error).message}`,
+        );
       }
     }
 
@@ -110,7 +112,9 @@ export class BannersService {
       try {
         await this.storageService.deleteFile(banner.videoUrl);
       } catch (error) {
-        console.warn(`Failed to delete video from storage: ${(error as Error).message}`);
+        console.warn(
+          `Failed to delete video from storage: ${(error as Error).message}`,
+        );
       }
     }
 

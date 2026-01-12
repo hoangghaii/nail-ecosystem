@@ -20,7 +20,8 @@ export class QueryGalleryDto {
   categoryId?: string;
 
   @ApiPropertyOptional({
-    description: 'DEPRECATED: Use categoryId instead. Filter by gallery category enum',
+    description:
+      'DEPRECATED: Use categoryId instead. Filter by gallery category enum',
     enum: GalleryCategory,
     example: GalleryCategory.NAIL_ART,
     deprecated: true,

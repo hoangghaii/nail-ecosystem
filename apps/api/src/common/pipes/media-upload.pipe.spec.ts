@@ -1,10 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { MediaUploadPipe } from './media-upload.pipe';
 
-function createMockFile(
-  mimetype: string,
-  size: number,
-): Express.Multer.File {
+function createMockFile(mimetype: string, size: number): Express.Multer.File {
   return {
     mimetype,
     size,
