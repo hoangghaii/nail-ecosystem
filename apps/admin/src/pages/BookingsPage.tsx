@@ -33,7 +33,9 @@ export function BookingsPage() {
   const queryClient = useQueryClient();
 
   // Extract bookings array from pagination response
-  const bookings = response?.data || [];
+  const bookings = useMemo(() => {
+    return response?.data || [];
+  }, [response?.data]);
 
   const [selectedBooking, setSelectedBooking] = useState<Booking | undefined>();
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);

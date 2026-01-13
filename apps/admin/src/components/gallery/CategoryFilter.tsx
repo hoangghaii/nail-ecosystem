@@ -18,7 +18,9 @@ export function CategoryFilter({
   // Add "All" filter at the beginning
   const allCategories = [
     { _id: "all", isActive: true, name: "All", slug: "all", sortIndex: 0 },
-    ...categories.filter((c) => c.isActive).sort((a, b) => a.name.localeCompare(b.name)),
+    ...categories
+      .filter((c) => c.isActive)
+      .sort((a, b) => a.name.localeCompare(b.name)),
   ];
 
   return (

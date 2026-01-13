@@ -4,15 +4,15 @@
  * Handles CRUD operations for nail salon services
  */
 
-import type { Service, ServiceCategory } from "@repo/types/service";
 import type { PaginationResponse } from "@repo/types/pagination";
+import type { Service, ServiceCategory } from "@repo/types/service";
 
 import { apiClient } from "@/lib/apiClient";
 
 export type GetServicesParams = {
-  page?: number;
-  limit?: number;
   category?: ServiceCategory;
+  limit?: number;
+  page?: number;
 };
 
 export class ServicesService {

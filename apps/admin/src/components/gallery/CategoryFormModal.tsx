@@ -4,12 +4,12 @@
  * Modal for creating and editing gallery categories
  */
 
+import type { GalleryCategoryItem } from "@repo/types/gallery-category";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-import type { GalleryCategoryItem } from "@repo/types/gallery-category";
 
 import { Button } from "@/components/ui/button";
 import {

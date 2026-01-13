@@ -44,9 +44,7 @@ export class GalleryCategoryService {
     }
   }
 
-  async create(
-    data: CreateGalleryCategoryDto,
-  ): Promise<GalleryCategoryItem> {
+  async create(data: CreateGalleryCategoryDto): Promise<GalleryCategoryItem> {
     return apiClient.post<GalleryCategoryItem>("/gallery-categories", data);
   }
 

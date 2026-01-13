@@ -1,5 +1,5 @@
 import type { Service, ServiceCategory } from "@repo/types/service";
-import type { GetServicesParams } from "@/services/services.service";
+import type { PaginationResponse } from "@repo/types/pagination";
 
 import { queryKeys } from "@repo/utils/api";
 import {
@@ -9,6 +9,8 @@ import {
   useInfiniteQuery,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+import type { GetServicesParams } from "@/services/services.service";
 
 import { servicesService } from "@/services/services.service";
 import { storage } from "@/services/storage.service";
@@ -28,12 +30,11 @@ export function useServices(params: GetServicesParams = {}) {
 /**
  * Query: Get all services with infinite scroll
  */
-export function useInfiniteServices(params: Omit<GetServicesParams, "page"> = {}) {
-  return useInfiniteQuery({
+export function useInfiniteServices(
+  params: Omit<GetServicesParams, "page"> = {},
+) {
+  return useInfiniteQuery<PaginationResponse<Service>, Error, PaginationResponse<Service>, ReturnType<typeof queryKeys.services.list>, number>({
     enabled: !!storage.get("auth_token", ""),
-    queryFn: ({ pageParam = 1 }) =>
-      servicesService.getAll({ ...params, page: pageParam }),
-    queryKey: queryKeys.services.list(params),
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {
         return lastPage.pagination.page + 1;
@@ -41,6 +42,9 @@ export function useInfiniteServices(params: Omit<GetServicesParams, "page"> = {}
       return undefined;
     },
     initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      servicesService.getAll({ ...params, page: pageParam }),
+    queryKey: queryKeys.services.list(params),
   });
 }
 

@@ -32,7 +32,10 @@ export function GalleryPage() {
 
   // Fetch categories
   const { data: categoriesData } = useGalleryCategories();
-  const categories = useMemo(() => categoriesData?.data ?? [], [categoriesData]);
+  const categories = useMemo(
+    () => categoriesData?.data ?? [],
+    [categoriesData],
+  );
 
   // Gallery item handlers
   const handleCreateItem = () => {

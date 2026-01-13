@@ -2,8 +2,8 @@
 
 Pink Nail Salon - Turborepo Monorepo
 
-**Last Updated**: 2026-01-12
-**Current Version**: 0.1.0
+**Last Updated**: 2026-01-13
+**Current Version**: 0.1.3
 **Status**: Production-ready
 
 ---
@@ -117,6 +117,15 @@ Pink Nail Salon - Turborepo Monorepo
   - Full Swagger documentation
   - 10/10 tests passed, 9.5/10 code review score
   - Production-ready
+
+- ✅ Contact Notes UI Integration (2026-01-13)
+  - Integrated contact notes endpoint into ContactDetailsModal
+  - Smart routing: notes-only → notes endpoint, status changes → status endpoint
+  - Added contactNotesUpdateSchema validation
+  - Comprehensive error handling and loading state management
+  - Type-check passing, build successful, lint clean
+  - 9.5/10 code review score, production-ready
+  - Files modified: 3 (+53 LOC net)
 
 **Testing & Validation**:
 - 🔄 Docker dev mode hot-reload testing
@@ -345,6 +354,25 @@ Pink Nail Salon - Turborepo Monorepo
 
 ## Version History
 
+### v0.1.3 (2026-01-13)
+
+**Contact Notes UI Integration**:
+- ✅ Integrated `PATCH /contacts/:id/notes` endpoint in admin dashboard
+- ✅ Smart routing logic in ContactDetailsModal (notes-only vs status updates)
+- ✅ Added contactNotesUpdateSchema for type-safe validation
+- ✅ Comprehensive error handling with user-friendly toast messages
+- ✅ Loading state unification across both mutation paths
+- ✅ Type-check passing (0 errors), build successful (16.6s)
+- ✅ Lint clean (contact files), code review approved (9.5/10)
+- ✅ 12/12 acceptance criteria met (100% complete)
+- ✅ Backward compatible (no breaking changes)
+- ✅ Production-ready
+
+**Files Modified**: 3
+- apps/admin/src/lib/validations/contact.validation.ts (+6 LOC)
+- apps/admin/src/components/contacts/ContactDetailsModal.tsx (+47 LOC)
+- apps/admin/src/hooks/api/useServices.ts (+10 LOC, -7 LOC)
+
 ### v0.1.2 (2026-01-12)
 
 **Contact Notes Endpoint**:
@@ -446,6 +474,6 @@ Pink Nail Salon - Turborepo Monorepo
 
 ---
 
-**Document Version**: 1.1
-**Last Updated**: 2026-01-10
+**Document Version**: 1.2
+**Last Updated**: 2026-01-13
 **Next Review**: Q2 2025

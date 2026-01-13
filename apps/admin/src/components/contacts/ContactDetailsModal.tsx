@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { Calendar, Mail, Phone, User } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import type { ContactStatusUpdate } from "@/lib/validations/contact.validation";
 import type { Contact } from "@/types/contact.types";
@@ -25,7 +26,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useUpdateContactStatus } from "@/hooks/api/useContacts";
+import {
+  useUpdateContactStatus,
+  useUpdateContactNotes,
+} from "@/hooks/api/useContacts";
 import { contactStatusUpdateSchema } from "@/lib/validations/contact.validation";
 import { ContactStatus } from "@/types/contact.types";
 
@@ -41,6 +45,7 @@ export function ContactDetailsModal({
   open,
 }: ContactDetailsModalProps) {
   const updateStatus = useUpdateContactStatus();
+  const updateNotes = useUpdateContactNotes();
 
   const {
     formState: { errors, isSubmitting },
@@ -56,6 +61,8 @@ export function ContactDetailsModal({
     },
     resolver: zodResolver(contactStatusUpdateSchema),
   });
+
+  const isLoading = updateStatus.isPending || updateNotes.isPending;
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const selectedStatus = watch("status");
@@ -73,6 +80,35 @@ export function ContactDetailsModal({
   const onSubmit = (data: ContactStatusUpdate) => {
     if (!contact) return;
 
+    const statusChanged = data.status !== contact.status;
+    const notesChanged = (data.adminNotes || "") !== (contact.adminNotes || "");
+
+    // Notes-only update (no status change)
+    if (notesChanged && !statusChanged) {
+      // Validate non-empty notes for notes endpoint
+      if (!data.adminNotes?.trim()) {
+        toast.error("Admin notes cannot be empty");
+        return;
+      }
+
+      updateNotes.mutate(
+        {
+          adminNotes: data.adminNotes,
+          id: contact._id,
+        },
+        {
+          onError: (error) => {
+            toast.error(`Failed to update notes: ${error.message}`);
+          },
+          onSuccess: () => {
+            onClose();
+          },
+        },
+      );
+      return;
+    }
+
+    // Status update (with or without notes)
     updateStatus.mutate(
       {
         adminNotes: data.adminNotes,
@@ -80,6 +116,9 @@ export function ContactDetailsModal({
         status: data.status,
       },
       {
+        onError: (error) => {
+          toast.error(`Failed to update status: ${error.message}`);
+        },
         onSuccess: () => {
           onClose();
         },
@@ -241,12 +280,12 @@ export function ContactDetailsModal({
               type="button"
               variant="outline"
               onClick={onClose}
-              disabled={isSubmitting}
+              disabled={isLoading || isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Changes"}
+            <Button type="submit" disabled={isLoading || isSubmitting}>
+              {isLoading || isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>

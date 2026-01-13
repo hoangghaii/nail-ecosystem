@@ -33,21 +33,21 @@ import {
 } from "@/hooks/api/useGallery";
 
 const gallerySchema = z.object({
-  title: z
-    .string()
-    .min(3, "Title must be at least 3 characters")
-    .max(100, "Title must be 100 characters or less"),
   category: z.string().min(1, "Category is required"),
   description: z
     .string()
     .max(500, "Description must be 500 characters or less")
     .optional(),
-  price: z.string().max(20, "Price must be 20 characters or less").optional(),
   duration: z
     .string()
     .max(20, "Duration must be 20 characters or less")
     .optional(),
   featured: z.boolean(),
+  price: z.string().max(20, "Price must be 20 characters or less").optional(),
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title must be 100 characters or less"),
 });
 
 type GalleryFormData = z.infer<typeof gallerySchema>;
@@ -84,12 +84,12 @@ export function GalleryFormModal({
     watch,
   } = useForm<GalleryFormData>({
     defaultValues: {
-      title: "",
       category: "manicure",
       description: "",
-      price: "",
       duration: "",
       featured: false,
+      price: "",
+      title: "",
     },
     resolver: zodResolver(gallerySchema),
   });
@@ -100,22 +100,22 @@ export function GalleryFormModal({
   useEffect(() => {
     if (galleryItem) {
       reset({
-        title: galleryItem.title,
         category: galleryItem.category as GalleryFormData["category"],
         description: galleryItem.description || "",
-        price: galleryItem.price || "",
         duration: galleryItem.duration || "",
         featured: galleryItem.featured || false,
+        price: galleryItem.price || "",
+        title: galleryItem.title,
       });
       setImagePreview(galleryItem.imageUrl);
     } else {
       reset({
-        title: "",
         category: "manicure",
         description: "",
-        price: "",
         duration: "",
         featured: false,
+        price: "",
+        title: "",
       });
       setImageFile(null);
       setImagePreview("");
@@ -126,12 +126,12 @@ export function GalleryFormModal({
   useEffect(() => {
     if (!open) {
       reset({
-        title: "",
         category: "manicure",
         description: "",
-        price: "",
         duration: "",
         featured: false,
+        price: "",
+        title: "",
       });
       setImageFile(null);
       setImagePreview("");
@@ -161,15 +161,15 @@ export function GalleryFormModal({
       // Edit mode - use update mutation with JSON
       updateGalleryItem.mutate(
         {
-          id: galleryItem._id,
           data: {
-            title: data.title,
             category: data.category,
             description: data.description || undefined,
-            price: data.price || undefined,
             duration: data.duration || undefined,
             featured: data.featured,
+            price: data.price || undefined,
+            title: data.title,
           },
+          id: galleryItem._id,
         },
         {
           onSuccess: () => {
@@ -279,7 +279,8 @@ export function GalleryFormModal({
             {/* Image Upload */}
             <div className="space-y-2">
               <Label htmlFor="image">
-                Image {!isEditMode && <span className="text-destructive">*</span>}
+                Image{" "}
+                {!isEditMode && <span className="text-destructive">*</span>}
               </Label>
               {isEditMode && imagePreview && (
                 <div className="mb-2 rounded-lg border border-border overflow-hidden">
@@ -289,7 +290,8 @@ export function GalleryFormModal({
                     className="w-full h-48 object-cover"
                   />
                   <p className="text-xs text-muted-foreground p-2 bg-muted">
-                    Current image. To change image, please delete and create a new item.
+                    Current image. To change image, please delete and create a
+                    new item.
                   </p>
                 </div>
               )}
@@ -386,13 +388,17 @@ export function GalleryFormModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={createGalleryItem.isPending || updateGalleryItem.isPending}
+              disabled={
+                createGalleryItem.isPending || updateGalleryItem.isPending
+              }
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={createGalleryItem.isPending || updateGalleryItem.isPending}
+              disabled={
+                createGalleryItem.isPending || updateGalleryItem.isPending
+              }
             >
               {createGalleryItem.isPending || updateGalleryItem.isPending
                 ? isEditMode

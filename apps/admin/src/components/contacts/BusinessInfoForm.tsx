@@ -152,7 +152,7 @@ export function BusinessInfoForm() {
 
         <div className="space-y-3">
           {businessInfo.businessHours.map((schedule, index) => {
-            // eslint-disable-next-line react-hooks/incompatible-library
+             
             const isClosed = watch(`businessHours.${index}.closed`);
 
             return (

@@ -4,9 +4,9 @@
  * Confirmation dialog for deleting gallery categories
  */
 
-import { AlertTriangle } from "lucide-react";
-
 import type { GalleryCategoryItem } from "@repo/types/gallery-category";
+
+import { AlertTriangle } from "lucide-react";
 
 import {
   AlertDialog,
@@ -75,9 +75,7 @@ export function DeleteCategoryDialog({
             )}
 
             <div className="rounded-lg border-l-4 border-destructive bg-destructive/10 p-3">
-              <p className="text-sm font-medium text-destructive">
-                ⚠️ Warning
-              </p>
+              <p className="text-sm font-medium text-destructive">⚠️ Warning</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 If this category is assigned to any gallery items, deletion will
                 fail. Make sure to reassign items to another category first.
