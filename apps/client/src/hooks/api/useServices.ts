@@ -1,6 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@repo/utils/api';
 import type { ServiceCategory } from '@repo/types/service';
+
+import { queryKeys } from '@repo/utils/api';
+import { useQuery } from '@tanstack/react-query';
+
 import { servicesService } from '@/services/services.service';
 
 /**
@@ -8,8 +10,8 @@ import { servicesService } from '@/services/services.service';
  */
 export function useServices() {
   return useQuery({
-    queryKey: queryKeys.services.lists(),
     queryFn: () => servicesService.getAll(),
+    queryKey: queryKeys.services.lists(),
   });
 }
 
@@ -18,9 +20,9 @@ export function useServices() {
  */
 export function useService(id: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.services.detail(id!),
-    queryFn: () => servicesService.getById(id!),
     enabled: !!id,
+    queryFn: () => servicesService.getById(id!),
+    queryKey: queryKeys.services.detail(id!),
   });
 }
 
@@ -29,8 +31,8 @@ export function useService(id: string | undefined) {
  */
 export function useServicesByCategory(category: ServiceCategory | undefined) {
   return useQuery({
-    queryKey: queryKeys.services.list({ category }),
-    queryFn: () => servicesService.getByCategory(category!),
     enabled: !!category,
+    queryFn: () => servicesService.getByCategory(category!),
+    queryKey: queryKeys.services.list({ category }),
   });
 }

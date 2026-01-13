@@ -86,15 +86,15 @@ export function CategoryFormModal({
   }, [category, open, form]);
 
   // Auto-generate slug preview
+  const nameValue = form.watch("name");
   const slugPreview = useMemo(() => {
-    const name = form.watch("name");
-    if (!name) return "";
-    return name
+    if (!nameValue) return "";
+    return nameValue
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
-  }, [form.watch("name")]);
+  }, [nameValue]);
 
   const onSubmit = (data: CategoryFormValues) => {
     if (isEditMode) {

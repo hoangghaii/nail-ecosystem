@@ -5,6 +5,7 @@
  */
 
 import type { GalleryItem } from "@repo/types/gallery";
+
 import { apiClient } from "@/lib/apiClient";
 
 export class GalleryService {

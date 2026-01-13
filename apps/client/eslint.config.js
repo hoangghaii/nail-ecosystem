@@ -19,6 +19,10 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
   {
@@ -60,6 +64,7 @@ export default defineConfig([
       "**/node_modules/**",
       "**/.venv/**",
       "**/.claude/**",
+      "**/dev-dist/**",
     ],
   },
   {

@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@repo/utils/api';
+import { useQuery } from '@tanstack/react-query';
+
 import { galleryService } from '@/services/gallery.service';
 
 /**
@@ -7,8 +8,8 @@ import { galleryService } from '@/services/gallery.service';
  */
 export function useGalleryItems() {
   return useQuery({
-    queryKey: queryKeys.gallery.lists(),
     queryFn: () => galleryService.getAll(),
+    queryKey: queryKeys.gallery.lists(),
   });
 }
 
@@ -17,9 +18,9 @@ export function useGalleryItems() {
  */
 export function useGalleryItem(id: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.gallery.detail(id!),
-    queryFn: () => galleryService.getById(id!),
     enabled: !!id,
+    queryFn: () => galleryService.getById(id!),
+    queryKey: queryKeys.gallery.detail(id!),
   });
 }
 
@@ -28,7 +29,7 @@ export function useGalleryItem(id: string | undefined) {
  */
 export function useFeaturedGalleryItems() {
   return useQuery({
-    queryKey: queryKeys.gallery.list({ featured: true }),
     queryFn: () => galleryService.getFeatured(),
+    queryKey: queryKeys.gallery.list({ featured: true }),
   });
 }

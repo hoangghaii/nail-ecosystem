@@ -5,6 +5,7 @@
  */
 
 import type { Booking } from "@repo/types/booking";
+
 import { apiClient } from "@/lib/apiClient";
 
 export class BookingsService {

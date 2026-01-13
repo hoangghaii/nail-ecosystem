@@ -7,16 +7,16 @@ import { apiClient } from "@/lib/apiClient";
 // Vietnamese label mapping (client-side only)
 const VIETNAMESE_LABELS: Record<string, string> = {
   all: "Tất Cả",
-  manicure: "Làm Móng Tay",
-  pedicure: "Làm Móng Chân",
-  "nail-art": "Nghệ Thuật Nail",
   extensions: "Nối Móng",
+  manicure: "Làm Móng Tay",
+  "nail-art": "Nghệ Thuật Nail",
+  pedicure: "Làm Móng Chân",
   seasonal: "Theo Mùa",
 };
 
-export type CategoryWithLabel = GalleryCategoryItem & {
+export type CategoryWithLabel = {
   label: string; // Vietnamese label
-};
+} & GalleryCategoryItem;
 
 async function fetchCategories(): Promise<
   PaginationResponse<GalleryCategoryItem>
@@ -46,12 +46,12 @@ export function useGalleryCategories() {
   const allCategories: CategoryWithLabel[] = [
     {
       _id: "all",
-      name: "All",
-      slug: "all",
       description: "",
-      sortIndex: 0,
       isActive: true,
       label: "Tất Cả",
+      name: "All",
+      slug: "all",
+      sortIndex: 0,
     },
     ...categoriesWithLabels,
   ];

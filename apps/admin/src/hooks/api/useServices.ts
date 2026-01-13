@@ -1,5 +1,5 @@
-import type { Service, ServiceCategory } from "@repo/types/service";
 import type { PaginationResponse } from "@repo/types/pagination";
+import type { Service, ServiceCategory } from "@repo/types/service";
 
 import { queryKeys } from "@repo/utils/api";
 import {

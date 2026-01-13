@@ -5,6 +5,7 @@
  */
 
 import type { Service, ServiceCategory } from "@repo/types/service";
+
 import { apiClient } from "@/lib/apiClient";
 
 export class ServicesService {
