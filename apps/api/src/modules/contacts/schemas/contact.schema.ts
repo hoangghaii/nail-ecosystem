@@ -40,5 +40,17 @@ export class Contact extends Document {
 export const ContactSchema = SchemaFactory.createForClass(Contact);
 
 // Indexes
-ContactSchema.index({ status: 1, createdAt: -1 });
+// Existing indexes
+ContactSchema.index({ status: 1, createdAt: -1 }); // Status filter + sort (keep for common use case)
 ContactSchema.index({ email: 1 });
+
+// Text search indexes for all searchable fields
+ContactSchema.index({ firstName: 1 });
+ContactSchema.index({ lastName: 1 });
+ContactSchema.index({ subject: 1 });
+ContactSchema.index({ phone: 1 });
+
+// Sorting indexes
+ContactSchema.index({ createdAt: -1 }); // Standalone createdAt sort
+ContactSchema.index({ firstName: 1, lastName: 1 }); // Sort by firstName first
+ContactSchema.index({ lastName: 1, firstName: 1 }); // Sort by lastName first

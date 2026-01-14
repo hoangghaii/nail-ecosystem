@@ -9,7 +9,7 @@ import { Model, Types } from 'mongoose';
 import { Booking, BookingDocument } from './schemas/booking.schema';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
-import { QueryBookingsDto } from './dto/query-bookings.dto';
+import { QueryBookingsDto, BookingSortField, SortOrder } from './dto/query-bookings.dto';
 
 @Injectable()
 export class BookingsService {
@@ -40,9 +40,20 @@ export class BookingsService {
   }
 
   async findAll(query: QueryBookingsDto) {
-    const { status, serviceId, date, page = 1, limit = 10 } = query;
+    const {
+      status,
+      serviceId,
+      date,
+      search,
+      sortBy = BookingSortField.DATE,
+      sortOrder = SortOrder.DESC,
+      page = 1,
+      limit = 10,
+    } = query;
 
     const filter: any = {};
+
+    // Existing filters
     if (status) filter.status = status;
     if (serviceId) {
       if (!Types.ObjectId.isValid(serviceId)) {
@@ -57,13 +68,48 @@ export class BookingsService {
       filter.date = { $gte: startDate, $lt: endDate };
     }
 
+    // Text search implementation
+    if (search && search.trim()) {
+      // Escape special regex characters to prevent ReDoS attacks
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(escapedSearch, 'i'); // case-insensitive
+
+      filter.$or = [
+        { 'customerInfo.firstName': searchRegex },
+        { 'customerInfo.lastName': searchRegex },
+        { 'customerInfo.email': searchRegex },
+        { 'customerInfo.phone': searchRegex },
+      ];
+    }
+
+    // Dynamic sorting
+    const sort: any = {};
+    switch (sortBy) {
+      case BookingSortField.DATE:
+        sort.date = sortOrder === SortOrder.DESC ? -1 : 1;
+        sort.timeSlot = sortOrder === SortOrder.DESC ? -1 : 1; // Secondary sort
+        break;
+      case BookingSortField.CREATED_AT:
+        sort.createdAt = sortOrder === SortOrder.DESC ? -1 : 1;
+        break;
+      case BookingSortField.CUSTOMER_NAME:
+        // Sort by lastName, then firstName
+        sort['customerInfo.lastName'] = sortOrder === SortOrder.DESC ? -1 : 1;
+        sort['customerInfo.firstName'] = sortOrder === SortOrder.DESC ? -1 : 1;
+        break;
+      default:
+        // Fallback to date DESC (current behavior)
+        sort.date = -1;
+        sort.timeSlot = -1;
+    }
+
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
       this.bookingModel
         .find(filter)
         .populate('serviceId', 'name duration price')
-        .sort({ date: -1, timeSlot: -1 })
+        .sort(sort)
         .skip(skip)
         .limit(limit)
         .exec(),

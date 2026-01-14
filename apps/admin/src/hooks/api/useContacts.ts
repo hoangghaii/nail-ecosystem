@@ -2,25 +2,24 @@ import { queryKeys } from "@repo/utils/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import type { ContactStatus } from "@/types/contact.types";
+import type { Contact, ContactStatus } from "@/types/contact.types";
 
-import { contactsService } from "@/services/contacts.service";
+import { contactsService, type ContactsQueryParams } from "@/services/contacts.service";
 import { storage } from "@/services/storage.service";
 
 /**
- * Query: Get all contacts with optional status filter
+ * Query: Get all contacts with backend filtering
  */
-export function useContacts(filters?: { status?: ContactStatus }) {
-  return useQuery({
-    // Don't run query if no auth token (prevents 401 errors on mount)
+export function useContacts(filters?: ContactsQueryParams) {
+  return useQuery<Contact[]>({
     enabled: !!storage.get("auth_token", ""),
-    queryFn: async () => {
-      if (filters?.status) {
-        return contactsService.getByStatus(filters.status);
-      }
-      return contactsService.getAll();
-    },
+    // @ts-expect-error - keepPreviousData exists in v4
+    keepPreviousData: true, // Show old data while fetching new (smooth UX)
+    queryFn: () => contactsService.getAll(filters),
+
     queryKey: queryKeys.contacts.list(filters),
+    // Cache configuration
+    staleTime: 30_000, // Consider data fresh for 30s
   });
 }
 

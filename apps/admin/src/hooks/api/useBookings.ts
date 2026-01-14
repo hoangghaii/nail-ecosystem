@@ -11,65 +11,47 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { bookingsService } from "@/services/bookings.service";
+import { bookingsService, type BookingsQueryParams } from "@/services/bookings.service";
 import { storage } from "@/services/storage.service";
 
-type BookingFilters = {
-  dateFrom?: string;
-  dateTo?: string;
-  status?: BookingStatus;
-};
-
-type UseBookingsOptions = BookingFilters &
+type UseBookingsOptions = BookingsQueryParams &
   Omit<
     UseQueryOptions<PaginationResponse<Booking>, ApiError>,
     "queryKey" | "queryFn"
   >;
 
 /**
- * Query: Get all bookings with optional filters
+ * Query: Get all bookings with backend filtering
  */
 export function useBookings(options?: UseBookingsOptions) {
-  const { dateFrom, dateTo, status, ...queryOptions } = options || {};
+  const {
+    date,
+    limit,
+    page,
+    search,
+    serviceId,
+    sortBy,
+    sortOrder,
+    status,
+    ...queryOptions
+  } = options || {};
 
-  const filters: BookingFilters | undefined =
-    status || dateFrom || dateTo ? { dateFrom, dateTo, status } : undefined;
+  // Build filter object for queryKey and service call
+  const filters: BookingsQueryParams | undefined =
+    status || serviceId || date || search || sortBy || sortOrder || page || limit
+      ? { date, limit, page, search, serviceId, sortBy, sortOrder, status }
+      : undefined;
 
   return useQuery({
-    // Don't run query if no auth token (prevents 401 errors on mount)
     enabled: queryOptions.enabled !== false && !!storage.get("auth_token", ""),
-    queryFn: async () => {
-      // Always return PaginationResponse for consistent typing
-      if (status) {
-        const items = await bookingsService.getByStatus(status);
-        return {
-          data: items,
-          pagination: {
-            limit: items.length,
-            page: 1,
-            total: items.length,
-            totalPages: 1,
-          },
-        };
-      }
-      if (dateFrom && dateTo) {
-        const items = await bookingsService.getByDateRange(
-          new Date(dateFrom),
-          new Date(dateTo),
-        );
-        return {
-          data: items,
-          pagination: {
-            limit: items.length,
-            page: 1,
-            total: items.length,
-            totalPages: 1,
-          },
-        };
-      }
-      return bookingsService.getAll();
-    },
+    // @ts-expect-error - keepPreviousData exists in v4
+    keepPreviousData: true, // Show old data while fetching new (smooth UX)
+    queryFn: () => bookingsService.getAll(filters),
+
     queryKey: queryKeys.bookings.list(filters),
+    // Cache configuration
+    staleTime: 30_000, // Consider data fresh for 30s
+
     ...queryOptions,
   });
 }

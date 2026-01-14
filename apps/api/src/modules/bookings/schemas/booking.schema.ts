@@ -46,7 +46,21 @@ export class Booking extends Document {
 export const BookingSchema = SchemaFactory.createForClass(Booking);
 
 // Indexes
+// Existing indexes
 BookingSchema.index({ serviceId: 1, date: 1, timeSlot: 1 });
 BookingSchema.index({ status: 1 });
 BookingSchema.index({ 'customerInfo.email': 1 });
 BookingSchema.index({ 'customerInfo.phone': 1 });
+
+// Text search indexes for customerInfo fields
+BookingSchema.index({ 'customerInfo.firstName': 1 });
+BookingSchema.index({ 'customerInfo.lastName': 1 });
+
+// Sorting indexes
+BookingSchema.index({ date: -1, timeSlot: -1 }); // Sort by date DESC (most common)
+BookingSchema.index({ createdAt: -1 }); // Sort by creation date
+BookingSchema.index({ 'customerInfo.lastName': 1, 'customerInfo.firstName': 1 }); // Sort by name
+
+// Compound indexes for common filter combinations
+BookingSchema.index({ status: 1, date: -1 }); // Status filter + date sort
+BookingSchema.index({ status: 1, createdAt: -1 }); // Status filter + created sort

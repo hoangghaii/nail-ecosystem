@@ -1,6 +1,18 @@
-import { IsOptional, IsString, IsDateString, Min, Max } from 'class-validator';
+import { IsOptional, IsString, IsDateString, IsEnum, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+
+// Sort enums for type safety and MongoDB injection prevention
+enum BookingSortField {
+  DATE = 'date',
+  CREATED_AT = 'createdAt',
+  CUSTOMER_NAME = 'customerName',
+}
+
+enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
 
 export class QueryBookingsDto {
   @ApiPropertyOptional({
@@ -50,4 +62,35 @@ export class QueryBookingsDto {
   @Min(1)
   @Max(100)
   limit?: number = 10;
+
+  @ApiPropertyOptional({
+    description: 'Search across customer name, email, and phone',
+    example: 'john',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    enum: BookingSortField,
+    example: BookingSortField.DATE,
+    default: BookingSortField.DATE,
+  })
+  @IsOptional()
+  @IsEnum(BookingSortField)
+  sortBy?: BookingSortField = BookingSortField.DATE;
+
+  @ApiPropertyOptional({
+    description: 'Sort order (ascending or descending)',
+    enum: SortOrder,
+    example: SortOrder.DESC,
+    default: SortOrder.DESC,
+  })
+  @IsOptional()
+  @IsEnum(SortOrder)
+  sortOrder?: SortOrder = SortOrder.DESC;
 }
+
+// Export enums for use in service
+export { BookingSortField, SortOrder };

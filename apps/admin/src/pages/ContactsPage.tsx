@@ -23,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import { useContacts } from "@/hooks/api/useContacts";
 
 export function ContactsPage() {
-  const { data: allContacts = [] } = useContacts();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [statusFilter, setStatusFilter] = useState<ContactStatus | "all">(
     "all",
@@ -31,31 +30,16 @@ export function ContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  // Filter and search contacts
-  const filteredContacts = useMemo(() => {
-    let result = allContacts;
+  // Backend filtering via hook params
+  const { data, isFetching } = useContacts({
+    limit: 1000, // Fetch all for now
+    search: debouncedSearch || undefined,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+    status: statusFilter === "all" ? undefined : statusFilter,
+  });
 
-    // Filter by status
-    if (statusFilter !== "all") {
-      result = result.filter((contact) => contact.status === statusFilter);
-    }
-
-    // Search across multiple fields
-    if (debouncedSearch) {
-      const query = debouncedSearch.toLowerCase();
-      result = result.filter(
-        (contact) =>
-          contact.firstName.toLowerCase().includes(query) ||
-          contact.lastName.toLowerCase().includes(query) ||
-          contact.email.toLowerCase().includes(query) ||
-          contact.subject.toLowerCase().includes(query) ||
-          contact.message.toLowerCase().includes(query) ||
-          (contact.phone && contact.phone.toLowerCase().includes(query)),
-      );
-    }
-
-    return result;
-  }, [allContacts, statusFilter, debouncedSearch]);
+  const allContacts: Contact[] = (data as Contact[]) || [];
 
   // Table columns definition
   const columns: ColumnDef<Contact>[] = useMemo(
@@ -150,16 +134,17 @@ export function ContactsPage() {
           </div>
 
           {/* Results Count */}
-          <div className="text-muted-foreground text-sm">
-            {filteredContacts.length === allContacts.length
-              ? `Showing all ${allContacts.length} messages`
-              : `Showing ${filteredContacts.length} of ${allContacts.length} messages`}
+          <div className="text-muted-foreground text-sm flex items-center gap-2">
+            Showing {allContacts.length} messages
+            {isFetching && (
+              <div className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            )}
           </div>
 
           {/* Data Table */}
           <DataTable
             columns={columns}
-            data={filteredContacts}
+            data={allContacts}
             onRowClick={(contact) => setSelectedContact(contact)}
           />
         </CardContent>
