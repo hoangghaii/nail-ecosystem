@@ -32,7 +32,7 @@ export function ContactsPage() {
 
   // Backend filtering via hook params
   const { data, isFetching } = useContacts({
-    limit: 1000, // Fetch all for now
+    limit: 100, // Fetch all for now
     search: debouncedSearch || undefined,
     sortBy: "createdAt",
     sortOrder: "desc",
