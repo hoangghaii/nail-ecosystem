@@ -9,7 +9,8 @@
     "./gallery-category": "./src/gallery-category.ts",
     "./booking": "./src/booking.ts",
     "./auth": "./src/auth.ts",
-    "./pagination": "./src/pagination.ts"
+    "./pagination": "./src/pagination.ts",
+    "./business-info": "./src/business-info.ts"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",

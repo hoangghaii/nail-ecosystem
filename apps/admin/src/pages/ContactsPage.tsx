@@ -34,8 +34,8 @@ export function ContactsPage() {
   const { data, isFetching } = useContacts({
     limit: 1000, // Fetch all for now
     search: debouncedSearch || undefined,
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
+    sortBy: "createdAt",
+    sortOrder: "desc",
     status: statusFilter === "all" ? undefined : statusFilter,
   });
 

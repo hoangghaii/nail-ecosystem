@@ -4,7 +4,7 @@
  * Handles business information (singleton - only one record exists)
  */
 
-import type { BusinessInfo } from "@/types/businessInfo.types";
+import type { BusinessInfo } from "@repo/types/business-info";
 
 import { apiClient } from "@/lib/apiClient";
 
@@ -19,7 +19,7 @@ export class BusinessInfoService {
     }
   }
 
-  async update(data: Partial<Omit<BusinessInfo, "id">>): Promise<BusinessInfo> {
+  async update(data: Partial<Omit<BusinessInfo, "_id" | "createdAt" | "updatedAt">>): Promise<BusinessInfo> {
     return apiClient.patch<BusinessInfo>("/business-info", data);
   }
 }

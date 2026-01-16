@@ -4,3 +4,4 @@ export * from './gallery-category';
 export * from './booking';
 export * from './auth';
 export * from './pagination';
+export * from './business-info';

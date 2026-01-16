@@ -4,7 +4,10 @@ import { toast } from "sonner";
 
 import type { Contact, ContactStatus } from "@/types/contact.types";
 
-import { contactsService, type ContactsQueryParams } from "@/services/contacts.service";
+import {
+  contactsService,
+  type ContactsQueryParams,
+} from "@/services/contacts.service";
 import { storage } from "@/services/storage.service";
 
 /**

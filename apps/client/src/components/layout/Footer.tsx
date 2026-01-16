@@ -1,10 +1,27 @@
 import { Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import { contactInfo, businessHours } from "@/data/businessInfo";
+import { useBusinessInfo } from "@/hooks/api/useBusinessInfo";
+import { transformBusinessInfo } from "@/utils/businessInfo";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+
+  // Fetch business info from API
+  const { data: businessInfoData } = useBusinessInfo();
+
+  // Transform data for display
+  const displayData = businessInfoData
+    ? transformBusinessInfo(businessInfoData)
+    : null;
+
+  const contactInfo = displayData?.contactInfo;
+  const businessHours = displayData?.businessHours;
+
+  // Fallback: render nothing if data not loaded yet
+  if (!displayData || !contactInfo || !businessHours) {
+    return null;
+  }
 
   return (
     <footer className="bg-primary text-primary-foreground rounded-t-[32px] mt-20">
@@ -83,10 +100,22 @@ export function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-5 w-5" />
                 <address className="text-sm not-italic">
-                  {contactInfo.address.street}
-                  <br />
-                  {contactInfo.address.city}, {contactInfo.address.state}{" "}
-                  {contactInfo.address.zip}
+                  {contactInfo.address.street && (
+                    <>
+                      {contactInfo.address.street}
+                      <br />
+                    </>
+                  )}
+                  {contactInfo.address.city &&
+                  contactInfo.address.state &&
+                  contactInfo.address.zip ? (
+                    <>
+                      {contactInfo.address.city}, {contactInfo.address.state}{" "}
+                      {contactInfo.address.zip}
+                    </>
+                  ) : (
+                    contactInfo.address.full
+                  )}
                 </address>
               </div>
             </div>

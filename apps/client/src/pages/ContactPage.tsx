@@ -3,11 +3,61 @@ import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
-import { contactInfo, businessHours } from "@/data/businessInfo";
+import { useBusinessInfo } from "@/hooks/api/useBusinessInfo";
 import { useContactPage } from "@/hooks/useContactPage";
+import { transformBusinessInfo } from "@/utils/businessInfo";
 
 export function ContactPage() {
   useContactPage();
+
+  // Fetch business info from API
+  const { data: businessInfoData, isLoading, error } = useBusinessInfo();
+
+  // Transform data for display
+  const displayData = businessInfoData
+    ? transformBusinessInfo(businessInfoData)
+    : null;
+
+  const contactInfo = displayData?.contactInfo;
+  const businessHours = displayData?.businessHours;
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
+              <p className="font-sans text-base text-muted-foreground">
+                Đang tải thông tin...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !displayData || !contactInfo || !businessHours) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <p className="font-sans text-lg text-foreground mb-2">
+                Không thể tải thông tin liên hệ
+              </p>
+              <p className="font-sans text-sm text-muted-foreground">
+                Vui lòng thử lại sau.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,10 +124,22 @@ export function ContactPage() {
                       Địa Chỉ
                     </p>
                     <address className="font-sans text-base text-foreground not-italic">
-                      {contactInfo.address.street}
-                      <br />
-                      {contactInfo.address.city}, {contactInfo.address.state}{" "}
-                      {contactInfo.address.zip}
+                      {contactInfo.address.street && (
+                        <>
+                          {contactInfo.address.street}
+                          <br />
+                        </>
+                      )}
+                      {contactInfo.address.city &&
+                      contactInfo.address.state &&
+                      contactInfo.address.zip ? (
+                        <>
+                          {contactInfo.address.city},{" "}
+                          {contactInfo.address.state} {contactInfo.address.zip}
+                        </>
+                      ) : (
+                        contactInfo.address.full
+                      )}
                     </address>
                   </div>
                 </div>

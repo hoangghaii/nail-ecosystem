@@ -9,9 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useBusinessInfo, useUpdateBusinessInfo } from "@/hooks/api/useBusinessInfo";
 import { businessInfoSchema } from "@/lib/validations/businessInfo.validation";
-import { businessInfoService } from "@/services/businessInfo.service";
-import { useBusinessInfoStore } from "@/store/businessInfoStore";
 
 const dayLabels = {
   friday: "Friday",
@@ -24,14 +23,11 @@ const dayLabels = {
 } as const;
 
 export function BusinessInfoForm() {
-  const { businessInfo, initializeBusinessInfo } = useBusinessInfoStore();
   const [isEditing, setIsEditing] = useState(false);
 
-  // Initialize business info on mount only
-  useEffect(() => {
-    initializeBusinessInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Use React Query instead of Zustand
+  const { data: businessInfo, error, isLoading } = useBusinessInfo();
+  const updateMutation = useUpdateBusinessInfo();
 
   const {
     control,
@@ -66,8 +62,7 @@ export function BusinessInfoForm() {
 
   const onSubmit = async (data: BusinessInfoFormData) => {
     try {
-      await businessInfoService.update(data);
-      toast.success("Business information updated successfully");
+      await updateMutation.mutateAsync(data);
       setIsEditing(false);
     } catch (error) {
       toast.error("Failed to update business information");
@@ -87,10 +82,29 @@ export function BusinessInfoForm() {
     setIsEditing(false);
   };
 
-  if (!businessInfo) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="text-muted-foreground p-4 text-center">
         Loading business information...
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="text-destructive p-4 text-center">
+        Failed to load business information. Please try again.
+      </div>
+    );
+  }
+
+  // No data state
+  if (!businessInfo) {
+    return (
+      <div className="text-muted-foreground p-4 text-center">
+        No business information found.
       </div>
     );
   }

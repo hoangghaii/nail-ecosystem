@@ -1,3 +1,4 @@
+import { DayOfWeek } from "@repo/types/business-info";
 import { z } from "zod";
 
 // Time format validation (HH:MM in 24-hour format)
@@ -10,15 +11,7 @@ const dayScheduleSchema = z
   .object({
     closed: z.boolean(),
     closeTime: z.string().regex(timeRegex, "Invalid time format (use HH:MM)"),
-    day: z.enum([
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday",
-    ]),
+    day: z.nativeEnum(DayOfWeek),
     openTime: z.string().regex(timeRegex, "Invalid time format (use HH:MM)"),
   })
   .refine(

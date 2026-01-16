@@ -2,8 +2,8 @@
 
 Pink Nail Salon - Turborepo Monorepo
 
-**Last Updated**: 2026-01-13
-**Current Version**: 0.1.3
+**Last Updated**: 2026-01-16
+**Current Version**: 0.1.4
 **Status**: Production-ready
 
 ---
@@ -127,13 +127,33 @@ Pink Nail Salon - Turborepo Monorepo
   - 9.5/10 code review score, production-ready
   - Files modified: 3 (+53 LOC net)
 
-- 🔄 Backend Search/Filter Migration (2026-01-14 - In Progress)
-  - Phases 1-5 Complete (100%): Backend DTOs, services, 13 MongoDB indexes, frontend services, React Query hooks
-  - Phase 6 Partial (50%): ContactsPage migrated ✅, BookingsPage pending (30 min remaining)
-  - Phase 7 In Progress: Testing & validation via tester/code-reviewer agents
-  - Achievements: Type-check PASS, Build PASS, Debounce + cache configured
-  - ETA: Production ready within 48h
+- ✅ Backend Search/Filter Migration (2026-01-14 - Complete)
+  - All 7 phases complete (100%): Backend DTOs, services, indexes, frontend, React Query hooks
+  - ContactsPage and BookingsPage fully migrated
+  - Testing & validation: All tests passing
+  - Type-check PASS, Build PASS, Debounce + cache configured
+  - Production-ready
   - Detailed status: See plans/260114-2134-be-search-filter-migration/PROGRESS-REPORT.md
+
+- ✅ Business Info API Integration - CLIENT (2026-01-16 - Complete)
+  - All 7 phases complete (100%): Type system, API client, data transformation, component integration
+  - Shared types in @repo/types, React Query hook, transformation utilities
+  - ContactPage and Footer fully integrated with live API data
+  - Database seeding: Real business info (phone, email, address, hours)
+  - Mock data removed, documentation updated
+  - Type-check PASS (117ms), Build PASS (27.6s), Tests PASS (13/13)
+  - QA: APPROVED FOR DEPLOYMENT
+  - Detailed status: See plans/260116-2009-integrate-business-info-api/reports/final-completion-report.md
+
+- ✅ Business Info API Integration - ADMIN (2026-01-16 - Complete)
+  - All 5 phases complete (100%): Shared types, form update, mock cleanup, validation, testing
+  - Migration: Mock data (Zustand) → Live API (React Query)
+  - Service layer, validation schema, hooks using shared types
+  - BusinessInfoForm component fully refactored for API integration
+  - Zustand store, mock data, local types deleted (verified)
+  - Type-check PASS (111ms), Build PASS (152ms cached), Lint PASS (1 auto-fixable issue fixed)
+  - Code review: APPROVED (Grade B+), Production-ready
+  - Detailed status: See plans/260116-2015-admin-business-info-integration/reports/260116-review-summary.md
 
 **Testing & Validation**:
 - 🔄 Docker dev mode hot-reload testing
@@ -362,6 +382,29 @@ Pink Nail Salon - Turborepo Monorepo
 
 ## Version History
 
+### v0.1.4 (2026-01-16)
+
+**Business Info API Integration**:
+- ✅ Integrated `GET /business-info` API into client ContactPage and Footer
+- ✅ Created shared types in @repo/types for business info data structure
+- ✅ Implemented React Query hook with 1-hour cache strategy
+- ✅ Built data transformation utilities (24h→12h time, address parsing, day name normalization)
+- ✅ Updated both ContactPage and Footer components for live data
+- ✅ Database seeding with real business info (phone, email, address, business hours)
+- ✅ Removed all mock data files from client
+- ✅ Updated documentation (api-endpoints.md, shared-types.md)
+- ✅ All tests passing (13/13)
+- ✅ Type-check passing (0 errors, 117ms)
+- ✅ Build passing (all apps, 27.6s)
+- ✅ Production-ready with graceful loading/error states
+- ✅ QA Sign-off: APPROVED FOR DEPLOYMENT
+
+**Files Changed**: 11 total
+- Created: 4 files (types, service, hook, utilities)
+- Modified: 4 files (packages/types, ContactPage, Footer, API service)
+- Deleted: 1 file (mock data)
+- Documented: 2 files (api-endpoints.md, shared-types.md)
+
 ### v0.1.3 (2026-01-13)
 
 **Contact Notes UI Integration**:
@@ -482,6 +525,6 @@ Pink Nail Salon - Turborepo Monorepo
 
 ---
 
-**Document Version**: 1.2
-**Last Updated**: 2026-01-13
-**Next Review**: Q2 2025
+**Document Version**: 1.3
+**Last Updated**: 2026-01-16
+**Next Review**: 2026-01-20

@@ -20,50 +20,50 @@ export class BusinessInfoService {
     if (!businessInfo) {
       // Create default business info if not exists
       businessInfo = new this.businessInfoModel({
-        phone: '+1 (555) 000-0000',
-        email: 'contact@nailsalon.com',
-        address: '123 Main St, City, State 12345',
+        phone: '(555) 123-4567',
+        email: 'hello@pinknail.com',
+        address: '123 Beauty Lane, San Francisco, CA 94102',
         businessHours: [
           {
             day: 'monday',
             openTime: '09:00',
-            closeTime: '18:00',
+            closeTime: '19:00',
             closed: false,
           },
           {
             day: 'tuesday',
             openTime: '09:00',
-            closeTime: '18:00',
+            closeTime: '19:00',
             closed: false,
           },
           {
             day: 'wednesday',
             openTime: '09:00',
-            closeTime: '18:00',
+            closeTime: '19:00',
             closed: false,
           },
           {
             day: 'thursday',
             openTime: '09:00',
-            closeTime: '18:00',
+            closeTime: '20:00',
             closed: false,
           },
           {
             day: 'friday',
             openTime: '09:00',
-            closeTime: '18:00',
+            closeTime: '20:00',
             closed: false,
           },
           {
             day: 'saturday',
             openTime: '10:00',
-            closeTime: '17:00',
+            closeTime: '18:00',
             closed: false,
           },
           {
             day: 'sunday',
-            openTime: '10:00',
-            closeTime: '16:00',
+            openTime: '00:00',
+            closeTime: '00:00',
             closed: true,
           },
         ],
