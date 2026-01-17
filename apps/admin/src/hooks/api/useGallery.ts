@@ -1,21 +1,49 @@
 import type { GalleryItem } from "@repo/types/gallery";
+import type { PaginationResponse } from "@repo/types/pagination";
+import type { ApiError } from "@repo/utils/api";
 
 import { queryKeys } from "@repo/utils/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { galleryService } from "@/services/gallery.service";
+import {
+  galleryService,
+  type GalleriesQueryParams,
+} from "@/services/gallery.service";
 import { storage } from "@/services/storage.service";
+
+type UseGalleriesOptions = GalleriesQueryParams &
+  Omit<
+    UseQueryOptions<PaginationResponse<GalleryItem>, ApiError>,
+    "queryKey" | "queryFn"
+  >;
 
 /**
  * Query: Get all gallery items
  */
-export function useGalleryItems() {
+export function useGalleryItems(options?: UseGalleriesOptions) {
+  const { categoryId, featured, isActive, limit, page, ...queryOptions } =
+    options || {};
+
+  // Build filter object for queryKey and service call
+  const filters: GalleriesQueryParams | undefined =
+    categoryId || featured || isActive || page || limit
+      ? { categoryId, featured, isActive, limit, page }
+      : undefined;
+
   return useQuery({
-    // Don't run query if no auth token (prevents 401 errors on mount)
-    enabled: !!storage.get("auth_token", ""),
-    queryFn: () => galleryService.getAll(),
-    queryKey: queryKeys.gallery.lists(),
+    enabled: queryOptions.enabled !== false && !!storage.get("auth_token", ""),
+    // @ts-expect-error - keepPreviousData exists in v4
+    keepPreviousData: true, // Show old data while fetching new (smooth UX)
+    queryFn: () => galleryService.getAll(filters),
+    queryKey: queryKeys.gallery.list(filters),
+    staleTime: 30_000, // Consider data fresh for 30s
+    ...queryOptions,
   });
 }
 

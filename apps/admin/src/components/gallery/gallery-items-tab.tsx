@@ -2,7 +2,6 @@ import type { GalleryItem } from "@repo/types/gallery";
 import type { GalleryCategoryItem } from "@repo/types/gallery-category";
 
 import { queryKeys } from "@repo/utils/api";
-import { useDebounce } from "@repo/utils/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Edit,
@@ -13,7 +12,7 @@ import {
   StarOff,
   Trash2,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CategoryFilter, FeaturedBadge } from "@/components/gallery";
 import { Button } from "@/components/ui/button";
@@ -51,15 +50,21 @@ export function GalleryItemsTab({
   onDeleteItem,
   onEditItem,
 }: GalleryItemsTabProps) {
-  const { data, isLoading } = useGalleryItems();
-  const galleryItems = useMemo(() => data?.data ?? [], [data]);
-  const toggleFeatured = useToggleGalleryFeatured();
   const queryClient = useQueryClient();
 
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState<string>(
+    categories?.[0]?._id,
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
-  const debouncedSearch = useDebounce(searchQuery, 300);
+  const { data, isLoading } = useGalleryItems({
+    categoryId: activeCategory,
+    limit: 100,
+  });
+
+  const galleryItems = useMemo(() => data?.data ?? [], [data]);
+
+  const toggleFeatured = useToggleGalleryFeatured();
 
   // Prefetch gallery item details on hover
   const handleItemHover = (item: GalleryItem) => {
@@ -73,29 +78,6 @@ export function GalleryItemsTab({
   const handleToggleFeatured = (item: GalleryItem) => {
     toggleFeatured.mutate({ featured: !item.featured, id: item._id });
   };
-
-  // Filter and search logic
-  const filteredItems = useMemo(() => {
-    let items = galleryItems;
-
-    // Filter by category
-    if (activeCategory !== "all") {
-      items = items.filter((item) => item.category === activeCategory);
-    }
-
-    // Filter by search query
-    if (debouncedSearch) {
-      const query = debouncedSearch.toLowerCase();
-      items = items.filter(
-        (item) =>
-          item.title.toLowerCase().includes(query) ||
-          item.description?.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query),
-      );
-    }
-
-    return items;
-  }, [galleryItems, activeCategory, debouncedSearch]);
 
   // Calculate category counts
   const categoryCounts = useMemo(() => {
@@ -111,6 +93,13 @@ export function GalleryItemsTab({
 
     return counts;
   }, [galleryItems, categories]);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveCategory(categories[0]._id);
+    }
+  }, [categories]);
 
   return (
     <div className="space-y-6">
@@ -137,7 +126,7 @@ export function GalleryItemsTab({
             <div>
               <CardTitle>Gallery Items</CardTitle>
               <CardDescription>
-                {filteredItems.length} of {galleryItems.length} items
+                {galleryItems.length} of {galleryItems.length} items
               </CardDescription>
             </div>
             <div className="w-full max-w-sm">
@@ -163,7 +152,7 @@ export function GalleryItemsTab({
                 </p>
               </div>
             </div>
-          ) : filteredItems.length === 0 ? (
+          ) : galleryItems.length === 0 ? (
             <div className="flex h-64 items-center justify-center">
               <div className="text-center">
                 <p className="text-muted-foreground">
@@ -181,7 +170,7 @@ export function GalleryItemsTab({
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredItems.map((item) => (
+              {galleryItems.map((item) => (
                 <div
                   key={item._id}
                   className="group relative overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg"

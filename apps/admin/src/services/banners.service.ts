@@ -10,9 +10,22 @@ import type { Banner } from "@/types/banner.types";
 
 import { apiClient } from "@/lib/apiClient";
 
+// Query params type for type-safe API calls
+export type BannersQueryParams = {
+  active?: boolean;
+  isPrimary?: boolean;
+  limit?: number;
+  page?: number;
+  type?: "image" | "video";
+};
+
 export class BannersService {
-  async getAll(): Promise<PaginationResponse<Banner>> {
-    return apiClient.get<PaginationResponse<Banner>>("/banners");
+  async getAll(
+    params?: BannersQueryParams,
+  ): Promise<PaginationResponse<Banner>> {
+    const queryString = this.buildQueryString(params);
+
+    return apiClient.get<PaginationResponse<Banner>>(`/banners${queryString}`);
   }
 
   async getById(id: string): Promise<Banner | null> {
@@ -72,6 +85,26 @@ export class BannersService {
       console.error("Failed to get active banners:", error);
       return [];
     }
+  }
+
+  /**
+   * Builds query string from params
+   * @private
+   */
+  private buildQueryString(params?: BannersQueryParams): string {
+    if (!params) return "";
+
+    const searchParams = new URLSearchParams();
+
+    if (params.active) searchParams.append("active", params.active.toString());
+    if (params.isPrimary)
+      searchParams.append("isPrimary", params.isPrimary.toString());
+    if (params.type) searchParams.append("type", params.type);
+    if (params.page) searchParams.append("page", params.page.toString());
+    if (params.limit) searchParams.append("limit", params.limit.toString());
+
+    const query = searchParams.toString();
+    return query ? `?${query}` : "";
   }
 }
 

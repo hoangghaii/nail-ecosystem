@@ -51,8 +51,6 @@ import { useHeroSettings } from "@/hooks/api/useHeroSettings";
 type BannerFilter = "all" | "active";
 
 export function BannersPage() {
-  const { data, isLoading } = useBanners();
-  const banners = useMemo(() => data?.data ?? [], [data]);
   const { data: heroSettings } = useHeroSettings();
   const toggleActive = useToggleBannerActive();
   const setPrimary = useSetPrimaryBanner();
@@ -65,6 +63,19 @@ export function BannersPage() {
   const [bannerFilter, setBannerFilter] = useState<BannerFilter>("all");
 
   const heroDisplayMode = heroSettings?.displayMode;
+
+  const { data, isLoading } = useBanners({
+    active: bannerFilter !== "all" ? true : undefined,
+    limit: 100,
+    type:
+      heroDisplayMode === "image" || heroDisplayMode === "carousel"
+        ? "image"
+        : heroDisplayMode === "video"
+          ? "video"
+          : undefined,
+  });
+
+  const banners = useMemo(() => data?.data ?? [], [data]);
 
   const handleCreate = () => {
     setSelectedBanner(undefined);
@@ -109,25 +120,6 @@ export function BannersPage() {
       },
     });
   };
-
-  // Filter banners based on hero display mode AND user filter
-  const filteredBanners = banners.filter((banner) => {
-    // First apply hero display mode filter based on banner type
-    let heroModeMatch = false;
-
-    if (heroDisplayMode === "image" || heroDisplayMode === "carousel") {
-      // Image mode: show primary banners with type "image"
-      heroModeMatch = banner.type === "image";
-    } else if (heroDisplayMode === "video") {
-      // Video mode: show primary banners with type "video"
-      heroModeMatch = banner.type === "video";
-    }
-
-    // Then apply user's manual filter
-    const userFilterMatch = bannerFilter === "all" ? true : banner.active;
-
-    return heroModeMatch && userFilterMatch;
-  });
 
   const columns: ColumnDef<Banner>[] = [
     {
@@ -294,7 +286,7 @@ export function BannersPage() {
               </div>
             </div>
           ) : (
-            <DataTable columns={columns} data={filteredBanners} />
+            <DataTable columns={columns} data={banners} />
           )}
         </CardContent>
       </Card>

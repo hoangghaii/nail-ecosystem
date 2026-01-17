@@ -12,24 +12,40 @@ import { toast } from "sonner";
 
 import type { Banner } from "@/types/banner.types";
 
-import { bannersService } from "@/services/banners.service";
+import {
+  bannersService,
+  type BannersQueryParams,
+} from "@/services/banners.service";
 import { storage } from "@/services/storage.service";
+
+type UseBannersOptions = BannersQueryParams &
+  Omit<
+    UseQueryOptions<PaginationResponse<Banner>, ApiError>,
+    "queryKey" | "queryFn"
+  >;
 
 /**
  * Query: Get all banners
  */
-export function useBanners(
-  options?: Omit<
-    UseQueryOptions<PaginationResponse<Banner>, ApiError>,
-    "queryKey" | "queryFn"
-  >,
-) {
+export function useBanners(options?: UseBannersOptions) {
+  const { active, isPrimary, limit, page, type, ...queryOptions } =
+    options || {};
+
+  // Build filter object for queryKey and service call
+  const filters: BannersQueryParams | undefined =
+    active || isPrimary || type || page || limit
+      ? { active, isPrimary, limit, page, type }
+      : undefined;
+
   return useQuery({
     // Don't run query if no auth token (prevents 401 errors on mount)
-    enabled: options?.enabled !== false && !!storage.get("auth_token", ""),
-    queryFn: () => bannersService.getAll(),
-    queryKey: queryKeys.banners.lists(),
-    ...options,
+    enabled: queryOptions?.enabled !== false && !!storage.get("auth_token", ""),
+    // @ts-expect-error - keepPreviousData exists in v4
+    keepPreviousData: true,
+    queryFn: () => bannersService.getAll(filters),
+    queryKey: queryKeys.banners.list(filters),
+    staleTime: 30_000,
+    ...queryOptions,
   });
 }
 

@@ -29,8 +29,8 @@ export class BannersService {
 
     const filter: any = {};
     if (type) filter.type = type;
-    if (isPrimary !== undefined) filter.isPrimary = isPrimary;
-    if (active !== undefined) filter.active = active;
+    if (isPrimary !== undefined) filter.isPrimary = true;
+    if (active !== undefined) filter.active = true;
 
     const skip = (page - 1) * limit;
 

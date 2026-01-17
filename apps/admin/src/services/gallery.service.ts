@@ -9,9 +9,24 @@ import type { PaginationResponse } from "@repo/types/pagination";
 
 import { apiClient } from "@/lib/apiClient";
 
+// Query params type for type-safe API calls
+export type GalleriesQueryParams = {
+  categoryId?: string;
+  featured?: boolean;
+  isActive?: boolean;
+  limit?: number;
+  page?: number;
+};
+
 export class GalleryService {
-  async getAll(): Promise<PaginationResponse<GalleryItem>> {
-    return apiClient.get<PaginationResponse<GalleryItem>>("/gallery");
+  async getAll(
+    params?: GalleriesQueryParams,
+  ): Promise<PaginationResponse<GalleryItem>> {
+    const queryString = this.buildQueryString(params);
+
+    return apiClient.get<PaginationResponse<GalleryItem>>(
+      `/gallery${queryString}`,
+    );
   }
 
   async getById(id: string): Promise<GalleryItem | null> {
@@ -76,6 +91,27 @@ export class GalleryService {
       console.error("Failed to get gallery items by category:", error);
       return [];
     }
+  }
+
+  /**
+   * Builds query string from params
+   * @private
+   */
+  private buildQueryString(params?: GalleriesQueryParams): string {
+    if (!params) return "";
+
+    const searchParams = new URLSearchParams();
+
+    if (params.categoryId) searchParams.append("categoryId", params.categoryId);
+    if (params.featured)
+      searchParams.append("featured", params.featured.toString());
+    if (params.isActive)
+      searchParams.append("isActive", params.isActive.toString());
+    if (params.page) searchParams.append("page", params.page.toString());
+    if (params.limit) searchParams.append("limit", params.limit.toString());
+
+    const query = searchParams.toString();
+    return query ? `?${query}` : "";
   }
 }
 

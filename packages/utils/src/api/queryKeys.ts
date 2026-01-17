@@ -24,8 +24,11 @@ export const queryKeys = {
   gallery: {
     all: ['gallery'] as const,
     lists: () => [...queryKeys.gallery.all, 'list'] as const,
-    list: (filters?: { featured?: boolean }) =>
-      [...queryKeys.gallery.lists(), filters] as const,
+    list: (filters?: {
+      categoryId?: string;
+      isActive?: boolean;
+      featured?: boolean;
+    }) => [...queryKeys.gallery.lists(), filters] as const,
     details: () => [...queryKeys.gallery.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.gallery.details(), id] as const,
   },
@@ -53,6 +56,11 @@ export const queryKeys = {
   banners: {
     all: ['banners'] as const,
     lists: () => [...queryKeys.banners.all, 'list'] as const,
+    list: (filters?: {
+      active?: boolean;
+      isPrimary?: boolean;
+      type?: string;
+    }) => [...queryKeys.banners.lists(), filters] as const,
     details: () => [...queryKeys.banners.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.banners.details(), id] as const,
   },
