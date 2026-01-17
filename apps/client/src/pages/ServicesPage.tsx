@@ -11,6 +11,7 @@ export function ServicesPage() {
   const {
     categories,
     filteredServices,
+    isLoading,
     selectedCategory,
     setSelectedCategory,
   } = useServicesPage();
@@ -44,24 +45,38 @@ export function ServicesPage() {
           ))}
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredServices.map((service, index) => (
-            <ServiceCard key={service._id} index={index} service={service} />
-          ))}
-        </div>
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="flex min-h-[400px] items-center justify-center">
+            <div className="text-center">
+              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <p className="mt-4 font-sans text-muted-foreground">
+                Đang tải dịch vụ...
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Services Grid */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredServices.map((service, index) => (
+                <ServiceCard key={service._id} index={index} service={service} />
+              ))}
+            </div>
 
-        {/* No results message */}
-        {filteredServices.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="py-12 text-center"
-          >
-            <p className="font-sans text-lg text-muted-foreground">
-              Không tìm thấy dịch vụ nào trong danh mục này.
-            </p>
-          </motion.div>
+            {/* No results message */}
+            {filteredServices.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="py-12 text-center"
+              >
+                <p className="font-sans text-lg text-muted-foreground">
+                  Không tìm thấy dịch vụ nào trong danh mục này.
+                </p>
+              </motion.div>
+            )}
+          </>
         )}
 
         {/* Bottom CTA */}

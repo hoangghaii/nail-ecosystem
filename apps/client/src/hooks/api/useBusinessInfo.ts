@@ -19,11 +19,11 @@ import { businessInfoService } from '@/services/business-info.service';
  */
 export function useBusinessInfo() {
   return useQuery({
+    gcTime: 1000 * 60 * 60 * 24, // 24 hours
     queryFn: () => businessInfoService.get(),
     queryKey: queryKeys.businessInfo.detail(),
-    staleTime: 1000 * 60 * 60, // 1 hour
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 1000 * 60 * 60, // 1 hour
   });
 }

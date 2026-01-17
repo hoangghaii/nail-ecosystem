@@ -11,7 +11,7 @@ export function ContactPage() {
   useContactPage();
 
   // Fetch business info from API
-  const { data: businessInfoData, isLoading, error } = useBusinessInfo();
+  const { data: businessInfoData, error, isLoading } = useBusinessInfo();
 
   // Transform data for display
   const displayData = businessInfoData

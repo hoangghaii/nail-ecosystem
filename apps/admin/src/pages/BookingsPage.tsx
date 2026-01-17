@@ -29,13 +29,7 @@ import { useBookings } from "@/hooks/api/useBookings";
 import { bookingsService } from "@/services/bookings.service";
 
 export function BookingsPage() {
-  const { data: response, isLoading } = useBookings();
   const queryClient = useQueryClient();
-
-  // Extract bookings array from pagination response
-  const bookings = useMemo(() => {
-    return response?.data || [];
-  }, [response?.data]);
 
   const [selectedBooking, setSelectedBooking] = useState<Booking | undefined>();
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -45,6 +39,20 @@ export function BookingsPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Backend filtering via hook params (follows ContactsPage pattern)
+  const { data: response, isFetching } = useBookings({
+    limit: 100,
+    search: debouncedSearch || undefined,
+    sortBy: "date",
+    sortOrder: "desc",
+    status: activeStatus !== "all" ? activeStatus : undefined,
+  });
+
+  // Extract bookings array from pagination response
+  const bookings = useMemo(() => {
+    return response?.data || [];
+  }, [response?.data]);
 
   // Prefetch booking details on row hover for instant modal display
   const handleRowHover = (booking: Booking) => {
@@ -62,31 +70,7 @@ export function BookingsPage() {
     setIsDetailsModalOpen(true);
   };
 
-  // Filter and search logic
-  const filteredBookings = useMemo(() => {
-    let items = bookings;
-
-    // Filter by status
-    if (activeStatus !== "all") {
-      items = items.filter((booking) => booking.status === activeStatus);
-    }
-
-    // Filter by search query (customer name, email, phone)
-    if (debouncedSearch) {
-      const query = debouncedSearch.toLowerCase();
-      items = items.filter(
-        (booking) =>
-          booking.customerInfo.firstName.toLowerCase().includes(query) ||
-          booking.customerInfo.lastName.toLowerCase().includes(query) ||
-          booking.customerInfo.email.toLowerCase().includes(query) ||
-          booking.customerInfo.phone.toLowerCase().includes(query),
-      );
-    }
-
-    return items;
-  }, [bookings, activeStatus, debouncedSearch]);
-
-  // Calculate status counts
+  // Calculate status counts from current (filtered) bookings
   const statusCounts = useMemo(() => {
     const counts: Record<BookingStatusType | "all", number> = {
       all: bookings.length,
@@ -159,11 +143,18 @@ export function BookingsPage() {
       },
       {
         accessorFn: (row) => row.serviceId,
-        cell: ({ row }) => (
-          <div className="text-sm text-muted-foreground">
-            {row.original.serviceId}
-          </div>
-        ),
+        cell: ({ row }) => {
+          const service = row.original.serviceId;
+          // Handle both populated service object and string ID
+          const serviceName =
+            typeof service === "object" && service !== null
+              ? (service as any).name
+              : service;
+
+          return (
+            <div className="text-sm text-muted-foreground">{serviceName}</div>
+          );
+        },
         header: "Service",
         id: "service",
       },
@@ -216,7 +207,7 @@ export function BookingsPage() {
             <div>
               <CardTitle>Bookings</CardTitle>
               <CardDescription>
-                {filteredBookings.length} of {bookings.length} bookings
+                {bookings.length} booking{bookings.length !== 1 ? "s" : ""}
               </CardDescription>
             </div>
             <div className="w-full max-w-sm">
@@ -233,7 +224,7 @@ export function BookingsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isFetching ? (
             <div className="flex h-64 items-center justify-center">
               <div className="text-center">
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -242,7 +233,7 @@ export function BookingsPage() {
                 </p>
               </div>
             </div>
-          ) : filteredBookings.length === 0 ? (
+          ) : bookings.length === 0 ? (
             <div className="flex h-64 items-center justify-center">
               <div className="text-center">
                 <p className="text-muted-foreground">
@@ -255,7 +246,7 @@ export function BookingsPage() {
           ) : (
             <DataTable
               columns={columns}
-              data={filteredBookings}
+              data={bookings}
               onRowClick={handleRowClick}
               onRowHover={handleRowHover}
             />

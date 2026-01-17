@@ -2,22 +2,22 @@ import type { BusinessInfo, DaySchedule } from '@repo/types/business-info';
 
 // Display types (internal to client app)
 type DisplayDaySchedule = {
-  day: string; // "Monday" (capitalized)
-  open: string; // "09:00 AM" (12-hour)
   close: string; // "07:00 PM" (12-hour)
   closed: boolean;
+  day: string; // "Monday" (capitalized)
+  open: string; // "09:00 AM" (12-hour)
 };
 
 type DisplayContactInfo = {
-  phone: string;
-  email: string;
   address: {
-    full: string; // Full address string
-    street?: string;
     city?: string;
+    full: string; // Full address string
     state?: string;
+    street?: string;
     zip?: string;
   };
+  email: string;
+  phone: string;
 };
 
 /**
@@ -49,10 +49,10 @@ export function transformBusinessHours(
   hours: DaySchedule[],
 ): DisplayDaySchedule[] {
   return hours.map((schedule) => ({
-    day: capitalizeDayName(schedule.day),
-    open: to12Hour(schedule.openTime),
     close: to12Hour(schedule.closeTime),
     closed: schedule.closed,
+    day: capitalizeDayName(schedule.day),
+    open: to12Hour(schedule.openTime),
   }));
 }
 
@@ -74,10 +74,10 @@ export function parseAddress(
 
     if (stateZipMatch) {
       return {
-        full: addressString,
-        street,
         city,
+        full: addressString,
         state: stateZipMatch[1],
+        street,
         zip: stateZipMatch[2],
       };
     }
@@ -92,15 +92,15 @@ export function parseAddress(
  * Main transformation function for ContactPage
  */
 export function transformBusinessInfo(data: BusinessInfo): {
-  contactInfo: DisplayContactInfo;
   businessHours: DisplayDaySchedule[];
+  contactInfo: DisplayContactInfo;
 } {
   return {
-    contactInfo: {
-      phone: data.phone,
-      email: data.email,
-      address: parseAddress(data.address),
-    },
     businessHours: transformBusinessHours(data.businessHours),
+    contactInfo: {
+      address: parseAddress(data.address),
+      email: data.email,
+      phone: data.phone,
+    },
   };
 }

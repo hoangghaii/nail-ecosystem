@@ -190,21 +190,40 @@ Response: 400 Bad Request (if validation fails)
 ### List All Services
 ```
 GET /services
-Query params: ?category={category}&featured={true|false}
+
+Query Parameters (all optional):
+- category: Filter by category (manicure, pedicure, spa-treatment, nail-art, waxing)
+- featured: Filter featured services (true/false)
+- isActive: Filter active services (true/false)
+- page: Page number (default: 1, min: 1)
+- limit: Items per page (default: 10, min: 1, max: 100)
+
+Examples:
+GET /services?category=manicure&isActive=true
+GET /services?featured=true
+GET /services?category=pedicure&page=2&limit=20
 
 Response: 200 OK
-[
-  {
-    "id": "service_id",
-    "name": "Gel Manicure",
-    "description": "Long-lasting gel polish",
-    "category": "manicure",
-    "price": 35,
-    "duration": 45,
-    "imageUrl": "https://...",
-    "featured": true
+{
+  "data": [
+    {
+      "id": "service_id",
+      "name": "Gel Manicure",
+      "description": "Long-lasting gel polish",
+      "category": "manicure",
+      "price": 35,
+      "duration": 45,
+      "imageUrl": "https://...",
+      "featured": true
+    }
+  ],
+  "pagination": {
+    "total": 50,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 5
   }
-]
+}
 ```
 
 ### Get Service by ID
@@ -268,20 +287,44 @@ Response: 204 No Content
 ### List Gallery Items
 ```
 GET /gallery
-Query params: ?category={category}&featured={true|false}
+
+Query Parameters (all optional):
+- categoryId: Filter by category ID (string, MongoDB ObjectId)
+- category: DEPRECATED - Filter by category enum (use categoryId instead)
+- featured: Filter featured items (true/false)
+- isActive: Filter active items (true/false)
+- page: Page number (default: 1, min: 1)
+- limit: Items per page (default: 10, min: 1, max: 100)
+
+Examples:
+GET /gallery?categoryId=507f1f77bcf86cd799439011&isActive=true
+GET /gallery?featured=true
+GET /gallery?categoryId=507f1f77bcf86cd799439011&page=2&limit=20
 
 Response: 200 OK
-[
-  {
-    "id": "gallery_id",
-    "title": "Elegant Nail Art",
-    "imageUrl": "https://...",
-    "category": "nail-art",
-    "description": "Custom design",
-    "featured": true,
-    "createdAt": "2025-12-31T00:00:00Z"
+{
+  "data": [
+    {
+      "id": "gallery_id",
+      "title": "Elegant Nail Art",
+      "imageUrl": "https://...",
+      "category": {
+        "_id": "507f1f77bcf86cd799439011",
+        "name": "Nail Art",
+        "slug": "nail-art"
+      },
+      "description": "Custom design",
+      "featured": true,
+      "createdAt": "2025-12-31T00:00:00Z"
+    }
+  ],
+  "pagination": {
+    "total": 120,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 12
   }
-]
+}
 ```
 
 ### Get Gallery Item by ID
@@ -333,25 +376,48 @@ Response: 204 No Content
 ```
 GET /bookings
 Authorization: Bearer {accessToken}
-Query params: ?status={pending|confirmed|completed|cancelled}&date={YYYY-MM-DD}
+
+Query Parameters (all optional):
+- status: Filter by status (pending, confirmed, completed, cancelled)
+- serviceId: Filter by service ID (MongoDB ObjectId)
+- date: Filter by booking date (ISO 8601 format: YYYY-MM-DD)
+- search: Search across customer name, email, and phone
+- sortBy: Sort field (date, createdAt, customerName) (default: date)
+- sortOrder: Sort order (asc, desc) (default: desc)
+- page: Page number (default: 1, min: 1)
+- limit: Items per page (default: 10, min: 1, max: 100)
+
+Examples:
+GET /bookings?status=pending&search=john
+GET /bookings?sortBy=date&sortOrder=desc
+GET /bookings?status=confirmed&date=2025-12-31
+GET /bookings?search=jane@example.com&page=1&limit=20
 
 Response: 200 OK
-[
-  {
-    "id": "booking_id",
-    "serviceId": "service_id",
-    "date": "2025-12-31",
-    "timeSlot": "10:00",
-    "customerInfo": {
-      "firstName": "Jane",
-      "lastName": "Doe",
-      "email": "jane@example.com",
-      "phone": "+1234567890"
-    },
-    "notes": "Prefer natural colors",
-    "status": "pending"
+{
+  "data": [
+    {
+      "id": "booking_id",
+      "serviceId": "service_id",
+      "date": "2025-12-31",
+      "timeSlot": "10:00",
+      "customerInfo": {
+        "firstName": "Jane",
+        "lastName": "Doe",
+        "email": "jane@example.com",
+        "phone": "+1234567890"
+      },
+      "notes": "Prefer natural colors",
+      "status": "pending"
+    }
+  ],
+  "pagination": {
+    "total": 75,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 8
   }
-]
+}
 ```
 
 ### Get Booking by ID
@@ -604,6 +670,6 @@ Response: 200 OK
 
 ---
 
-**Last Updated**: 2026-01-16
+**Last Updated**: 2026-01-17
 **API Version**: 0.1.4
-**Latest Addition**: Business Info API integration (Client + Admin) (2026-01-16)
+**Latest Addition**: Filter migration query parameter documentation (Services, Gallery, Bookings) (2026-01-17)

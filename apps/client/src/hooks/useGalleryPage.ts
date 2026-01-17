@@ -11,15 +11,21 @@ export function useGalleryPage() {
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch gallery items and categories from API
-  const { data: galleryItems = [], isLoading: isLoadingItems } =
-    useGalleryItems();
+  // Fetch categories
   const { categories, isLoading: isLoadingCategories } = useGalleryCategories();
 
-  const filteredGallery = useMemo(() => {
-    if (selectedCategory === "all") return galleryItems;
-    return galleryItems.filter((item: GalleryItem) => item.category === selectedCategory);
-  }, [galleryItems, selectedCategory]);
+  // Find categoryId from slug
+  const categoryId = useMemo(() => {
+    if (selectedCategory === "all") return undefined;
+    const category = categories.find(c => c.slug === selectedCategory);
+    return category?._id;
+  }, [selectedCategory, categories]);
+
+  // Backend filtering by categoryId
+  const { data: galleryItems = [], isLoading: isLoadingItems } = useGalleryItems({
+    categoryId,
+    isActive: true,
+  });
 
   const handleImageClick = (item: GalleryItem, index: number) => {
     setSelectedImage(item);
@@ -28,16 +34,16 @@ export function useGalleryPage() {
   };
 
   const handleNext = () => {
-    const nextIndex = (currentIndex + 1) % filteredGallery.length;
+    const nextIndex = (currentIndex + 1) % galleryItems.length;
     setCurrentIndex(nextIndex);
-    setSelectedImage(filteredGallery[nextIndex]);
+    setSelectedImage(galleryItems[nextIndex]);
   };
 
   const handlePrevious = () => {
     const prevIndex =
-      (currentIndex - 1 + filteredGallery.length) % filteredGallery.length;
+      (currentIndex - 1 + galleryItems.length) % galleryItems.length;
     setCurrentIndex(prevIndex);
-    setSelectedImage(filteredGallery[prevIndex]);
+    setSelectedImage(galleryItems[prevIndex]);
   };
 
   const closeLightbox = () => {
@@ -49,7 +55,7 @@ export function useGalleryPage() {
     categories,
     closeLightbox,
     currentIndex,
-    filteredGallery,
+    filteredGallery: galleryItems, // Already filtered by backend
     handleImageClick,
     handleNext,
     handlePrevious,

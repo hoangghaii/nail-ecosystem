@@ -8,7 +8,11 @@ import { Model, Types } from 'mongoose';
 import { Contact, ContactDocument } from './schemas/contact.schema';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
-import { QueryContactsDto, ContactSortField, SortOrder } from './dto/query-contacts.dto';
+import {
+  QueryContactsDto,
+  ContactSortField,
+  SortOrder,
+} from './dto/query-contacts.dto';
 
 @Injectable()
 export class ContactsService {
@@ -82,12 +86,7 @@ export class ContactsService {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
-      this.contactModel
-        .find(filter)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .exec(),
+      this.contactModel.find(filter).sort(sort).skip(skip).limit(limit).exec(),
       this.contactModel.countDocuments(filter),
     ]);
 

@@ -25,6 +25,7 @@ import { BusinessInfoModule } from './modules/business-info/business-info.module
 import { HeroSettingsModule } from './modules/hero-settings/hero-settings.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { AccessTokenGuard } from './modules/auth/guards/access-token.guard';
+import { SeedModule } from './seeds/seed.module';
 
 @Module({
   imports: [
@@ -117,6 +118,7 @@ import { AccessTokenGuard } from './modules/auth/guards/access-token.guard';
     BusinessInfoModule,
     HeroSettingsModule,
     StorageModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [

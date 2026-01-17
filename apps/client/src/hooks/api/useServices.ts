@@ -1,17 +1,16 @@
-import type { ServiceCategory } from '@repo/types/service';
-
 import { queryKeys } from '@repo/utils/api';
 import { useQuery } from '@tanstack/react-query';
 
-import { servicesService } from '@/services/services.service';
+import { servicesService, type ServicesQueryParams } from '@/services/services.service';
 
 /**
- * Query: Get all public services
+ * Query: Get all services with optional filters
  */
-export function useServices() {
+export function useServices(params?: ServicesQueryParams) {
   return useQuery({
-    queryFn: () => servicesService.getAll(),
-    queryKey: queryKeys.services.lists(),
+    queryFn: () => servicesService.getAll(params),
+    queryKey: queryKeys.services.list(params),
+    staleTime: 30_000, // 30s cache
   });
 }
 
@@ -23,16 +22,5 @@ export function useService(id: string | undefined) {
     enabled: !!id,
     queryFn: () => servicesService.getById(id!),
     queryKey: queryKeys.services.detail(id!),
-  });
-}
-
-/**
- * Query: Get services by category
- */
-export function useServicesByCategory(category: ServiceCategory | undefined) {
-  return useQuery({
-    enabled: !!category,
-    queryFn: () => servicesService.getByCategory(category!),
-    queryKey: queryKeys.services.list({ category }),
   });
 }

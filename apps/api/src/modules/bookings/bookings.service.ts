@@ -9,7 +9,11 @@ import { Model, Types } from 'mongoose';
 import { Booking, BookingDocument } from './schemas/booking.schema';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
-import { QueryBookingsDto, BookingSortField, SortOrder } from './dto/query-bookings.dto';
+import {
+  QueryBookingsDto,
+  BookingSortField,
+  SortOrder,
+} from './dto/query-bookings.dto';
 
 @Injectable()
 export class BookingsService {

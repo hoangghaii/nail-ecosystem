@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-import { servicesData } from "@/data/services";
 import { ServiceCategory } from "@/types";
+
+import { useServices } from "./api/useServices";
 
 const categories = [
   { label: "Tất Cả Dịch Vụ", value: "all" },
@@ -15,14 +16,16 @@ const categories = [
 export function useServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const filteredServices =
-    selectedCategory === "all"
-      ? servicesData
-      : servicesData.filter((service) => service.category === selectedCategory);
+  // Backend filtering
+  const { data: services = [], isLoading } = useServices({
+    category: selectedCategory !== "all" ? (selectedCategory as ServiceCategory) : undefined,
+    isActive: true, // Only show active services
+  });
 
   return {
     categories,
-    filteredServices,
+    filteredServices: services, // Already filtered by backend
+    isLoading,
     selectedCategory,
     setSelectedCategory,
   };

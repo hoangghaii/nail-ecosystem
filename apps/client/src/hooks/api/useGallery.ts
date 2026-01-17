@@ -1,15 +1,16 @@
 import { queryKeys } from '@repo/utils/api';
 import { useQuery } from '@tanstack/react-query';
 
-import { galleryService } from '@/services/gallery.service';
+import { galleryService, type GalleryQueryParams } from '@/services/gallery.service';
 
 /**
- * Query: Get all public gallery items
+ * Query: Get all gallery items with optional filters
  */
-export function useGalleryItems() {
+export function useGalleryItems(params?: GalleryQueryParams) {
   return useQuery({
-    queryFn: () => galleryService.getAll(),
-    queryKey: queryKeys.gallery.lists(),
+    queryFn: () => galleryService.getAll(params),
+    queryKey: queryKeys.gallery.list(params),
+    staleTime: 30_000, // 30s cache
   });
 }
 
@@ -31,5 +32,6 @@ export function useFeaturedGalleryItems() {
   return useQuery({
     queryFn: () => galleryService.getFeatured(),
     queryKey: queryKeys.gallery.list({ featured: true }),
+    staleTime: 30_000, // 30s cache
   });
 }

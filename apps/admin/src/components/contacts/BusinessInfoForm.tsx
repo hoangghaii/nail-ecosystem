@@ -9,7 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useBusinessInfo, useUpdateBusinessInfo } from "@/hooks/api/useBusinessInfo";
+import {
+  useBusinessInfo,
+  useUpdateBusinessInfo,
+} from "@/hooks/api/useBusinessInfo";
 import { businessInfoSchema } from "@/lib/validations/businessInfo.validation";
 
 const dayLabels = {
@@ -166,7 +169,7 @@ export function BusinessInfoForm() {
 
         <div className="space-y-3">
           {businessInfo.businessHours.map((schedule, index) => {
-             
+            // eslint-disable-next-line react-hooks/incompatible-library
             const isClosed = watch(`businessHours.${index}.closed`);
 
             return (
