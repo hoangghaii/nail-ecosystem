@@ -15,15 +15,19 @@ export type BookingsQueryParams = {
   page?: number;
   search?: string;
   serviceId?: string;
-  sortBy?: 'date' | 'createdAt' | 'customerName';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "date" | "createdAt" | "customerName";
+  sortOrder?: "asc" | "desc";
   status?: BookingStatus;
 };
 
 export class BookingsService {
-  async getAll(params?: BookingsQueryParams): Promise<PaginationResponse<Booking>> {
+  async getAll(
+    params?: BookingsQueryParams,
+  ): Promise<PaginationResponse<Booking>> {
     const queryString = this.buildQueryString(params);
-    return apiClient.get<PaginationResponse<Booking>>(`/bookings${queryString}`);
+    return apiClient.get<PaginationResponse<Booking>>(
+      `/bookings${queryString}`,
+    );
   }
 
   async getById(id: string): Promise<Booking | null> {
@@ -52,21 +56,21 @@ export class BookingsService {
    * @private
    */
   private buildQueryString(params?: BookingsQueryParams): string {
-    if (!params) return '';
+    if (!params) return "";
 
     const searchParams = new URLSearchParams();
 
-    if (params.status) searchParams.append('status', params.status);
-    if (params.serviceId) searchParams.append('serviceId', params.serviceId);
-    if (params.date) searchParams.append('date', params.date);
-    if (params.search) searchParams.append('search', params.search);
-    if (params.sortBy) searchParams.append('sortBy', params.sortBy);
-    if (params.sortOrder) searchParams.append('sortOrder', params.sortOrder);
-    if (params.page) searchParams.append('page', params.page.toString());
-    if (params.limit) searchParams.append('limit', params.limit.toString());
+    if (params.status) searchParams.append("status", params.status);
+    if (params.serviceId) searchParams.append("serviceId", params.serviceId);
+    if (params.date) searchParams.append("date", params.date);
+    if (params.search) searchParams.append("search", params.search);
+    if (params.sortBy) searchParams.append("sortBy", params.sortBy);
+    if (params.sortOrder) searchParams.append("sortOrder", params.sortOrder);
+    if (params.page) searchParams.append("page", params.page.toString());
+    if (params.limit) searchParams.append("limit", params.limit.toString());
 
     const query = searchParams.toString();
-    return query ? `?${query}` : '';
+    return query ? `?${query}` : "";
   }
 
   // REMOVED: getByStatus, getByDateRange, getUpcoming, getPast

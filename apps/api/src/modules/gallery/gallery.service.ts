@@ -53,6 +53,7 @@ export class GalleryService {
       category,
       featured,
       isActive,
+      search,
       page = 1,
       limit = 10,
     } = query;
@@ -74,6 +75,19 @@ export class GalleryService {
 
     if (featured !== undefined) filter.featured = featured;
     if (isActive !== undefined) filter.isActive = isActive;
+
+    // Text search implementation (same pattern as Bookings)
+    if (search && search.trim()) {
+      // Escape special regex characters to prevent ReDoS attacks
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp(escapedSearch, 'i'); // case-insensitive
+
+      filter.$or = [
+        { title: searchRegex },
+        { description: searchRegex },
+        { price: searchRegex }, // Will only match if price exists
+      ];
+    }
 
     const skip = (page - 1) * limit;
 

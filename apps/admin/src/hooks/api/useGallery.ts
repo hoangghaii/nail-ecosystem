@@ -27,13 +27,20 @@ type UseGalleriesOptions = GalleriesQueryParams &
  * Query: Get all gallery items
  */
 export function useGalleryItems(options?: UseGalleriesOptions) {
-  const { categoryId, featured, isActive, limit, page, ...queryOptions } =
-    options || {};
+  const {
+    categoryId,
+    featured,
+    isActive,
+    limit,
+    page,
+    search,
+    ...queryOptions
+  } = options || {};
 
   // Build filter object for queryKey and service call
   const filters: GalleriesQueryParams | undefined =
-    categoryId || featured || isActive || page || limit
-      ? { categoryId, featured, isActive, limit, page }
+    categoryId || featured || isActive || search || page || limit
+      ? { categoryId, featured, isActive, limit, page, search }
       : undefined;
 
   return useQuery({

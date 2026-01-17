@@ -2,6 +2,7 @@ import type { GalleryItem } from "@repo/types/gallery";
 import type { GalleryCategoryItem } from "@repo/types/gallery-category";
 
 import { queryKeys } from "@repo/utils/api";
+import { useDebounce } from "@repo/utils/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Edit,
@@ -56,10 +57,12 @@ export function GalleryItemsTab({
     categories?.[0]?._id,
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   const { data, isLoading } = useGalleryItems({
     categoryId: activeCategory,
     limit: 100,
+    search: debouncedSearch || undefined,
   });
 
   const galleryItems = useMemo(() => data?.data ?? [], [data]);
@@ -98,6 +101,7 @@ export function GalleryItemsTab({
     if (categories.length > 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveCategory(categories[0]._id);
+      setSearchQuery(""); // Clear search on category change
     }
   }, [categories]);
 
@@ -133,7 +137,7 @@ export function GalleryItemsTab({
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search by title, description, or category..."
+                  placeholder="Search by title, description, or price..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"

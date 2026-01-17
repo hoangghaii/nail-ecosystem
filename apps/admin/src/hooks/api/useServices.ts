@@ -33,7 +33,13 @@ export function useServices(params: GetServicesParams = {}) {
 export function useInfiniteServices(
   params: Omit<GetServicesParams, "page"> = {},
 ) {
-  return useInfiniteQuery<PaginationResponse<Service>, Error, PaginationResponse<Service>, ReturnType<typeof queryKeys.services.list>, number>({
+  return useInfiniteQuery<
+    PaginationResponse<Service>,
+    Error,
+    PaginationResponse<Service>,
+    ReturnType<typeof queryKeys.services.list>,
+    number
+  >({
     enabled: !!storage.get("auth_token", ""),
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {

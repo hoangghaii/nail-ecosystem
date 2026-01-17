@@ -11,7 +11,10 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { bookingsService, type BookingsQueryParams } from "@/services/bookings.service";
+import {
+  bookingsService,
+  type BookingsQueryParams,
+} from "@/services/bookings.service";
 import { storage } from "@/services/storage.service";
 
 type UseBookingsOptions = BookingsQueryParams &
@@ -38,7 +41,14 @@ export function useBookings(options?: UseBookingsOptions) {
 
   // Build filter object for queryKey and service call
   const filters: BookingsQueryParams | undefined =
-    status || serviceId || date || search || sortBy || sortOrder || page || limit
+    status ||
+    serviceId ||
+    date ||
+    search ||
+    sortBy ||
+    sortOrder ||
+    page ||
+    limit
       ? { date, limit, page, search, serviceId, sortBy, sortOrder, status }
       : undefined;
 

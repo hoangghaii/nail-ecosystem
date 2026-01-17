@@ -26,8 +26,9 @@ export function useUpdateBusinessInfo() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<Omit<BusinessInfo, "_id" | "createdAt" | "updatedAt">>) =>
-      businessInfoService.update(data),
+    mutationFn: (
+      data: Partial<Omit<BusinessInfo, "_id" | "createdAt" | "updatedAt">>,
+    ) => businessInfoService.update(data),
     onSuccess: (updated) => {
       queryClient.setQueryData(queryKeys.businessInfo.detail(), updated);
       toast.success("Business information updated successfully");

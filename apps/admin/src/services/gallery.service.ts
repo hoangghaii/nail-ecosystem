@@ -16,6 +16,7 @@ export type GalleriesQueryParams = {
   isActive?: boolean;
   limit?: number;
   page?: number;
+  search?: string;
 };
 
 export class GalleryService {
@@ -107,6 +108,7 @@ export class GalleryService {
       searchParams.append("featured", params.featured.toString());
     if (params.isActive)
       searchParams.append("isActive", params.isActive.toString());
+    if (params.search) searchParams.append("search", params.search);
     if (params.page) searchParams.append("page", params.page.toString());
     if (params.limit) searchParams.append("limit", params.limit.toString());
 

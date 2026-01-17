@@ -49,6 +49,14 @@ export class QueryGalleryDto {
   isActive?: boolean;
 
   @ApiPropertyOptional({
+    description: 'Search across title, description, and price',
+    example: 'french',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({
     description: 'Page number for pagination',
     example: 1,
     minimum: 1,

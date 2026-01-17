@@ -19,7 +19,9 @@ export class BusinessInfoService {
     }
   }
 
-  async update(data: Partial<Omit<BusinessInfo, "_id" | "createdAt" | "updatedAt">>): Promise<BusinessInfo> {
+  async update(
+    data: Partial<Omit<BusinessInfo, "_id" | "createdAt" | "updatedAt">>,
+  ): Promise<BusinessInfo> {
     return apiClient.patch<BusinessInfo>("/business-info", data);
   }
 }
