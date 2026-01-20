@@ -16,6 +16,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import { CategoryFilter, FeaturedBadge } from "@/components/gallery";
+import { InfiniteScrollTrigger } from "@/components/layout/shared/infinite-scroll-trigger";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
-  useGalleryItems,
+  useInfiniteGalleryItems,
   useToggleGalleryFeatured,
 } from "@/hooks/api/useGallery";
 import { galleryService } from "@/services/gallery.service";
@@ -59,13 +60,21 @@ export function GalleryItemsTab({
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const { data, isLoading } = useGalleryItems({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteGalleryItems({
     categoryId: activeCategory,
-    limit: 100,
     search: debouncedSearch || undefined,
   });
 
-  const galleryItems = useMemo(() => data?.data ?? [], [data]);
+  const galleryItems = useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flatMap((page) => page.data);
+  }, [data]);
 
   const toggleFeatured = useToggleGalleryFeatured();
 
@@ -90,7 +99,7 @@ export function GalleryItemsTab({
 
     categories.forEach((cat) => {
       counts[cat.slug] = galleryItems.filter(
-        (item) => item.category === cat.slug,
+        (item: GalleryItem) => item.category === cat.slug,
       ).length;
     });
 
@@ -174,7 +183,7 @@ export function GalleryItemsTab({
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {galleryItems.map((item) => (
+              {galleryItems.map((item: GalleryItem) => (
                 <div
                   key={item._id}
                   className="group relative overflow-hidden rounded-lg border border-border bg-card transition-all hover:shadow-lg"
@@ -258,6 +267,16 @@ export function GalleryItemsTab({
                 </div>
               ))}
             </div>
+          )}
+
+          {/* Infinite Scroll Trigger */}
+          {!isLoading && galleryItems.length > 0 && (
+            <InfiniteScrollTrigger
+              hasMore={!!hasNextPage}
+              isLoading={isFetchingNextPage}
+              onLoadMore={fetchNextPage}
+              className="mt-4"
+            />
           )}
         </CardContent>
       </Card>

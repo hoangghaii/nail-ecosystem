@@ -18,6 +18,7 @@ import {
   HeroSettingsCard,
 } from "@/components/banners";
 import { DataTable } from "@/components/layout/shared/DataTable";
+import { InfiniteScrollTrigger } from "@/components/layout/shared/infinite-scroll-trigger";
 import { StatusBadge } from "@/components/layout/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,7 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  useBanners,
+  useInfiniteBanners,
   useToggleBannerActive,
   useSetPrimaryBanner,
   useReorderBanners,
@@ -64,9 +65,14 @@ export function BannersPage() {
 
   const heroDisplayMode = heroSettings?.displayMode;
 
-  const { data, isLoading } = useBanners({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteBanners({
     active: bannerFilter !== "all" ? true : undefined,
-    limit: 100,
     type:
       heroDisplayMode === "image" || heroDisplayMode === "carousel"
         ? "image"
@@ -75,7 +81,10 @@ export function BannersPage() {
           : undefined,
   });
 
-  const banners = useMemo(() => data?.data ?? [], [data]);
+  const banners = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data],
+  );
 
   const handleCreate = () => {
     setSelectedBanner(undefined);
@@ -286,7 +295,17 @@ export function BannersPage() {
               </div>
             </div>
           ) : (
-            <DataTable columns={columns} data={banners} />
+            <>
+              <DataTable columns={columns} data={banners} />
+
+              {/* Infinite Scroll Trigger */}
+              <InfiniteScrollTrigger
+                hasMore={!!hasNextPage}
+                isLoading={isFetchingNextPage}
+                onLoadMore={fetchNextPage}
+                className="mt-4"
+              />
+            </>
           )}
         </CardContent>
       </Card>

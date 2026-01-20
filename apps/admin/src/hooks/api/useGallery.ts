@@ -5,9 +5,11 @@ import type { ApiError } from "@repo/utils/api";
 import { queryKeys } from "@repo/utils/api";
 import {
   useQuery,
+  useInfiniteQuery,
   useMutation,
   useQueryClient,
   type UseQueryOptions,
+  type InfiniteData,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -51,6 +53,34 @@ export function useGalleryItems(options?: UseGalleriesOptions) {
     queryKey: queryKeys.gallery.list(filters),
     staleTime: 30_000, // Consider data fresh for 30s
     ...queryOptions,
+  });
+}
+
+/**
+ * Query: Get all gallery items with infinite scroll
+ */
+export function useInfiniteGalleryItems(
+  params: Omit<GalleriesQueryParams, "page"> = {},
+) {
+  return useInfiniteQuery<
+    PaginationResponse<GalleryItem>,
+    Error,
+    InfiniteData<PaginationResponse<GalleryItem>>,
+    ReturnType<typeof queryKeys.gallery.list>,
+    number
+  >({
+    enabled: !!storage.get("auth_token", ""),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.page < lastPage.pagination.totalPages) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      galleryService.getAll({ ...params, limit: 20, page: pageParam }),
+    queryKey: queryKeys.gallery.list(params),
+    staleTime: 30_000,
   });
 }
 

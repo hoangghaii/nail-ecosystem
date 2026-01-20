@@ -16,6 +16,7 @@ import {
   DataTable,
   DataTableColumnHeader,
 } from "@/components/layout/shared/DataTable";
+import { InfiniteScrollTrigger } from "@/components/layout/shared/infinite-scroll-trigger";
 import { StatusBadge } from "@/components/layout/shared/StatusBadge";
 import {
   Card,
@@ -25,7 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useBookings } from "@/hooks/api/useBookings";
+import { useInfiniteBookings } from "@/hooks/api/useBookings";
 import { bookingsService } from "@/services/bookings.service";
 
 export function BookingsPage() {
@@ -41,8 +42,13 @@ export function BookingsPage() {
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Backend filtering via hook params (follows ContactsPage pattern)
-  const { data: response, isFetching } = useBookings({
-    limit: 100,
+  const {
+    data: response,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isFetching,
+  } = useInfiniteBookings({
     search: debouncedSearch || undefined,
     sortBy: "date",
     sortOrder: "desc",
@@ -51,8 +57,9 @@ export function BookingsPage() {
 
   // Extract bookings array from pagination response
   const bookings = useMemo(() => {
-    return response?.data || [];
-  }, [response?.data]);
+    if (!response?.pages) return [];
+    return response.pages.flatMap((page) => page.data);
+  }, [response]);
 
   // Prefetch booking details on row hover for instant modal display
   const handleRowHover = (booking: Booking) => {
@@ -148,7 +155,7 @@ export function BookingsPage() {
           // Handle both populated service object and string ID
           const serviceName =
             typeof service === "object" && service !== null
-              ? (service as any).name
+              ? (service as { name: string }).name
               : service;
 
           return (
@@ -244,12 +251,22 @@ export function BookingsPage() {
               </div>
             </div>
           ) : (
-            <DataTable
-              columns={columns}
-              data={bookings}
-              onRowClick={handleRowClick}
-              onRowHover={handleRowHover}
-            />
+            <>
+              <DataTable
+                columns={columns}
+                data={bookings}
+                onRowClick={handleRowClick}
+                onRowHover={handleRowHover}
+              />
+
+              {/* Infinite Scroll Trigger */}
+              <InfiniteScrollTrigger
+                hasMore={!!hasNextPage}
+                isLoading={isFetchingNextPage}
+                onLoadMore={fetchNextPage}
+                className="mt-4"
+              />
+            </>
           )}
         </CardContent>
       </Card>

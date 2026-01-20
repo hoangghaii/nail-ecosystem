@@ -4,9 +4,11 @@ import type { ApiError } from "@repo/utils/api";
 import { queryKeys } from "@repo/utils/api";
 import {
   useQuery,
+  useInfiniteQuery,
   useMutation,
   useQueryClient,
   type UseQueryOptions,
+  type InfiniteData,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -46,6 +48,34 @@ export function useBanners(options?: UseBannersOptions) {
     queryKey: queryKeys.banners.list(filters),
     staleTime: 30_000,
     ...queryOptions,
+  });
+}
+
+/**
+ * Query: Get all banners with infinite scroll
+ */
+export function useInfiniteBanners(
+  params: Omit<BannersQueryParams, "page"> = {},
+) {
+  return useInfiniteQuery<
+    PaginationResponse<Banner>,
+    Error,
+    InfiniteData<PaginationResponse<Banner>>,
+    ReturnType<typeof queryKeys.banners.list>,
+    number
+  >({
+    enabled: !!storage.get("auth_token", ""),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.page < lastPage.pagination.totalPages) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      bannersService.getAll({ ...params, limit: 20, page: pageParam }),
+    queryKey: queryKeys.banners.list(params),
+    staleTime: 30_000,
   });
 }
 

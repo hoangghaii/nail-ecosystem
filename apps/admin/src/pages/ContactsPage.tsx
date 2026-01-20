@@ -11,6 +11,7 @@ import { BusinessInfoForm } from "@/components/contacts/BusinessInfoForm";
 import { ContactDetailsModal } from "@/components/contacts/ContactDetailsModal";
 import { StatusFilter } from "@/components/contacts/StatusFilter";
 import { DataTable } from "@/components/layout/shared/DataTable";
+import { InfiniteScrollTrigger } from "@/components/layout/shared/infinite-scroll-trigger";
 import { StatusBadge } from "@/components/layout/shared/StatusBadge";
 import {
   Card,
@@ -20,7 +21,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useContacts } from "@/hooks/api/useContacts";
+import { useInfiniteContacts } from "@/hooks/api/useContacts";
 
 export function ContactsPage() {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
@@ -31,15 +32,23 @@ export function ContactsPage() {
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Backend filtering via hook params
-  const { data, isFetching } = useContacts({
-    limit: 100, // Fetch all for now
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isFetching,
+  } = useInfiniteContacts({
     search: debouncedSearch || undefined,
     sortBy: "createdAt",
     sortOrder: "desc",
     status: statusFilter === "all" ? undefined : statusFilter,
   });
 
-  const allContacts: Contact[] = (data as Contact[]) || [];
+  const allContacts: Contact[] = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data],
+  );
 
   // Table columns definition
   const columns: ColumnDef<Contact>[] = useMemo(
@@ -146,6 +155,14 @@ export function ContactsPage() {
             columns={columns}
             data={allContacts}
             onRowClick={(contact) => setSelectedContact(contact)}
+          />
+
+          {/* Infinite Scroll Trigger */}
+          <InfiniteScrollTrigger
+            hasMore={!!hasNextPage}
+            isLoading={isFetchingNextPage}
+            onLoadMore={fetchNextPage}
+            className="mt-4"
           />
         </CardContent>
       </Card>

@@ -5,9 +5,11 @@ import type { ApiError } from "@repo/utils/api";
 import { queryKeys } from "@repo/utils/api";
 import {
   useQuery,
+  useInfiniteQuery,
   useMutation,
   useQueryClient,
   type UseQueryOptions,
+  type InfiniteData,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -63,6 +65,34 @@ export function useBookings(options?: UseBookingsOptions) {
     staleTime: 30_000, // Consider data fresh for 30s
 
     ...queryOptions,
+  });
+}
+
+/**
+ * Query: Get all bookings with infinite scroll
+ */
+export function useInfiniteBookings(
+  params: Omit<BookingsQueryParams, "page"> = {},
+) {
+  return useInfiniteQuery<
+    PaginationResponse<Booking>,
+    Error,
+    InfiniteData<PaginationResponse<Booking>>,
+    ReturnType<typeof queryKeys.bookings.list>,
+    number
+  >({
+    enabled: !!storage.get("auth_token", ""),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.page < lastPage.pagination.totalPages) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      bookingsService.getAll({ ...params, limit: 20, page: pageParam }),
+    queryKey: queryKeys.bookings.list(params),
+    staleTime: 30_000,
   });
 }
 

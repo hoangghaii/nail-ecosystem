@@ -4,6 +4,8 @@
  * Handles operations for customer contact inquiries with backend filtering
  */
 
+import type { PaginationResponse } from "@repo/types/pagination";
+
 import type { Contact, ContactStatus } from "@/types/contact.types";
 
 import { apiClient } from "@/lib/apiClient";
@@ -27,6 +29,15 @@ export class ContactsService {
 
     // Backend now returns pagination response, extract data
     return "data" in response ? response.data : response;
+  }
+
+  async getAllPaginated(
+    params?: ContactsQueryParams,
+  ): Promise<PaginationResponse<Contact>> {
+    const queryString = this.buildQueryString(params);
+    return apiClient.get<PaginationResponse<Contact>>(
+      `/contacts${queryString}`,
+    );
   }
 
   async getById(id: string): Promise<Contact | null> {

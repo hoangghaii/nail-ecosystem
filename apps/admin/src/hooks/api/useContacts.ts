@@ -1,5 +1,13 @@
+import type { PaginationResponse } from "@repo/types/pagination";
+
 import { queryKeys } from "@repo/utils/api";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import type { Contact, ContactStatus } from "@/types/contact.types";
@@ -23,6 +31,34 @@ export function useContacts(filters?: ContactsQueryParams) {
     queryKey: queryKeys.contacts.list(filters),
     // Cache configuration
     staleTime: 30_000, // Consider data fresh for 30s
+  });
+}
+
+/**
+ * Query: Get all contacts with infinite scroll
+ */
+export function useInfiniteContacts(
+  params: Omit<ContactsQueryParams, "page"> = {},
+) {
+  return useInfiniteQuery<
+    PaginationResponse<Contact>,
+    Error,
+    InfiniteData<PaginationResponse<Contact>>,
+    ReturnType<typeof queryKeys.contacts.list>,
+    number
+  >({
+    enabled: !!storage.get("auth_token", ""),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.page < lastPage.pagination.totalPages) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      contactsService.getAllPaginated({ ...params, limit: 20, page: pageParam }),
+    queryKey: queryKeys.contacts.list(params),
+    staleTime: 30_000,
   });
 }
 
