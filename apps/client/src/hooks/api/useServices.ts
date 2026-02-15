@@ -1,7 +1,10 @@
-import { queryKeys } from '@repo/utils/api';
-import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from "@repo/utils/api";
+import { useQuery } from "@tanstack/react-query";
 
-import { servicesService, type ServicesQueryParams } from '@/services/services.service';
+import {
+  servicesService,
+  type ServicesQueryParams,
+} from "@/services/services.service";
 
 /**
  * Query: Get all services with optional filters

@@ -21,7 +21,6 @@ export default defineConfig({
     },
     sourcemap: false, // Don't generate sourcemaps in production
   },
-
   plugins: [react(), tailwindcss()],
 
   // Preview server (for testing production build)
@@ -34,6 +33,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    preserveSymlinks: true,
   },
 
   // Development server

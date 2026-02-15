@@ -10,6 +10,7 @@ export const servicesData = [
     featured: true,
     isActive: true,
     sortIndex: 0,
+    imageUrl: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&h=600&fit=crop',
   },
   {
     name: 'Gel Manicure',
@@ -21,6 +22,7 @@ export const servicesData = [
     featured: true,
     isActive: true,
     sortIndex: 1,
+    imageUrl: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=800&h=600&fit=crop',
   },
   {
     name: 'French Manicure',
@@ -31,6 +33,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 2,
+    imageUrl: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=800&h=600&fit=crop',
   },
   {
     name: 'Deluxe Manicure with Spa',
@@ -42,6 +45,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 3,
+    imageUrl: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=800&h=600&fit=crop',
   },
   {
     name: 'Express Manicure',
@@ -52,6 +56,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 4,
+    imageUrl: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=800&h=600&fit=crop',
   },
 
   // Pedicure (5 services)
@@ -64,6 +69,7 @@ export const servicesData = [
     featured: true,
     isActive: true,
     sortIndex: 5,
+    imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop',
   },
   {
     name: 'Gel Pedicure',
@@ -75,6 +81,7 @@ export const servicesData = [
     featured: true,
     isActive: true,
     sortIndex: 6,
+    imageUrl: 'https://images.unsplash.com/photo-1519755965442-5d0e4e9bc5e3?w=800&h=600&fit=crop',
   },
   {
     name: 'Spa Pedicure Deluxe',
@@ -86,6 +93,7 @@ export const servicesData = [
     featured: true,
     isActive: true,
     sortIndex: 7,
+    imageUrl: 'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=800&h=600&fit=crop',
   },
   {
     name: 'Express Pedicure',
@@ -96,6 +104,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 8,
+    imageUrl: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&h=600&fit=crop',
   },
   {
     name: 'Hot Stone Pedicure',
@@ -107,6 +116,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 9,
+    imageUrl: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=800&h=600&fit=crop',
   },
 
   // Nail Art (3 services)
@@ -119,6 +129,7 @@ export const servicesData = [
     featured: true,
     isActive: true,
     sortIndex: 10,
+    imageUrl: 'https://images.unsplash.com/photo-1604902396830-aca29e19b067?w=800&h=600&fit=crop',
   },
   {
     name: 'Ombre Nails',
@@ -129,6 +140,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 11,
+    imageUrl: 'https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=800&h=600&fit=crop',
   },
   {
     name: '3D Nail Design',
@@ -139,6 +151,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 12,
+    imageUrl: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=800&h=600&fit=crop',
   },
 
   // Extensions (4 services)
@@ -152,6 +165,7 @@ export const servicesData = [
     featured: true,
     isActive: true,
     sortIndex: 13,
+    imageUrl: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?w=800&h=600&fit=crop',
   },
   {
     name: 'Acrylic Fill',
@@ -162,6 +176,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 14,
+    imageUrl: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=800&h=600&fit=crop',
   },
   {
     name: 'Dip Powder Full Set',
@@ -173,6 +188,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 15,
+    imageUrl: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=800&h=600&fit=crop',
   },
   {
     name: 'Gel Extension',
@@ -183,6 +199,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 16,
+    imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop',
   },
 
   // Spa (2 services)
@@ -195,6 +212,7 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 17,
+    imageUrl: 'https://images.unsplash.com/photo-1519755965442-5d0e4e9bc5e3?w=800&h=600&fit=crop',
   },
   {
     name: 'Hand & Foot Massage',
@@ -205,5 +223,6 @@ export const servicesData = [
     featured: false,
     isActive: true,
     sortIndex: 18,
+    imageUrl: 'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=800&h=600&fit=crop',
   },
 ];

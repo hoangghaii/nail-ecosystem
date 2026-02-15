@@ -4,10 +4,10 @@
  * Fetches business information (phone, email, address, hours) from API
  */
 
-import { queryKeys } from '@repo/utils/api';
-import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from "@repo/utils/api";
+import { useQuery } from "@tanstack/react-query";
 
-import { businessInfoService } from '@/services/business-info.service';
+import { businessInfoService } from "@/services/business-info.service";
 
 /**
  * Query: Get business information

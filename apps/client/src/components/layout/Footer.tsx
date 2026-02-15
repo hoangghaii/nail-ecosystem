@@ -1,6 +1,7 @@
 import { Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { FooterSkeleton } from "@/components/shared/skeletons/FooterSkeleton";
 import { useBusinessInfo } from "@/hooks/api/useBusinessInfo";
 import { transformBusinessInfo } from "@/utils/businessInfo";
 
@@ -8,7 +9,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   // Fetch business info from API
-  const { data: businessInfoData } = useBusinessInfo();
+  const { data: businessInfoData, isError, isLoading } = useBusinessInfo();
 
   // Transform data for display
   const displayData = businessInfoData
@@ -18,8 +19,13 @@ export function Footer() {
   const contactInfo = displayData?.contactInfo;
   const businessHours = displayData?.businessHours;
 
-  // Fallback: render nothing if data not loaded yet
-  if (!displayData || !contactInfo || !businessHours) {
+  // Show skeleton while loading
+  if (isLoading) {
+    return <FooterSkeleton />;
+  }
+
+  // Graceful degradation: render nothing if error or data not available
+  if (isError || !displayData || !contactInfo || !businessHours) {
     return null;
   }
 

@@ -5,7 +5,9 @@ import type { GalleryItem } from "@/types";
 import { GalleryCard } from "@/components/gallery/GalleryCard";
 import { ImageLightbox } from "@/components/gallery/ImageLightbox";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { GalleryItemSkeleton } from "@/components/shared/skeletons/GalleryItemSkeleton";
 import { useGalleryPage } from "@/hooks/useGalleryPage";
 
 export function GalleryPage() {
@@ -16,8 +18,10 @@ export function GalleryPage() {
     handleImageClick,
     handleNext,
     handlePrevious,
+    isError,
     isLoading,
     lightboxOpen,
+    refetch,
     selectedCategory,
     selectedImage,
     setSelectedCategory,
@@ -54,12 +58,16 @@ export function GalleryPage() {
 
         {/* Gallery Grid */}
         {isLoading ? (
-          <div className="py-12 text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-            <p className="mt-4 font-sans text-lg text-muted-foreground">
-              Đang tải thư viện...
-            </p>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <GalleryItemSkeleton key={i} />
+            ))}
           </div>
+        ) : isError ? (
+          <ErrorMessage
+            message="Không thể tải thư viện. Vui lòng thử lại."
+            onRetry={() => refetch()}
+          />
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredGallery.map((item: GalleryItem, index: number) => (

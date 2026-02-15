@@ -17,12 +17,17 @@ export function useGalleryPage() {
   // Find categoryId from slug
   const categoryId = useMemo(() => {
     if (selectedCategory === "all") return undefined;
-    const category = categories.find(c => c.slug === selectedCategory);
+    const category = categories.find((c) => c.slug === selectedCategory);
     return category?._id;
   }, [selectedCategory, categories]);
 
   // Backend filtering by categoryId
-  const { data: galleryItems = [], isLoading: isLoadingItems } = useGalleryItems({
+  const {
+    data: galleryItems = [],
+    isError,
+    isLoading: isLoadingItems,
+    refetch,
+  } = useGalleryItems({
     categoryId,
     isActive: true,
   });
@@ -59,8 +64,10 @@ export function useGalleryPage() {
     handleImageClick,
     handleNext,
     handlePrevious,
+    isError,
     isLoading: isLoadingItems || isLoadingCategories,
     lightboxOpen,
+    refetch,
     selectedCategory,
     selectedImage,
     setSelectedCategory,

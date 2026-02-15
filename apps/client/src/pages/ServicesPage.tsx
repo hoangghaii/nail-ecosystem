@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { ServiceCardSkeleton } from "@/components/shared/skeletons/ServiceCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useServicesPage } from "@/hooks/useServicesPage";
 
@@ -11,7 +13,9 @@ export function ServicesPage() {
   const {
     categories,
     filteredServices,
+    isError,
     isLoading,
+    refetch,
     selectedCategory,
     setSelectedCategory,
   } = useServicesPage();
@@ -47,20 +51,26 @@ export function ServicesPage() {
 
         {/* Loading State */}
         {isLoading ? (
-          <div className="flex min-h-[400px] items-center justify-center">
-            <div className="text-center">
-              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-              <p className="mt-4 font-sans text-muted-foreground">
-                Đang tải dịch vụ...
-              </p>
-            </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <ServiceCardSkeleton key={i} />
+            ))}
           </div>
+        ) : isError ? (
+          <ErrorMessage
+            message="Không thể tải dịch vụ. Vui lòng thử lại."
+            onRetry={() => refetch()}
+          />
         ) : (
           <>
             {/* Services Grid */}
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredServices.map((service, index) => (
-                <ServiceCard key={service._id} index={index} service={service} />
+                <ServiceCard
+                  key={service._id}
+                  index={index}
+                  service={service}
+                />
               ))}
             </div>
 

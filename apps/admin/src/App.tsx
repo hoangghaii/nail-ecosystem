@@ -8,6 +8,7 @@ import { BannersPage } from "./pages/BannersPage";
 import { BookingsPage } from "./pages/BookingsPage";
 import { ContactsPage } from "./pages/ContactsPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { ExpensesPage } from "./pages/ExpensesPage";
 import { GalleryPage } from "./pages/GalleryPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ServicesPage } from "./pages/ServicesPage";
@@ -36,6 +37,7 @@ function App() {
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/contacts" element={<ContactsPage />} />
+            <Route path="/expenses" element={<ExpensesPage />} />
           </Route>
         </Route>
       </Routes>

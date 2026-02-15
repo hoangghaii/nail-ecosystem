@@ -1,5 +1,5 @@
-import { ApiError } from '@repo/utils/api';
-import { QueryClient } from '@tanstack/react-query';
+import { ApiError } from "@repo/utils/api";
+import { QueryClient } from "@tanstack/react-query";
 
 /**
  * Client QueryClient Configuration
@@ -14,7 +14,7 @@ export const queryClient = new QueryClient({
     mutations: {
       // Global error handler
       onError: (error) => {
-        console.error('[Mutation Error]', error);
+        console.error("[Mutation Error]", error);
 
         if (ApiError.isApiError(error)) {
           // Customer-friendly error messages
@@ -24,7 +24,7 @@ export const queryClient = new QueryClient({
         } else if (error instanceof Error) {
           console.error(error.message);
         } else {
-          console.error('An unexpected error occurred');
+          console.error("An unexpected error occurred");
         }
       },
 
@@ -40,8 +40,19 @@ export const queryClient = new QueryClient({
       // Refetch config
       refetchOnWindowFocus: false, // Less aggressive for customers
 
-      // Retry config
-      retry: 2, // More retries for public users (network issues)
+      // Retry config - smart retry with exponential backoff
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors (client errors)
+        if (
+          ApiError.isApiError(error) &&
+          error.statusCode >= 400 &&
+          error.statusCode < 500
+        ) {
+          return false;
+        }
+        // Retry up to 2 times for network errors or 5xx errors
+        return failureCount < 2;
+      },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       // Cache config
       staleTime: 5 * 60_000, // 5min - customer data rarely changes

@@ -19,9 +19,9 @@ export interface GalleryQueryParams {
 
 export class GalleryService {
   async getAll(params?: GalleryQueryParams): Promise<GalleryItem[]> {
-    const queryString = params ? this.buildQueryString(params) : '';
+    const queryString = params ? this.buildQueryString(params) : "";
     const response = await apiClient.get<PaginationResponse<GalleryItem>>(
-      `/gallery${queryString}`
+      `/gallery${queryString}`,
     );
     return response.data; // Extract array from pagination
   }
@@ -37,13 +37,15 @@ export class GalleryService {
 
   private buildQueryString(params: GalleryQueryParams): string {
     const searchParams = new URLSearchParams();
-    if (params.categoryId) searchParams.set('categoryId', params.categoryId);
-    if (params.featured !== undefined) searchParams.set('featured', String(params.featured));
-    if (params.isActive !== undefined) searchParams.set('isActive', String(params.isActive));
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.categoryId) searchParams.set("categoryId", params.categoryId);
+    if (params.featured !== undefined)
+      searchParams.set("featured", String(params.featured));
+    if (params.isActive !== undefined)
+      searchParams.set("isActive", String(params.isActive));
+    if (params.page) searchParams.set("page", String(params.page));
+    if (params.limit) searchParams.set("limit", String(params.limit));
     const query = searchParams.toString();
-    return query ? `?${query}` : '';
+    return query ? `?${query}` : "";
   }
 }
 

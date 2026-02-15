@@ -6,10 +6,7 @@ import { useFeaturedGalleryItems } from "./api/useGallery";
 
 export function useFeaturedGallery() {
   const { data: featuredData = [], isLoading } = useFeaturedGalleryItems();
-  const featuredItems = useMemo(
-    () => featuredData.slice(0, 8),
-    [featuredData],
-  );
+  const featuredItems = useMemo(() => featuredData.slice(0, 8), [featuredData]);
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);

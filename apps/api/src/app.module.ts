@@ -26,6 +26,8 @@ import { HeroSettingsModule } from './modules/hero-settings/hero-settings.module
 import { StorageModule } from './modules/storage/storage.module';
 import { AccessTokenGuard } from './modules/auth/guards/access-token.guard';
 import { SeedModule } from './seeds/seed.module';
+import { ExpensesModule } from './modules/expenses/expenses.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -119,6 +121,8 @@ import { SeedModule } from './seeds/seed.module';
     HeroSettingsModule,
     StorageModule,
     SeedModule,
+    ExpensesModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [

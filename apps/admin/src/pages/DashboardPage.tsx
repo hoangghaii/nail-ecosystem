@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ProfitChart } from "@/components/analytics/ProfitChart";
 import { useBanners } from "@/hooks/api/useBanners";
 import { useBookings } from "@/hooks/api/useBookings";
 import { useGalleryItems } from "@/hooks/api/useGallery";
@@ -111,6 +112,8 @@ export function DashboardPage() {
           </Card>
         ))}
       </div>
+
+      <ProfitChart />
 
       <Card>
         <CardHeader>

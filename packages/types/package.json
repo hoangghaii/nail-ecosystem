@@ -10,7 +10,12 @@
     "./booking": "./src/booking.ts",
     "./auth": "./src/auth.ts",
     "./pagination": "./src/pagination.ts",
-    "./business-info": "./src/business-info.ts"
+    "./business-info": "./src/business-info.ts",
+    "./contact": "./src/contact.ts",
+    "./banner": "./src/banner.ts",
+    "./hero-settings": "./src/hero-settings.ts",
+    "./expense": "./src/expense.ts",
+    "./analytics": "./src/analytics.ts"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",

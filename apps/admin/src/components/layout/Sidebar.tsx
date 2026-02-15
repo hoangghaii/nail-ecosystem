@@ -1,5 +1,6 @@
 import {
   Calendar,
+  DollarSign,
   Image,
   Images,
   LayoutDashboard,
@@ -17,6 +18,7 @@ const navItems = [
   { icon: Images, label: "Gallery", to: "/gallery" },
   { icon: Calendar, label: "Bookings", to: "/bookings" },
   { icon: MessageSquare, label: "Contacts", to: "/contacts" },
+  { icon: DollarSign, label: "Expenses", to: "/expenses" },
 ];
 
 export function Sidebar() {

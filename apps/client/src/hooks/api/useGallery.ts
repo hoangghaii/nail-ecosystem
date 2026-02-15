@@ -1,7 +1,10 @@
-import { queryKeys } from '@repo/utils/api';
-import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from "@repo/utils/api";
+import { useQuery } from "@tanstack/react-query";
 
-import { galleryService, type GalleryQueryParams } from '@/services/gallery.service';
+import {
+  galleryService,
+  type GalleryQueryParams,
+} from "@/services/gallery.service";
 
 /**
  * Query: Get all gallery items with optional filters

@@ -1,8 +1,9 @@
 import { motion, type Variants } from "motion/react";
 import { Link } from "react-router-dom";
 
+import { ServiceCardSkeleton } from "@/components/shared/skeletons/ServiceCardSkeleton";
 import { Button } from "@/components/ui/button";
-import { getFeaturedServices } from "@/data/services";
+import { useServices } from "@/hooks/api/useServices";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,7 +29,34 @@ const itemVariants: Variants = {
 } as Variants;
 
 export function ServicesOverview() {
-  const featuredServices = getFeaturedServices();
+  const { data: featuredServices = [], isLoading } = useServices({
+    featured: true,
+    isActive: true,
+    limit: 3,
+  });
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <section className="py-12 md:py-16 lg:py-20 bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center md:mb-16">
+            <h2 className="font-serif text-4xl font-semibold text-foreground md:text-5xl">
+              Dịch vụ Nổi bật
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl font-sans text-base leading-relaxed text-muted-foreground lg:text-lg">
+              Khám phá các dịch vụ chăm sóc móng cao cấp của chúng tôi
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <ServiceCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-background">
@@ -57,7 +85,7 @@ export function ServicesOverview() {
           viewport={{ margin: "-50px", once: true }}
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
         >
-          {featuredServices.slice(0, 3).map((service) => (
+          {featuredServices.map((service) => (
             <motion.div
               key={service._id}
               variants={itemVariants}
@@ -72,7 +100,7 @@ export function ServicesOverview() {
                   <motion.img
                     src={service.imageUrl}
                     alt={service.name}
-                    className="rounded-[16px] h-56 w-full object-cover"
+                    className="rounded-2xl h-56 w-full object-cover"
                     whileHover={{ scale: 1.08 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   />

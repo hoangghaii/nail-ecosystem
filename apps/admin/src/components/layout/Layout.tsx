@@ -1,5 +1,7 @@
 import { Outlet } from "react-router-dom";
 
+import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
+
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
@@ -13,6 +15,7 @@ export function Layout() {
           <Outlet />
         </main>
       </div>
+      <ScrollToTopButton />
     </div>
   );
 }

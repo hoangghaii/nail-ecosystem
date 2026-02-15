@@ -1,4 +1,4 @@
-import type { BusinessInfo, DaySchedule } from '@repo/types/business-info';
+import type { BusinessInfo, DaySchedule } from "@repo/types/business-info";
 
 // Display types (internal to client app)
 type DisplayDaySchedule = {
@@ -26,10 +26,10 @@ type DisplayContactInfo = {
  * @returns Time in "hh:MM AM/PM" format (e.g., "09:00 AM", "02:30 PM")
  */
 function to12Hour(time24: string): string {
-  const [hours, minutes] = time24.split(':').map(Number);
-  const period = hours >= 12 ? 'PM' : 'AM';
+  const [hours, minutes] = time24.split(":").map(Number);
+  const period = hours >= 12 ? "PM" : "AM";
   const hours12 = hours % 12 || 12;
-  return `${hours12.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+  return `${hours12.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`;
 }
 
 /**
@@ -65,8 +65,8 @@ export function transformBusinessHours(
  */
 export function parseAddress(
   addressString: string,
-): DisplayContactInfo['address'] {
-  const parts = addressString.split(',').map((s) => s.trim());
+): DisplayContactInfo["address"] {
+  const parts = addressString.split(",").map((s) => s.trim());
 
   if (parts.length >= 3) {
     const [street, city, stateZip] = parts;

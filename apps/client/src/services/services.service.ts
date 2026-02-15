@@ -19,9 +19,9 @@ export interface ServicesQueryParams {
 
 export class ServicesService {
   async getAll(params?: ServicesQueryParams): Promise<Service[]> {
-    const queryString = params ? this.buildQueryString(params) : '';
+    const queryString = params ? this.buildQueryString(params) : "";
     const response = await apiClient.get<PaginationResponse<Service>>(
-      `/services${queryString}`
+      `/services${queryString}`,
     );
     return response.data; // Extract array from pagination
   }
@@ -32,13 +32,15 @@ export class ServicesService {
 
   private buildQueryString(params: ServicesQueryParams): string {
     const searchParams = new URLSearchParams();
-    if (params.category) searchParams.set('category', params.category);
-    if (params.featured !== undefined) searchParams.set('featured', String(params.featured));
-    if (params.isActive !== undefined) searchParams.set('isActive', String(params.isActive));
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.category) searchParams.set("category", params.category);
+    if (params.featured !== undefined)
+      searchParams.set("featured", String(params.featured));
+    if (params.isActive !== undefined)
+      searchParams.set("isActive", String(params.isActive));
+    if (params.page) searchParams.set("page", String(params.page));
+    if (params.limit) searchParams.set("limit", String(params.limit));
     const query = searchParams.toString();
-    return query ? `?${query}` : '';
+    return query ? `?${query}` : "";
   }
 }
 

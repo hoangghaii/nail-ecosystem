@@ -63,6 +63,7 @@ export const queryKeys = {
     }) => [...queryKeys.banners.lists(), filters] as const,
     details: () => [...queryKeys.banners.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.banners.details(), id] as const,
+    primary: ['banners', 'primary'] as const,
   },
 
   // Contact submissions
@@ -85,5 +86,28 @@ export const queryKeys = {
   heroSettings: {
     all: ['heroSettings'] as const,
     detail: () => [...queryKeys.heroSettings.all, 'detail'] as const,
+  },
+
+  // Expenses
+  expenses: {
+    all: ['expenses'] as const,
+    lists: () => [...queryKeys.expenses.all, 'list'] as const,
+    list: (filters?: {
+      category?: string;
+      startDate?: string;
+      endDate?: string;
+    }) => [...queryKeys.expenses.lists(), filters] as const,
+    details: () => [...queryKeys.expenses.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.expenses.details(), id] as const,
+  },
+
+  // Analytics
+  analytics: {
+    all: ['analytics'] as const,
+    profit: (params?: {
+      startDate?: string;
+      endDate?: string;
+      groupBy?: string;
+    }) => [...queryKeys.analytics.all, 'profit', params] as const,
   },
 } as const;

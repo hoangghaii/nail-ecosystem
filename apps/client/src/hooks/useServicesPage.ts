@@ -17,15 +17,25 @@ export function useServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   // Backend filtering
-  const { data: services = [], isLoading } = useServices({
-    category: selectedCategory !== "all" ? (selectedCategory as ServiceCategory) : undefined,
+  const {
+    data: services = [],
+    isError,
+    isLoading,
+    refetch,
+  } = useServices({
+    category:
+      selectedCategory !== "all"
+        ? (selectedCategory as ServiceCategory)
+        : undefined,
     isActive: true, // Only show active services
   });
 
   return {
     categories,
     filteredServices: services, // Already filtered by backend
+    isError,
     isLoading,
+    refetch,
     selectedCategory,
     setSelectedCategory,
   };

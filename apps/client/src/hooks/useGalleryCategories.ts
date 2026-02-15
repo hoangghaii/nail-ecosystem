@@ -36,7 +36,9 @@ export function useGalleryCategories() {
   // Transform categories with Vietnamese labels
   const categoriesWithLabels: CategoryWithLabel[] = (query.data?.data ?? [])
     .filter((c: GalleryCategoryItem) => c.isActive)
-    .sort((a: GalleryCategoryItem, b: GalleryCategoryItem) => a.name.localeCompare(b.name))
+    .sort((a: GalleryCategoryItem, b: GalleryCategoryItem) =>
+      a.name.localeCompare(b.name),
+    )
     .map((category: GalleryCategoryItem) => ({
       ...category,
       label: VIETNAMESE_LABELS[category.slug] || category.name,
