@@ -106,7 +106,7 @@ export function ContactInfoDisplay({
             <div className="rounded-[12px] bg-muted p-3">
               <Clock className="h-6 w-6 text-primary" />
             </div>
-            <div>
+            <div className="w-full">
               <p className="font-sans text-sm font-medium text-muted-foreground mb-2">
                 Giờ Làm Việc
               </p>
@@ -114,7 +114,7 @@ export function ContactInfoDisplay({
                 {businessHours.map((schedule) => (
                   <div
                     key={schedule.day}
-                    className="flex justify-between gap-4 font-sans text-sm text-foreground"
+                    className="flex justify-between items-center w-full gap-4 font-sans text-sm text-foreground"
                   >
                     <span>{schedule.day}</span>
                     <span className="text-muted-foreground">

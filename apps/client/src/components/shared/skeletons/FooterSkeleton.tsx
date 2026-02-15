@@ -3,7 +3,7 @@ import { TextSkeleton } from "./TextSkeleton";
 export function FooterSkeleton() {
   return (
     <footer className="bg-background border-t border-border py-12 md:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
           role="status"

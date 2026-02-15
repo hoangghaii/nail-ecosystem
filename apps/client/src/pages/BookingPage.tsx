@@ -1,8 +1,10 @@
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
+import { BookingConfirmation } from "@/components/booking/BookingConfirmation";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { ServiceCardSkeleton } from "@/components/shared/skeletons/ServiceCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
@@ -14,23 +16,28 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { servicesData } from "@/data/services";
 import { useBookingPage } from "@/hooks/useBookingPage";
 import { cn } from "@/lib/utils";
 
 export function BookingPage() {
   const {
+    bookingResult,
     canProceed,
     currentStep,
     form,
     galleryItem,
+    handleCloseConfirmation,
     handleDateSelect,
     handleNext,
     handlePrevious,
     handleServiceSelect,
     handleTimeSelect,
+    isPending,
+    isSuccess,
     onSubmit,
     selectedService,
+    servicesData,
+    servicesLoading,
     steps,
     timeSlots,
   } = useBookingPage();
@@ -38,9 +45,29 @@ export function BookingPage() {
   const selectedDate = form.watch("date");
   const selectedTime = form.watch("timeSlot");
 
+  // Show success confirmation
+  if (isSuccess && bookingResult) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <Breadcrumb />
+          <PageHeader
+            subtitle="Xác nhận đặt lịch của bạn"
+            title="Đặt Lịch Thành Công"
+          />
+          <BookingConfirmation
+            booking={bookingResult}
+            serviceName={selectedService?.name}
+            onClose={handleCloseConfirmation}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
           subtitle="Đặt lịch hẹn chỉ với vài bước đơn giản"
@@ -144,8 +171,17 @@ export function BookingPage() {
                 <h3 className="mb-6 font-serif text-2xl font-semibold text-foreground">
                   Chọn Dịch Vụ Của Bạn
                 </h3>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {servicesData.map((service) => (
+
+                {/* Loading State */}
+                {servicesLoading ? (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <ServiceCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {servicesData.map((service) => (
                     <button
                       key={service._id}
                       onClick={() => handleServiceSelect(service)}
@@ -169,9 +205,10 @@ export function BookingPage() {
                           {service.duration} phút
                         </span>
                       </div>
-                    </button>
-                  ))}
-                </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             )}
 
@@ -413,11 +450,20 @@ export function BookingPage() {
               <Button
                 size="lg"
                 onClick={onSubmit}
-                disabled={!canProceed()}
+                disabled={!canProceed() || isPending}
                 className="rounded-[12px] flex-1 sm:flex-initial text-xs sm:text-base"
               >
-                <Check className="size-4 sm:size-5" />
-                <span className="whitespace-nowrap">Xác Nhận Đặt Lịch</span>
+                {isPending ? (
+                  <>
+                    <Loader2 className="size-4 sm:size-5 animate-spin" />
+                    <span className="whitespace-nowrap">Đang Xử Lý...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="size-4 sm:size-5" />
+                    <span className="whitespace-nowrap">Xác Nhận Đặt Lịch</span>
+                  </>
+                )}
               </Button>
             )}
           </div>

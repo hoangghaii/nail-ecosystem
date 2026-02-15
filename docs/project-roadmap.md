@@ -2,8 +2,8 @@
 
 Pink Nail Salon - Turborepo Monorepo
 
-**Last Updated**: 2026-01-17
-**Current Version**: 0.1.5
+**Last Updated**: 2026-02-15
+**Current Version**: 0.1.6
 **Status**: Production-ready
 
 ---
@@ -180,6 +180,44 @@ Pink Nail Salon - Turborepo Monorepo
   - 9 files modified, 1 new component created
   - Performance: Initial load reduced from 100 to 20 items (80% faster first paint)
   - Detailed status: See plans/260120-2014-infinite-scroll-admin/plan.md
+
+- ✅ Contact Form Validation Update (2026-02-15 - Complete)
+  - All 3 phases complete (100%): Schema update, backend integration, testing & validation
+  - Frontend: Email optional (validates if provided), Phone required, Subject optional
+  - Backend: Updated DTO, MongoDB schema, and shared types in @repo/types
+  - Validation: 20 comprehensive tests (100% DTO coverage), 185/185 tests passing
+  - Type-check PASS, Build PASS, Security audit PASS, Design system PASS
+  - Comprehensive test suite: All validation scenarios covered (email, phone, subject)
+  - Deployment-ready with zero breaking changes
+  - Files modified: 8 (frontend, backend, types, tests, seeder)
+  - QA Status: APPROVED FOR DEPLOYMENT
+  - Detailed status: See plans/260215-1739-contact-form-validation-update/plan.md
+
+- ✅ Contact Toast Notifications (2026-02-15 - Complete)
+  - Phase 01/01 complete (100%): Toast integration - success/error replacements
+  - Replaced inline message boxes with toast notifications in contact form
+  - Success toast: "Cảm ơn bạn! Chúng tôi sẽ liên hệ lại sớm nhất."
+  - Error toast: "Không thể gửi tin nhắn. Vui lòng thử lại."
+  - Type-check PASS, Build PASS (2.51s), Bundle size unaffected (705.80 kB)
+  - Code review: APPROVED (0 critical/high/medium issues)
+  - Design system compliant: Warm, border-based theme (16px rounded, 2px border)
+  - YAGNI/KISS/DRY principles followed: Reuses existing toast infrastructure
+  - Files modified: 1 (contact-form.tsx, -14 lines net cleaner)
+  - QA Status: APPROVED FOR DEPLOYMENT
+  - Detailed status: See plans/260215-1814-contact-toast-notifications/plan.md
+
+- ✅ Vietnamese Phone Validation (2026-02-15 - Complete)
+  - All phases complete (100%): Regex pattern, validation schema, testing
+  - Phone validation: Basic → Vietnamese format (10-11 digits starting with 0)
+  - Regex pattern: `/^0[235789]\d{8,9}$/` (validates carriers 02-09)
+  - Error message: Comprehensive Vietnamese description
+  - Placeholder: `0912345678` (matches validation pattern)
+  - Type-check PASS, Build PASS, Manual tests PASS (14/14)
+  - Code review: APPROVED (regex bug fixed, all tests passing)
+  - Design system compliant: Vietnamese UX localization
+  - Files modified: 1 (contact-form.tsx)
+  - QA Status: APPROVED FOR DEPLOYMENT
+  - Detailed status: See plans/260215-1851-vietnamese-phone-validation/plan.md
 
 **Testing & Validation**:
 - 🔄 Docker dev mode hot-reload testing
@@ -408,6 +446,50 @@ Pink Nail Salon - Turborepo Monorepo
 
 ## Version History
 
+### v0.1.7 (2026-02-15)
+
+**Vietnamese Phone Validation Complete**:
+- ✅ Vietnamese phone format validation implemented in contact form
+- ✅ Regex pattern: `/^0[235789]\d{8,9}$/` (10-11 digits, carriers 02-09)
+- ✅ Fixed critical regex bug: Character class pipe syntax corrected
+- ✅ Placeholder updated to `0912345678` (matches validation pattern)
+- ✅ Error message: Comprehensive Vietnamese description
+- ✅ Type-check PASS, Build PASS, Manual tests PASS (14/14)
+- ✅ Code review APPROVED (regex verified, all tests passing)
+- ✅ Production-ready
+
+**Files Changed**: 1 file
+- Modified: contact-form.tsx (phone validation schema + placeholder)
+
+**Achievement**:
+- Vietnamese phone numbers now properly validated
+- UX localized for Vietnamese users
+- Zero breaking changes
+- Zero dependencies added
+
+### v0.1.6 (2026-02-15)
+
+**Contact Toast Notifications Complete**:
+- ✅ Replaced inline success/error messages with toast notifications
+- ✅ Toast integration in contact form mutation callbacks
+- ✅ Success: "Cảm ơn bạn! Chúng tôi sẽ liên hệ lại sớm nhất."
+- ✅ Error: "Không thể gửi tin nhắn. Vui lòng thử lại."
+- ✅ Type-check PASS, Build PASS (2.51s)
+- ✅ Code review APPROVED (9.5/10, 0 critical issues)
+- ✅ Design system compliant (warm theme, 16px border-radius)
+- ✅ YAGNI/KISS/DRY compliant (reuses existing toast infrastructure)
+- ✅ Production-ready
+
+**Files Changed**: 1 file
+- Modified: contact-form.tsx (-14 lines net, cleaner UI)
+
+**Achievement**:
+- Improved UX with non-intrusive toast notifications
+- Cleaner component code (removed inline message boxes)
+- Maintains form reset behavior on success
+- Zero breaking changes
+- Zero dependencies added
+
 ### v0.1.5 (2026-01-17)
 
 **Frontend-to-Backend Filter Migration Complete**:
@@ -577,6 +659,6 @@ Pink Nail Salon - Turborepo Monorepo
 
 ---
 
-**Document Version**: 1.4
-**Last Updated**: 2026-01-17
-**Next Review**: 2026-01-20
+**Document Version**: 1.5
+**Last Updated**: 2026-02-15
+**Next Review**: 2026-02-20

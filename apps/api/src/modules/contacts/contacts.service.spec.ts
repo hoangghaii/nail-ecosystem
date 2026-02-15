@@ -64,6 +64,7 @@ describe('ContactsService', () => {
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane@example.com',
+        phone: '0987654321',
         subject: 'Question',
         message: 'I have a question about services',
       };

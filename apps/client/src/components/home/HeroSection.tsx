@@ -57,7 +57,7 @@ export function HeroSection() {
   if (isLoading) {
     return (
       <section className="relative overflow-hidden bg-background py-12 md:py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center h-96">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
           </div>
@@ -70,7 +70,7 @@ export function HeroSection() {
   if (banners.length === 0) {
     return (
       <section className="relative overflow-hidden bg-background py-12 md:py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="text-center py-20">
             <h1 className="font-serif text-4xl font-bold text-foreground">
               Chăm Sóc Móng Cao Cấp
@@ -98,7 +98,7 @@ export function HeroSection() {
       />
 
       {/* Hero Content - Horizontal Layout */}
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-12 items-center">
           {/* Left: Content & CTAs */}
           <motion.div

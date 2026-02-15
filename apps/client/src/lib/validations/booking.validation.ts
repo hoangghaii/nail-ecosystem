@@ -24,10 +24,9 @@ export const customerInfoSchema = z.object({
     .string()
     .min(1, "Số điện thoại là bắt buộc")
     .regex(
-      /^[\d\s()+-]+$/,
-      "Số điện thoại không hợp lệ. Chỉ chấp nhận số và các ký tự đặc biệt: (), +, -",
-    )
-    .length(10, "Số điện thoại phải có 10 ký tự"),
+      /^0[235789]\d{8,9}$/,
+      "Số điện thoại không hợp lệ (phải là 10-11 chữ số, bắt đầu bằng 02/03/05/07/08/09)"
+    ),
 });
 
 /**

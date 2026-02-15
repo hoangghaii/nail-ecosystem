@@ -10,9 +10,9 @@ export interface Contact {
   _id: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone?: string;
-  subject: string;
+  email?: string;
+  phone: string;
+  subject?: string;
   message: string;
   status: ContactStatus;
   adminNotes?: string;

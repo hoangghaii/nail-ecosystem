@@ -11,14 +11,14 @@ export class Contact extends Document {
   @Prop({ required: true })
   lastName: string;
 
+  @Prop()
+  email?: string;
+
   @Prop({ required: true })
-  email: string;
+  phone: string;
 
   @Prop()
-  phone?: string;
-
-  @Prop({ required: true })
-  subject: string;
+  subject?: string;
 
   @Prop({ required: true })
   message: string;

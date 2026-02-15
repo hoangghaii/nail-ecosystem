@@ -24,7 +24,7 @@ export function ContactPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
@@ -42,7 +42,7 @@ export function ContactPage() {
   if (error || !displayData || !contactInfo || !businessHours) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <p className="font-sans text-lg text-foreground mb-2">
@@ -60,7 +60,7 @@ export function ContactPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
           subtitle="Bạn có câu hỏi hoặc sẵn sàng đặt lịch? Chúng tôi rất muốn nghe từ bạn."

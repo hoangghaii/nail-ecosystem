@@ -50,7 +50,7 @@ export function Breadcrumb() {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ damping: 30, stiffness: 300, type: "spring" }}
-      className="mb-8 rounded-[12px] border border-border bg-card px-4 py-3"
+      className="mb-8 rounded-sm border border-border bg-card px-4 py-3 w-fit"
     >
       <BreadcrumbRoot>
         <BreadcrumbList>

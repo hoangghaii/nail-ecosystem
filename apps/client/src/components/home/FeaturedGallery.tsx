@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import type { GalleryItem } from "@/types";
 
 import { ImageLightbox } from "@/components/gallery/ImageLightbox";
+import { LazyImage } from "@/components/shared/LazyImage";
 import { GalleryItemSkeleton } from "@/components/shared/skeletons/GalleryItemSkeleton";
 import { Button } from "@/components/ui/button";
 import { useFeaturedGallery } from "@/hooks/useFeaturedGallery";
@@ -49,7 +50,7 @@ export function FeaturedGallery() {
 
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -109,16 +110,20 @@ export function FeaturedGallery() {
               >
                 {/* Gold-framed image */}
                 <div className="overflow-hidden rounded-[12px] md:rounded-[16px]">
-                  <motion.img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="w-full object-cover"
-                    style={{
-                      height: `${masonryHeights[index % masonryHeights.length]}px`,
-                    }}
+                  <motion.div
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  />
+                  >
+                    <LazyImage
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="w-full object-cover"
+                      style={{
+                        height: `${masonryHeights[index % masonryHeights.length]}px`,
+                      }}
+                      placeholderClassName="rounded-[12px] md:rounded-[16px]"
+                    />
+                  </motion.div>
                 </div>
 
                 {/* Hover overlay with reduced opacity */}

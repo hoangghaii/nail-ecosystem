@@ -18,6 +18,7 @@ Migrate client ServicesPage from frontend filtering to backend filtering.
 ## Current State Analysis
 
 ### Files Affected
+
 - `apps/client/src/pages/ServicesPage.tsx` - UI component
 - `apps/client/src/hooks/useServicesPage.ts` - Business logic hook
 - `apps/client/src/services/services.service.ts` - API service
@@ -25,6 +26,7 @@ Migrate client ServicesPage from frontend filtering to backend filtering.
 - `apps/client/src/data/services.ts` - **TO DELETE** (hardcoded data)
 
 ### Current Flow
+
 ```typescript
 // useServicesPage.ts - FRONTEND FILTERING
 import { servicesData } from '@/data/services'; // Hardcoded!
@@ -35,6 +37,7 @@ const filteredServices = selectedCategory === 'all'
 ```
 
 **Problems:**
+
 - Uses hardcoded data instead of API
 - Frontend filtering (not scalable)
 - Data can become stale
@@ -49,6 +52,7 @@ const filteredServices = selectedCategory === 'all'
 Verify backend API supports filtering.
 
 **Test Commands:**
+
 ```bash
 # All services
 curl http://localhost:3000/api/services
@@ -67,6 +71,7 @@ curl http://localhost:3000/api/services?category=pedicure&isActive=true
 ```
 
 **Verify Response Format:**
+
 ```json
 {
   "data": [
@@ -94,6 +99,7 @@ curl http://localhost:3000/api/services?category=pedicure&isActive=true
 **File:** `apps/client/src/services/services.service.ts`
 
 **Add Query Params Interface:**
+
 ```typescript
 import type { Service, ServiceCategory } from '@repo/types/service';
 import type { PaginationResponse } from '@repo/types/pagination';
@@ -145,6 +151,7 @@ export const servicesService = new ServicesService();
 **File:** `apps/client/src/hooks/api/useServices.ts`
 
 **Update useServices Hook:**
+
 ```typescript
 import type { ServiceCategory } from '@repo/types/service';
 import type { ServicesQueryParams } from '@/services/services.service';
@@ -184,6 +191,7 @@ export function useService(id: string | undefined) {
 **File:** `apps/client/src/hooks/useServicesPage.ts`
 
 **Migrate to Backend Filtering:**
+
 ```typescript
 import { useState } from 'react';
 import { ServiceCategory } from '@repo/types/service';
@@ -221,6 +229,7 @@ export function useServicesPage() {
 ```
 
 **DELETE:**
+
 - Remove `import { servicesData } from '@/data/services'`
 - Remove frontend filtering logic
 
@@ -229,6 +238,7 @@ export function useServicesPage() {
 **File:** `apps/client/src/pages/ServicesPage.tsx`
 
 **Add Loading State:**
+
 ```typescript
 export function ServicesPage() {
   const {
@@ -241,7 +251,7 @@ export function ServicesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader /* ... */ />
 
@@ -295,6 +305,7 @@ export function ServicesPage() {
 Verify it uses backend filtering for featured services.
 
 **Expected:**
+
 ```typescript
 const { data: services = [] } = useServices({
   featured: true,
@@ -310,6 +321,7 @@ If using hardcoded data, update to use hook.
 **File:** `apps/client/src/data/services.ts`
 
 **DELETE entire file** after verifying all imports removed:
+
 ```bash
 # Find any remaining imports
 grep -r "from '@/data/services'" apps/client/src
@@ -321,16 +333,19 @@ rm apps/client/src/data/services.ts
 ### Step 8: Testing (30 min)
 
 **Type Check:**
+
 ```bash
 npm run type-check
 ```
 
 **Build:**
+
 ```bash
 npm run build
 ```
 
 **Manual Tests:**
+
 1. Navigate to `/services`
 2. Click "Tất Cả Dịch Vụ" - should show all active services
 3. Click each category filter - should show filtered services
@@ -340,6 +355,7 @@ npm run build
 7. Verify service detail pages still work
 
 **API Monitoring:**
+
 ```bash
 # Open DevTools Network tab
 # Verify requests:

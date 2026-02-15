@@ -15,20 +15,24 @@ Replace mock data with live API integration in ContactPage and Footer components
 ## Tasks
 
 ### 1. Update Imports
+
 **File**: `apps/client/src/pages/ContactPage.tsx`
 
 **Remove**:
+
 ```typescript
 import { contactInfo, businessHours } from "@/data/businessInfo";
 ```
 
 **Add**:
+
 ```typescript
 import { useBusinessInfo } from "@/hooks/useBusinessInfo";
 import { transformBusinessInfo } from "@/utils/businessInfo";
 ```
 
 ### 2. Add API Data Fetching
+
 **Location**: Inside `ContactPage` component (after `useContactPage()`)
 
 ```typescript
@@ -51,13 +55,14 @@ export function ContactPage() {
 ```
 
 ### 3. Add Loading State
+
 **Location**: Before main return statement
 
 ```typescript
 if (isLoading) {
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
@@ -73,13 +78,14 @@ if (isLoading) {
 ```
 
 ### 4. Add Error State
+
 **Location**: After loading state
 
 ```typescript
 if (error || !displayData) {
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <p className="font-sans text-lg text-foreground mb-2">
@@ -97,9 +103,11 @@ if (error || !displayData) {
 ```
 
 ### 5. Update Address Rendering
+
 **Location**: Address section (around line 76-82)
 
 **Replace**:
+
 ```typescript
 <address className="font-sans text-base text-foreground not-italic">
   {contactInfo.address.street}
@@ -110,6 +118,7 @@ if (error || !displayData) {
 ```
 
 **With**:
+
 ```typescript
 <address className="font-sans text-base text-foreground not-italic">
   {contactInfo.address.street && (
@@ -129,9 +138,11 @@ if (error || !displayData) {
 ```
 
 ### 6. Verify Business Hours Rendering
+
 **Location**: Business hours section (around line 95-107)
 
 Current implementation should work as-is since data structure matches:
+
 ```typescript
 {businessHours.map((schedule) => (
   <div key={schedule.day} className="flex justify-between gap-4 font-sans text-sm text-foreground">
@@ -148,20 +159,24 @@ Current implementation should work as-is since data structure matches:
 ## Part B: Footer Component
 
 ### 7. Update Footer Imports
+
 **File**: `apps/client/src/components/layout/Footer.tsx`
 
 **Remove**:
+
 ```typescript
 import { contactInfo, businessHours } from "@/data/businessInfo";
 ```
 
 **Add**:
+
 ```typescript
 import { useBusinessInfo } from "@/hooks/useBusinessInfo";
 import { transformBusinessInfo } from "@/utils/businessInfo";
 ```
 
 ### 8. Add API Data Fetching to Footer
+
 **Location**: Inside `Footer` component
 
 ```typescript
@@ -193,9 +208,11 @@ export function Footer() {
 ```
 
 ### 9. Update Footer Address Rendering
+
 **Location**: Address section (lines 85-90)
 
 **Replace**:
+
 ```typescript
 <address className="text-sm not-italic">
   {contactInfo.address.street}
@@ -206,6 +223,7 @@ export function Footer() {
 ```
 
 **With**:
+
 ```typescript
 <address className="text-sm not-italic">
   {contactInfo.address.street && (
@@ -225,9 +243,11 @@ export function Footer() {
 ```
 
 ### 10. Update Footer Business Hours Display
+
 **Location**: Hours section (lines 94-99)
 
 **Current** (simplified hours display):
+
 ```typescript
 <p className="mt-1 text-sm opacity-90">
   {businessHours.find((h) => !h.closed)?.open} -{" "}
@@ -243,6 +263,7 @@ export function Footer() {
 ## Validation
 
 ### ContactPage
+
 - [ ] Component renders without errors
 - [ ] Loading spinner shows while fetching
 - [ ] Error message shows if API fails
@@ -254,6 +275,7 @@ export function Footer() {
 - [ ] Data persists after refresh (React Query cache)
 
 ### Footer
+
 - [ ] Footer renders without errors
 - [ ] Phone displays and `tel:` link works
 - [ ] Email displays and `mailto:` link works
@@ -262,6 +284,7 @@ export function Footer() {
 - [ ] Footer handles loading state gracefully (returns null or skeleton)
 
 ### Both Components
+
 - [ ] No TypeScript errors
 - [ ] No console errors
 - [ ] React Query caches data (Footer reuses ContactPage's query)

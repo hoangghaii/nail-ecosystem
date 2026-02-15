@@ -29,7 +29,7 @@ export function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
           subtitle="Khám phá bộ sưu tập nghệ thuật nail và thiết kế tuyệt đẹp. Mỗi bộ móng kể một câu chuyện."
@@ -45,7 +45,7 @@ export function GalleryPage() {
               whileTap={{ scale: 0.95 }}
               transition={{ damping: 30, stiffness: 300, type: "spring" }}
               onClick={() => setSelectedCategory(category.slug)}
-              className={`rounded-[12px] px-6 py-3 font-sans font-medium transition-colors duration-200 ${
+              className={`rounded-sm px-6 py-3 font-sans font-medium transition-colors duration-200 ${
                 selectedCategory === category.slug
                   ? "bg-primary text-primary-foreground"
                   : "border border-border bg-card text-foreground hover:border-secondary"

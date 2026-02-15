@@ -25,9 +25,9 @@ export class ContactsSeeder {
     const contacts: Array<{
       firstName: string;
       lastName: string;
-      email: string;
-      phone?: string;
-      subject: string;
+      email?: string;
+      phone: string;
+      subject?: string;
       message: string;
       status: string;
       createdAt: Date;
@@ -104,9 +104,9 @@ export class ContactsSeeder {
       const contact: {
         firstName: string;
         lastName: string;
-        email: string;
-        phone?: string;
-        subject: string;
+        email?: string;
+        phone: string;
+        subject?: string;
         message: string;
         status: string;
         createdAt: Date;
@@ -115,9 +115,9 @@ export class ContactsSeeder {
       } = {
         firstName,
         lastName,
-        email: generateEmail(firstName, lastName),
-        phone: Math.random() > 0.3 ? generateVietnamesePhone() : undefined, // 70% include phone
-        subject,
+        email: Math.random() > 0.3 ? generateEmail(firstName, lastName) : undefined, // 70% include email
+        phone: generateVietnamesePhone(),
+        subject: Math.random() > 0.2 ? subject : undefined, // 80% include subject
         message,
         status,
         createdAt,

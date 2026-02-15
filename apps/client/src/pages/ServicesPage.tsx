@@ -22,7 +22,7 @@ export function ServicesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
           subtitle="Khám phá các dịch vụ chăm sóc móng cao cấp được thiết kế để bạn trông và cảm thấy tốt nhất"

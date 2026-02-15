@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export function AboutSection() {
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 items-center">
           {/* Image with Offset Border Effect */}
           <motion.div

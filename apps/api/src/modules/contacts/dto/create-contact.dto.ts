@@ -28,31 +28,31 @@ export class CreateContactDto {
   @MinLength(1)
   lastName: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Contact email address',
     example: 'sarah.johnson@example.com',
   })
   @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @ApiPropertyOptional({
-    description: 'Contact phone number',
-    example: '+1 (555) 987-6543',
-  })
-  @IsString()
   @IsOptional()
-  phone?: string;
+  email?: string;
 
   @ApiProperty({
-    description: 'Subject of the inquiry',
-    example: 'Question about services',
+    description: 'Contact phone number',
+    example: '+1 (555) 987-6543',
     minLength: 1,
   })
   @IsString()
   @IsNotEmpty()
   @MinLength(1)
-  subject: string;
+  phone: string;
+
+  @ApiPropertyOptional({
+    description: 'Subject of the inquiry',
+    example: 'Question about services',
+  })
+  @IsString()
+  @IsOptional()
+  subject?: string;
 
   @ApiProperty({
     description: 'Message content',

@@ -6,7 +6,8 @@ import { useLocation } from "react-router-dom";
 
 import type { GalleryItem, Service } from "@/types";
 
-import { servicesData } from "@/data/services";
+import { useCreateBooking } from "@/hooks/api/useBookings";
+import { useServices } from "@/hooks/api/useServices";
 import { toast } from "@/lib/toast";
 import {
   type BookingFormData,
@@ -42,6 +43,14 @@ const timeSlots = [
 
 export function useBookingPage() {
   const location = useLocation();
+
+  // Fetch services from API
+  const { data: servicesData = [], isLoading: servicesLoading } = useServices({
+    isActive: true,
+  });
+
+  // Booking mutation
+  const { data: bookingResult, isPending, isSuccess, mutate: createBooking } = useCreateBooking();
 
   // Get gallery item from navigation state
   const galleryItem = (location.state as { galleryItem?: GalleryItem })
@@ -102,37 +111,29 @@ export function useBookingPage() {
   };
 
   const onSubmit = form.handleSubmit((data) => {
-    try {
-      // In a real app, this would submit to an API
-      console.log("Booking data:", data);
+    // Transform form data to match API DTO
+    const bookingDto = {
+      customerInfo: data.customerInfo,
+      date: data.date.toISOString().split('T')[0], // Convert Date to "YYYY-MM-DD"
+      notes: "", // Optional field
+      serviceId: data.serviceId,
+      timeSlot: data.timeSlot, // Already a string like "14:00"
+    };
 
-      // Generate unique ID and save to localStorage as a demo
-      const bookingId = crypto.randomUUID();
-      const booking = {
-        ...data,
-        id: bookingId,
-        status: "pending",
-      };
-      localStorage.setItem("lastBooking", JSON.stringify(booking));
-
-      // Show success toast
-      toast.success(
-        "Đặt lịch thành công!",
-        `Dịch vụ: ${selectedService?.name} | Ngày: ${data.date.toLocaleDateString("vi-VN")} | Giờ: ${data.timeSlot}`,
-      );
-
-      // Reset form
-      form.reset();
-      setSelectedService(null);
-      setCurrentStep(1);
-    } catch (error) {
-      console.error("Lỗi khi đặt lịch:", error);
-      toast.error(
-        "Có lỗi xảy ra",
-        "Vui lòng thử lại hoặc liên hệ với chúng tôi.",
-      );
-    }
+    // Submit to API
+    createBooking(bookingDto, {
+      onError: () => {
+        toast.error("Không thể đặt lịch. Vui lòng thử lại hoặc liên hệ với chúng tôi.");
+      },
+    });
   });
+
+  // Reset form after successful booking
+  const handleCloseConfirmation = () => {
+    form.reset();
+    setSelectedService(null);
+    setCurrentStep(1);
+  };
 
   const canProceed = () => {
     if (currentStep === 1) {
@@ -171,17 +172,23 @@ export function useBookingPage() {
   };
 
   return {
+    bookingResult,
     canProceed,
     currentStep,
     form,
     galleryItem,
+    handleCloseConfirmation,
     handleDateSelect,
     handleNext,
     handlePrevious,
     handleServiceSelect,
     handleTimeSelect,
+    isPending,
+    isSuccess,
     onSubmit,
     selectedService,
+    servicesData,
+    servicesLoading,
     steps,
     timeSlots,
   };

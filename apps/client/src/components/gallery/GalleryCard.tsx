@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import type { GalleryItem } from "@/types";
 
+import { LazyImage } from "@/components/shared/LazyImage";
 import { Button } from "@/components/ui/button";
 
 type GalleryCardProps = {
@@ -35,11 +36,11 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
         stiffness: 300,
         type: "spring",
       }}
-      className="group flex h-full flex-col rounded-[16px] border-2 border-secondary bg-card p-2 transition-colors duration-200 hover:border-primary md:rounded-[20px]"
+      className="group flex h-full flex-col rounded-2xl border-2 border-secondary bg-card p-2 transition-colors duration-200 hover:border-primary md:rounded-[20px]"
     >
       {/* Gold-framed image */}
       <div
-        className="relative mb-3 cursor-pointer overflow-hidden rounded-[12px] md:mb-4 md:rounded-[16px]"
+        className="relative mb-3 cursor-pointer overflow-hidden rounded-sm md:mb-4 md:rounded-2xl"
         onClick={onImageClick}
         role="button"
         tabIndex={0}
@@ -50,14 +51,15 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
           }
         }}
       >
-        <img
+        <LazyImage
           alt={item.title}
           className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105 md:h-80"
           src={item.imageUrl}
+          placeholderClassName="rounded-[12px] md:rounded-[16px]"
         />
         {/* Hover overlay hint */}
-        <div className="absolute inset-0 flex items-center justify-center rounded-[12px] bg-foreground/0 opacity-0 transition-all duration-200 group-hover:bg-foreground/10 group-hover:opacity-100 md:rounded-[16px]">
-          <span className="rounded-[8px] border border-background bg-background/90 px-2 py-1 font-sans text-xs font-medium text-foreground md:px-3 md:py-1.5">
+        <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-foreground/0 opacity-0 transition-all duration-200 group-hover:bg-foreground/10 group-hover:opacity-100 md:rounded-2xl">
+          <span className="rounded-xs border border-background bg-background/90 px-2 py-1 font-sans text-xs font-medium text-foreground md:px-3 md:py-1.5">
             Nhấn để xem
           </span>
         </div>
@@ -78,9 +80,9 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
         )}
 
         {/* Price and Duration - Separate rows with different backgrounds */}
-        <div className="mb-3 space-y-2 md:mb-4">
+        <div className="flex justify-between items-center gap-3 mb-3 space-y-2 md:mb-4">
           {item.price && (
-            <div className="flex items-center gap-2 rounded-[12px] border border-border bg-primary/5 p-2 md:p-2.5">
+            <div className="flex flex-1 mb-0 items-center gap-2 rounded-sm border border-border bg-primary/5 p-2 md:p-2.5">
               <DollarSign className="size-4 text-primary" />
               <span className="font-sans text-sm font-semibold text-primary md:text-base">
                 {item.price}
@@ -89,7 +91,7 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
           )}
 
           {item.duration && (
-            <div className="flex items-center gap-2 rounded-[12px] border border-border bg-secondary/10 p-2 md:p-2.5">
+            <div className="flex flex-1 items-center gap-2 rounded-sm border border-border bg-secondary/10 p-2 md:p-2.5">
               <Clock className="size-4 text-secondary" />
               <span className="font-sans text-sm font-foreground md:text-base">
                 {item.duration}
@@ -100,7 +102,7 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
 
         {/* Book Now Button */}
         <Button
-          className="w-full rounded-[12px] text-sm md:text-base"
+          className="w-full rounded-sm mt-auto text-sm md:text-base"
           onClick={handleBookNow}
           size="default"
           variant="default"

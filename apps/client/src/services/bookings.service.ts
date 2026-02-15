@@ -8,8 +8,21 @@ import type { Booking } from "@repo/types/booking";
 
 import { apiClient } from "@/lib/apiClient";
 
+export interface CreateBookingDto {
+  customerInfo: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+  };
+  date: string; // ISO date format "YYYY-MM-DD"
+  notes?: string;
+  serviceId: string;
+  timeSlot: string; // e.g., "14:00"
+}
+
 export class BookingsService {
-  async create(data: Omit<Booking, "id" | "status">): Promise<Booking> {
+  async create(data: CreateBookingDto): Promise<Booking> {
     return apiClient.post<Booking>("/bookings", data);
   }
 }

@@ -44,22 +44,8 @@ export function useGalleryCategories() {
       label: VIETNAMESE_LABELS[category.slug] || category.name,
     }));
 
-  // Add "All" category
-  const allCategories: CategoryWithLabel[] = [
-    {
-      _id: "all",
-      description: "",
-      isActive: true,
-      label: "Tất Cả",
-      name: "All",
-      slug: "all",
-      sortIndex: 0,
-    },
-    ...categoriesWithLabels,
-  ];
-
   return {
     ...query,
-    categories: allCategories,
+    categories: categoriesWithLabels,
   };
 }

@@ -4,15 +4,22 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { useContactMutation } from "@/hooks/api/useContacts";
+import { toast } from "@/lib/toast";
 
 // Validation schema
 const contactFormSchema = z.object({
-  email: z.string().email("Email không hợp lệ"),
+  email: z.union([z.string().email("Email không hợp lệ"), z.literal("")]),
   firstName: z.string().min(1, "Vui lòng nhập tên"),
   lastName: z.string().min(1, "Vui lòng nhập họ"),
   message: z.string().min(10, "Tin nhắn phải có ít nhất 10 ký tự"),
-  phone: z.string().optional(),
-  subject: z.string().min(1, "Vui lòng nhập chủ đề"),
+  phone: z
+    .string()
+    .min(1, "Vui lòng nhập số điện thoại")
+    .regex(
+      /^0[235789]\d{8,9}$/,
+      "Số điện thoại không hợp lệ (phải là 10-11 chữ số, bắt đầu bằng 02/03/05/07/08/09)"
+    ),
+  subject: z.string().optional(),
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -29,12 +36,23 @@ export function ContactForm() {
   });
 
   // Mutation setup
-  const { isError, isPending, isSuccess, mutate } = useContactMutation();
+  const { isPending, mutate } = useContactMutation();
 
   // Form submission handler
   const onSubmit = (data: ContactFormValues) => {
-    mutate(data, {
+    // Transform empty email/subject to undefined for backend validation
+    const payload = {
+      ...data,
+      email: data.email || undefined,
+      subject: data.subject || undefined,
+    };
+
+    mutate(payload, {
+      onError: () => {
+        toast.error("Không thể gửi tin nhắn. Vui lòng thử lại.");
+      },
       onSuccess: () => {
+        toast.success("Cảm ơn bạn! Chúng tôi sẽ liên hệ lại sớm nhất.");
         reset();
       },
     });
@@ -45,24 +63,6 @@ export function ContactForm() {
       <h2 className="font-serif text-2xl font-semibold text-foreground mb-6">
         Gửi Tin Nhắn Cho Chúng Tôi
       </h2>
-
-      {/* Success Message */}
-      {isSuccess && (
-        <div className="mb-6 rounded-[12px] border border-border bg-background p-4">
-          <p className="font-sans text-base text-foreground">
-            ✓ Cảm ơn bạn! Chúng tôi sẽ liên hệ lại sớm nhất.
-          </p>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {isError && (
-        <div className="mb-6 rounded-[12px] border border-destructive/50 bg-destructive/10 p-4">
-          <p className="font-sans text-sm text-destructive">
-            Không thể gửi tin nhắn. Vui lòng thử lại.
-          </p>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* First Name */}
@@ -115,7 +115,7 @@ export function ContactForm() {
             htmlFor="email"
             className="block font-sans text-sm font-medium text-foreground mb-2"
           >
-            Địa Chỉ Email <span className="text-destructive">*</span>
+            Địa Chỉ Email
           </label>
           <input
             type="email"
@@ -137,14 +137,14 @@ export function ContactForm() {
             htmlFor="phone"
             className="block font-sans text-sm font-medium text-foreground mb-2"
           >
-            Số Điện Thoại
+            Số Điện Thoại <span className="text-destructive">*</span>
           </label>
           <input
             type="tel"
             id="phone"
             {...register("phone")}
             className="w-full rounded-[12px] border border-input bg-background px-4 py-3 font-sans text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all"
-            placeholder="0123 456 789"
+            placeholder="0912345678"
           />
           {errors.phone && (
             <p className="mt-1 font-sans text-sm text-destructive">
@@ -159,7 +159,7 @@ export function ContactForm() {
             htmlFor="subject"
             className="block font-sans text-sm font-medium text-foreground mb-2"
           >
-            Chủ Đề <span className="text-destructive">*</span>
+            Chủ Đề
           </label>
           <input
             type="text"

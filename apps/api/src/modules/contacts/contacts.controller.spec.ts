@@ -43,6 +43,7 @@ describe('ContactsController', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
+        phone: '0123456789',
         subject: 'Test',
         message: 'Test message',
       };
