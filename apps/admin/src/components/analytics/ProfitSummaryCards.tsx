@@ -10,22 +10,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-US', {
-    style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 0,
     maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    style: 'currency',
   }).format(amount);
 
 type ProfitSummaryCardsProps = {
-  revenue: number;
   expenses: number;
   profit: number;
+  revenue: number;
 };
 
 export function ProfitSummaryCards({
-  revenue,
   expenses,
   profit,
+  revenue,
 }: ProfitSummaryCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-3 mb-6">

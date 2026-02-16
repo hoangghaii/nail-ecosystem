@@ -1,10 +1,10 @@
 import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { Link } from "react-router-dom";
 
 import { BookingConfirmation } from "@/components/booking/BookingConfirmation";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { ServiceCardSkeleton } from "@/components/shared/skeletons/ServiceCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
@@ -30,20 +30,34 @@ export function BookingPage() {
     handleDateSelect,
     handleNext,
     handlePrevious,
-    handleServiceSelect,
     handleTimeSelect,
     isPending,
     isSuccess,
+    isValidState, // Will be used in Phase 4 for error handling
     onSubmit,
     selectedService,
-    servicesData,
-    servicesLoading,
     steps,
     timeSlots,
   } = useBookingPage();
 
   const selectedDate = form.watch("date");
   const selectedTime = form.watch("timeSlot");
+
+  // Show loading while validating/redirecting
+  if (!isValidState || !selectedService) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <div className="flex items-center justify-center">
+            <Loader2 className="size-8 animate-spin text-primary" />
+            <p className="ml-3 font-sans text-lg text-muted-foreground">
+              Đang chuyển hướng...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Show success confirmation
   if (isSuccess && bookingResult) {
@@ -74,6 +88,60 @@ export function BookingPage() {
           title="Đặt Lịch Hẹn"
         />
 
+        {/* Selected Service Summary */}
+        {selectedService && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 rounded-[24px] border-2 border-primary bg-primary/5 p-6"
+          >
+            <p className="mb-3 font-sans text-sm font-medium text-muted-foreground">
+              Dịch Vụ Đã Chọn
+            </p>
+
+            <div className="flex items-start gap-4">
+              {selectedService.imageUrl && (
+                <img
+                  src={selectedService.imageUrl}
+                  alt={selectedService.name}
+                  className="h-20 w-20 rounded-[12px] object-cover"
+                />
+              )}
+
+              <div className="flex-1">
+                <h3 className="mb-2 font-serif text-xl font-semibold text-foreground">
+                  {selectedService.name}
+                </h3>
+
+                <div className="flex flex-wrap gap-4 font-sans text-sm">
+                  <span className="font-bold text-primary">
+                    ${selectedService.price}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {selectedService.duration} phút
+                  </span>
+                </div>
+
+                {selectedService.description && (
+                  <p className="mt-2 font-sans text-sm text-muted-foreground">
+                    {selectedService.description}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Optional: Change Service Link */}
+            <div className="mt-4 border-t border-border pt-4">
+              <Link
+                to="/services"
+                className="font-sans text-sm text-secondary hover:underline"
+              >
+                ← Thay đổi dịch vụ
+              </Link>
+            </div>
+          </motion.div>
+        )}
+
         {/* Progress Steps */}
         <div className="mb-12">
           <div className="flex items-center justify-between">
@@ -87,7 +155,7 @@ export function BookingPage() {
                   key={step.id}
                   className={cn(
                     "flex items-center",
-                    step.id === 3 ? "" : "flex-1",
+                    step.id === 2 ? "" : "flex-1",
                   )}
                 >
                   <div className="flex flex-col items-center">
@@ -159,63 +227,10 @@ export function BookingPage() {
         {/* Form Container */}
         <div className="rounded-[24px] border-2 border-border bg-card p-6 sm:p-8">
           <AnimatePresence mode="wait">
-            {/* Step 1: Select Service */}
+            {/* Step 1: Select Date & Time */}
             {currentStep === 1 && (
               <motion.div
                 key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ damping: 30, stiffness: 300, type: "spring" }}
-              >
-                <h3 className="mb-6 font-serif text-2xl font-semibold text-foreground">
-                  Chọn Dịch Vụ Của Bạn
-                </h3>
-
-                {/* Loading State */}
-                {servicesLoading ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                      <ServiceCardSkeleton key={i} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {servicesData.map((service) => (
-                    <button
-                      key={service._id}
-                      onClick={() => handleServiceSelect(service)}
-                      className={`rounded-[16px] border-2 p-4 text-left transition-all duration-200 ${
-                        selectedService?._id === service._id
-                          ? "border-primary bg-primary/5"
-                          : "border-border bg-background hover:border-secondary"
-                      }`}
-                    >
-                      <h4 className="mb-1 font-sans text-base font-semibold text-foreground">
-                        {service.name}
-                      </h4>
-                      <p className="mb-2 font-sans text-sm text-muted-foreground line-clamp-2">
-                        {service.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="font-sans text-lg font-bold text-primary">
-                          ${service.price}
-                        </span>
-                        <span className="font-sans text-sm text-muted-foreground">
-                          {service.duration} phút
-                        </span>
-                      </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {/* Step 2: Select Date & Time */}
-            {currentStep === 2 && (
-              <motion.div
-                key="step2"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -327,10 +342,10 @@ export function BookingPage() {
               </motion.div>
             )}
 
-            {/* Step 3: Customer Information */}
-            {currentStep === 3 && (
+            {/* Step 2: Customer Information */}
+            {currentStep === 2 && (
               <motion.div
-                key="step3"
+                key="step2"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -436,7 +451,7 @@ export function BookingPage() {
               <span className="hidden sm:inline">Quay Lại</span>
             </Button>
 
-            {currentStep < 3 ? (
+            {currentStep < 2 ? (
               <Button
                 size="lg"
                 onClick={handleNext}

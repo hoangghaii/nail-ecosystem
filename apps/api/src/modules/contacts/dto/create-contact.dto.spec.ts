@@ -237,7 +237,8 @@ describe('CreateContactDto Validation', () => {
         email: 'jane@example.com',
         phone: '+1 (555) 987-6543',
         subject: 'Question about gel manicure',
-        message: 'I would like to know more about your gel manicure services and pricing.',
+        message:
+          'I would like to know more about your gel manicure services and pricing.',
       });
 
       const errors = await validate(dto);

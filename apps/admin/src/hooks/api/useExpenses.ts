@@ -31,19 +31,19 @@ type UseExpensesOptions = ExpenseQueryParams &
  */
 export function useExpenses(options?: UseExpensesOptions) {
   const {
-    startDate,
-    endDate,
     category,
+    endDate,
     limit,
     page,
     sortBy,
     sortOrder,
+    startDate,
     ...queryOptions
   } = options || {};
 
   const filters: ExpenseQueryParams | undefined =
     startDate || endDate || category || page || limit || sortBy || sortOrder
-      ? { startDate, endDate, category, limit, page, sortBy, sortOrder }
+      ? { category, endDate, limit, page, sortBy, sortOrder, startDate }
       : undefined;
 
   return useQuery({
@@ -103,13 +103,13 @@ export function useCreateExpense() {
   return useMutation({
     mutationFn: (data: Omit<Expense, '_id' | 'createdAt' | 'updatedAt' | 'currency'>) =>
       expenseService.create(data),
+    onError: () => {
+      toast.error('Failed to create expense');
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
       toast.success('Expense created successfully');
-    },
-    onError: () => {
-      toast.error('Failed to create expense');
     },
   });
 }
@@ -122,20 +122,20 @@ export function useUpdateExpense() {
 
   return useMutation({
     mutationFn: ({
-      id,
       data,
+      id,
     }: {
-      id: string;
       data: Partial<Omit<Expense, '_id' | 'createdAt' | 'updatedAt'>>;
+      id: string;
     }) => expenseService.update(id, data),
+    onError: () => {
+      toast.error('Failed to update expense');
+    },
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.expenses.lists() });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
       queryClient.setQueryData(queryKeys.expenses.detail(updated._id), updated);
       toast.success('Expense updated successfully');
-    },
-    onError: () => {
-      toast.error('Failed to update expense');
     },
   });
 }
@@ -148,13 +148,13 @@ export function useDeleteExpense() {
 
   return useMutation({
     mutationFn: (id: string) => expenseService.delete(id),
+    onError: () => {
+      toast.error('Failed to delete expense');
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
       toast.success('Expense deleted successfully');
-    },
-    onError: () => {
-      toast.error('Failed to delete expense');
     },
   });
 }

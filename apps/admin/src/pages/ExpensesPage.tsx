@@ -4,15 +4,16 @@
  * Manage business expenses with infinite scroll, filters, and CRUD operations
  */
 
-import { useState } from 'react';
 import type { ExpenseCategory } from '@repo/types/expense';
-import { Plus } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+
 import { ExpenseCard } from '@/components/expenses/ExpenseCard';
 import { ExpenseFilters } from '@/components/expenses/ExpenseFilters';
 import { ExpenseFormModal } from '@/components/expenses/ExpenseFormModal';
 import { InfiniteScrollTrigger } from '@/components/layout/shared/infinite-scroll-trigger';
+import { Button } from '@/components/ui/button';
 import { useInfiniteExpenses } from '@/hooks/api/useExpenses';
 
 export function ExpensesPage() {
@@ -25,8 +26,8 @@ export function ExpensesPage() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteExpenses({
       category: (category === 'all' ? undefined : category) as ExpenseCategory | undefined,
-      startDate: startDate || undefined,
       endDate: endDate || undefined,
+      startDate: startDate || undefined,
     });
 
   const totalExpenses = data?.pages[0]?.pagination.total || 0;

@@ -4,10 +4,11 @@
  * Displays expense item with edit/delete actions
  */
 
-import { useState } from 'react';
 import type { Expense } from '@repo/types/expense';
-import { Calendar, DollarSign, Edit, Trash2 } from 'lucide-react';
+
 import { format } from 'date-fns';
+import { Calendar, DollarSign, Edit, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 import {
   AlertDialog,
@@ -22,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { useDeleteExpense } from '@/hooks/api/useExpenses';
+
 import { ExpenseFormModal } from './ExpenseFormModal';
 
 type ExpenseCardProps = {
@@ -29,17 +31,17 @@ type ExpenseCardProps = {
 };
 
 const categoryLabels: Record<string, string> = {
-  supplies: 'Supplies',
   materials: 'Materials',
-  utilities: 'Utilities',
   other: 'Other',
+  supplies: 'Supplies',
+  utilities: 'Utilities',
 };
 
 const categoryColors: Record<string, string> = {
-  supplies: 'bg-blue-100 text-blue-700',
   materials: 'bg-green-100 text-green-700',
-  utilities: 'bg-amber-100 text-amber-700',
   other: 'bg-gray-100 text-gray-700',
+  supplies: 'bg-blue-100 text-blue-700',
+  utilities: 'bg-amber-100 text-amber-700',
 };
 
 export function ExpenseCard({ expense }: ExpenseCardProps) {
@@ -59,9 +61,9 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
-      style: 'currency',
       currency: expense.currency || 'USD',
       minimumFractionDigits: 2,
+      style: 'currency',
     }).format(amount);
   };
 

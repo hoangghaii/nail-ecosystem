@@ -5,32 +5,32 @@
  */
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
   currency: 'USD',
-  minimumFractionDigits: 0,
   maximumFractionDigits: 0,
+  minimumFractionDigits: 0,
+  style: 'currency',
 });
 
 const dateFormatter = (dateStr: string) => {
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-US', {
-    month: 'short',
     day: 'numeric',
+    month: 'short',
     year: '2-digit',
   });
 };
 
 type TooltipProps = {
   active?: boolean;
+  label?: string;
   payload?: Array<{
+    color: string;
     name: string;
     value: number;
-    color: string;
   }>;
-  label?: string;
 };
 
-export function ChartTooltip({ active, payload, label }: TooltipProps) {
+export function ChartTooltip({ active, label, payload }: TooltipProps) {
   if (!active || !payload?.length) return null;
 
   return (

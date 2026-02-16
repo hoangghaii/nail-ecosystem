@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { ProfitChart } from "@/components/analytics/ProfitChart";
 import {
   Card,
   CardContent,
@@ -15,7 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ProfitChart } from "@/components/analytics/ProfitChart";
 import { useBanners } from "@/hooks/api/useBanners";
 import { useBookings } from "@/hooks/api/useBookings";
 import { useGalleryItems } from "@/hooks/api/useGallery";

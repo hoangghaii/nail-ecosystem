@@ -1,8 +1,10 @@
 import { Clock, DollarSign } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 import type { Service, ServiceCategory } from "@/types";
+import type { BookingNavigationState } from "@/types/navigation";
 
 import { Button } from "@/components/ui/button";
 
@@ -23,7 +25,19 @@ export function ServiceCard({ index, service }: ServiceCardProps) {
   const navigate = useNavigate();
 
   const handleBookNow = () => {
-    navigate("/booking");
+    // Validate service prop exists (defensive programming)
+    if (!service || !service._id) {
+      toast.error("Dịch vụ không hợp lệ");
+      return;
+    }
+
+    // Navigate with service pre-selected
+    navigate("/booking", {
+      state: {
+        fromService: true,
+        service: service,
+      } as BookingNavigationState,
+    });
   };
 
   return (

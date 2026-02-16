@@ -1,23 +1,23 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, FileText, User } from "lucide-react";
-import { useState } from "react";
+import { Calendar, User } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import type { GalleryItem, Service } from "@/types";
+import type { Service } from "@/types";
+import type { BookingNavigationState } from "@/types/navigation";
 
 import { useCreateBooking } from "@/hooks/api/useBookings";
-import { useServices } from "@/hooks/api/useServices";
 import { toast } from "@/lib/toast";
 import {
   type BookingFormData,
   bookingFormSchema,
 } from "@/lib/validations/booking.validation";
+import { isValidBookingState } from "@/types/navigation";
 
 const steps = [
-  { icon: FileText, id: 1, title: "Chọn Dịch Vụ" },
-  { icon: Calendar, id: 2, title: "Chọn Ngày & Giờ" },
-  { icon: User, id: 3, title: "Thông Tin" },
+  { icon: Calendar, id: 1, title: "Chọn Ngày & Giờ" },
+  { icon: User, id: 2, title: "Thông Tin" },
 ];
 
 const timeSlots = [
@@ -43,39 +43,50 @@ const timeSlots = [
 
 export function useBookingPage() {
   const location = useLocation();
-
-  // Fetch services from API
-  const { data: servicesData = [], isLoading: servicesLoading } = useServices({
-    isActive: true,
-  });
+  const navigate = useNavigate();
 
   // Booking mutation
   const { data: bookingResult, isPending, isSuccess, mutate: createBooking } = useCreateBooking();
 
-  // Get gallery item from navigation state
-  const galleryItem = (location.state as { galleryItem?: GalleryItem })
-    ?.galleryItem;
+  // Extract service from navigation state
+  const navState = location.state as BookingNavigationState | null;
 
-  // Initialize service from gallery state - compute initial values
-  const state = location.state as {
-    fromGallery?: boolean;
-    galleryItem?: GalleryItem;
-  } | null;
+  // Validate navigation state
+  const isValidState = isValidBookingState(navState);
 
-  const matchingService =
-    state?.fromGallery && state.galleryItem
-      ? servicesData.find(
-          (service) => service.category === state.galleryItem?.category,
-        )
+  // Extract service based on navigation source
+  const preSelectedService = isValidState ? navState.service : null;
+
+  // Extract gallery item (if from gallery)
+  const galleryItem =
+    isValidState && "fromGallery" in navState && navState.fromGallery
+      ? navState.galleryItem
       : null;
 
-  const initialServiceId = matchingService?._id ?? "";
-  const initialStep = state?.fromGallery && matchingService ? 2 : 1;
+  const initialServiceId = preSelectedService?._id ?? "";
 
-  const [currentStep, setCurrentStep] = useState(initialStep);
-  const [selectedService, setSelectedService] = useState<Service | null>(
-    matchingService ?? null,
-  );
+  const [currentStep, setCurrentStep] = useState(1); // Always start at step 1 (Date/Time)
+  const [selectedService] = useState<Service | null>(preSelectedService);
+  // Note: No setter needed (service immutable once set)
+
+  // Validate navigation state on mount
+  useEffect(() => {
+    const navState = location.state as BookingNavigationState | null;
+
+    if (!isValidBookingState(navState)) {
+      // Invalid state: redirect to services
+      toast.error("Vui lòng chọn dịch vụ trước khi đặt lịch");
+      navigate("/services", { replace: true });
+      return;
+    }
+
+    // Additional validation: check service exists
+    if (!navState.service || !navState.service._id) {
+      toast.error("Dịch vụ không hợp lệ. Vui lòng chọn lại");
+      navigate("/services", { replace: true });
+      return;
+    }
+  }, [location.state, navigate]);
 
   // Initialize React Hook Form with Zod validation
   const form = useForm<BookingFormData>({
@@ -95,7 +106,7 @@ export function useBookingPage() {
   });
 
   const handleNext = () => {
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
       // Scroll to top smoothly when moving to next step
       window.scrollTo({ behavior: "smooth", top: 0 });
@@ -131,20 +142,18 @@ export function useBookingPage() {
   // Reset form after successful booking
   const handleCloseConfirmation = () => {
     form.reset();
-    setSelectedService(null);
     setCurrentStep(1);
   };
 
   const canProceed = () => {
     if (currentStep === 1) {
-      return selectedService !== null && form.getValues("serviceId") !== "";
-    }
-    if (currentStep === 2) {
+      // Step 1: Date & Time
       const date = form.getValues("date");
       const timeSlot = form.getValues("timeSlot");
       return date instanceof Date && timeSlot !== "";
     }
-    if (currentStep === 3) {
+    if (currentStep === 2) {
+      // Step 2: Customer Info
       const { customerInfo } = form.getValues();
       return (
         customerInfo.firstName !== "" &&
@@ -154,11 +163,6 @@ export function useBookingPage() {
       );
     }
     return false;
-  };
-
-  const handleServiceSelect = (service: Service) => {
-    setSelectedService(service);
-    form.setValue("serviceId", service._id, { shouldValidate: true });
   };
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -181,14 +185,12 @@ export function useBookingPage() {
     handleDateSelect,
     handleNext,
     handlePrevious,
-    handleServiceSelect,
     handleTimeSelect,
     isPending,
     isSuccess,
+    isValidState,
     onSubmit,
     selectedService,
-    servicesData,
-    servicesLoading,
     steps,
     timeSlots,
   };

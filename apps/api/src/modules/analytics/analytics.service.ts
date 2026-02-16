@@ -71,11 +71,7 @@ export class AnalyticsService {
     const expensesCount = expenseResult[0]?.count || 0;
 
     // Generate chart data
-    const chartData = await this.generateChartData(
-      startDate,
-      endDate,
-      groupBy,
-    );
+    const chartData = await this.generateChartData(startDate, endDate, groupBy);
 
     return {
       revenue,

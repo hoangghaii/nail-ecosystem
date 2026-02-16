@@ -115,7 +115,8 @@ export class ContactsSeeder {
       } = {
         firstName,
         lastName,
-        email: Math.random() > 0.3 ? generateEmail(firstName, lastName) : undefined, // 70% include email
+        email:
+          Math.random() > 0.3 ? generateEmail(firstName, lastName) : undefined, // 70% include email
         phone: generateVietnamesePhone(),
         subject: Math.random() > 0.2 ? subject : undefined, // 80% include subject
         message,

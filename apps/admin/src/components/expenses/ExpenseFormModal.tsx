@@ -4,12 +4,13 @@
  * Shared form for creating and editing expenses
  */
 
-import { useEffect } from 'react';
 import type { Expense } from '@repo/types/expense';
-import { useForm } from 'react-hook-form';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { format } from 'date-fns';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -48,29 +49,29 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 type ExpenseFormModalProps = {
-  mode: 'create' | 'edit';
   expense?: Expense;
-  open: boolean;
+  mode: 'create' | 'edit';
   onOpenChange: (open: boolean) => void;
+  open: boolean;
 };
 
 export function ExpenseFormModal({
-  mode,
   expense,
-  open,
+  mode,
   onOpenChange,
+  open,
 }: ExpenseFormModalProps) {
   const createMutation = useCreateExpense();
   const updateMutation = useUpdateExpense();
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       amount: '',
       category: 'supplies',
       date: '',
       description: '',
     },
+    resolver: zodResolver(formSchema),
   });
 
   // Reset form when expense changes or modal opens
@@ -106,7 +107,7 @@ export function ExpenseFormModal({
     if (mode === 'create') {
       await createMutation.mutateAsync(data);
     } else if (expense) {
-      await updateMutation.mutateAsync({ id: expense._id, data });
+      await updateMutation.mutateAsync({ data, id: expense._id });
     }
 
     onOpenChange(false);

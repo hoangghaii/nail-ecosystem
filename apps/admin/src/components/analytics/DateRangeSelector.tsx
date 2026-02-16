@@ -4,8 +4,8 @@
  * Preset date ranges and custom date picker
  */
 
-import { useState } from 'react';
 import { addDays, format } from 'date-fns';
+import { useState } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-type DateRange = { startDate: string; endDate: string };
+type DateRange = { endDate: string; startDate: string; };
 
 type DateRangeSelectorProps = {
   onChange: (range: DateRange) => void;
@@ -39,16 +39,16 @@ export function DateRangeSelector({ onChange }: DateRangeSelectorProps) {
     const endDate = new Date();
     const startDate = addDays(endDate, -parseInt(days));
     onChange({
-      startDate: format(startDate, 'yyyy-MM-dd'),
       endDate: format(endDate, 'yyyy-MM-dd'),
+      startDate: format(startDate, 'yyyy-MM-dd'),
     });
   };
 
   const handleCustomDateChange = () => {
     if (customStartDate && customEndDate) {
       onChange({
-        startDate: customStartDate,
         endDate: customEndDate,
+        startDate: customStartDate,
       });
     }
   };
@@ -97,8 +97,8 @@ export function DateRangeSelector({ onChange }: DateRangeSelectorProps) {
                 setCustomEndDate(e.target.value);
                 if (customStartDate && e.target.value) {
                   onChange({
-                    startDate: customStartDate,
                     endDate: e.target.value,
+                    startDate: customStartDate,
                   });
                 }
               }}

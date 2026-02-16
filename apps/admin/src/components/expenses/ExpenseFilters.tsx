@@ -18,24 +18,24 @@ import {
 
 type ExpenseFiltersProps = {
   category: string;
-  onCategoryChange: (value: string) => void;
-  startDate: string;
-  onStartDateChange: (value: string) => void;
   endDate: string;
+  onCategoryChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
-  searchQuery: string;
   onSearchChange: (value: string) => void;
+  onStartDateChange: (value: string) => void;
+  searchQuery: string;
+  startDate: string;
 };
 
 export function ExpenseFilters({
   category,
-  onCategoryChange,
-  startDate,
-  onStartDateChange,
   endDate,
+  onCategoryChange,
   onEndDateChange,
-  searchQuery,
   onSearchChange,
+  onStartDateChange,
+  searchQuery,
+  startDate,
 }: ExpenseFiltersProps) {
   return (
     <div className="mb-6 space-y-4">

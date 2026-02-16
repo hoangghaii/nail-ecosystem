@@ -17,9 +17,9 @@ import { storage } from '@/services/storage.service';
  */
 export function useProfitAnalytics(params: ProfitQueryParams) {
   return useQuery<ProfitAnalytics, Error>({
-    queryKey: queryKeys.analytics.profit(params),
-    queryFn: () => analyticsService.getProfit(params),
     enabled: !!storage.get('auth_token', '') && !!params.startDate && !!params.endDate,
+    queryFn: () => analyticsService.getProfit(params),
+    queryKey: queryKeys.analytics.profit(params),
     staleTime: 60_000, // 60s cache for aggregated data
   });
 }

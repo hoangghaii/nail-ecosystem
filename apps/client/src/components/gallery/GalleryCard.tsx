@@ -1,11 +1,15 @@
+import type { Service } from "@repo/types/service";
+
 import { Clock, DollarSign } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 import type { GalleryItem } from "@/types";
 
 import { LazyImage } from "@/components/shared/LazyImage";
 import { Button } from "@/components/ui/button";
+import { useServices } from "@/hooks/api/useServices";
 
 type GalleryCardProps = {
   index: number;
@@ -16,12 +20,29 @@ type GalleryCardProps = {
 export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
   const navigate = useNavigate();
 
+  // Fetch active services for matching
+  const { data: services = [] } = useServices({ isActive: true });
+
   const handleBookNow = () => {
-    // Navigate to booking page with gallery item data
+    // Match service by category
+    const matchedService = services.find(
+      (service: Service) => service.category === item.category
+    );
+
+    // Validate service found
+    if (!matchedService) {
+      toast.error(
+        "Không tìm thấy dịch vụ phù hợp. Vui lòng liên hệ với chúng tôi."
+      );
+      return;
+    }
+
+    // Navigate with matched service
     navigate("/booking", {
       state: {
         fromGallery: true,
         galleryItem: item,
+        service: matchedService,
       },
     });
   };
