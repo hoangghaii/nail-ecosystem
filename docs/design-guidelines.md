@@ -1,73 +1,45 @@
-# Design Guidelines - Pink Nail Admin Dashboard
+# Design Guidelines - Pink Nail Salon Client Website
 
-**Last Updated**: 2025-12-03
-**Version**: 1.0.0
+**Last Updated**: 2026-02-16
+**Version**: 2.0.0 (Phase 1 Design Foundation)
+**Status**: Phase 1 Complete - OKLCH colors, typography, design tokens implemented
+
+---
 
 ## Design System Overview
 
-This admin dashboard uses the **shadcn/ui blue theme design system** with a professional, clean aesthetic. All components follow Radix UI accessibility standards and use OKLCH color space for consistent theming.
+This customer-facing website uses a **warm, organic, border-based design system** with OKLCH color space for future-proof color consistency. The design emphasizes softness, femininity, and natural elegance through earth tones, serif typography, and minimal shadows.
+
+**Design Philosophy**: Border-based (NO shadows), organic shapes, cozy aesthetic
+
+**Browser Support**: OKLCH format supported by 93%+ modern browsers
 
 ---
 
-## Color Palette
+## Phase 1 Documentation Structure
 
-### Light Mode
+Phase 1 design documentation is modularized for easier navigation:
 
-```css
---primary: oklch(0.488 0.243 264.376); /* Professional blue */
---primary-foreground: oklch(0.97 0.014 254.604); /* Light text on blue */
---secondary: oklch(0.967 0.001 286.375); /* Light gray */
---secondary-foreground: oklch(0.21 0.006 285.885); /* Dark text on gray */
---background: oklch(1 0 0); /* White */
---foreground: oklch(0.141 0.005 285.823); /* Dark blue-gray text */
---card: oklch(1 0 0); /* White card background */
---card-foreground: oklch(0.141 0.005 285.823); /* Dark text on cards */
---muted: oklch(0.967 0.001 286.375); /* Light gray background */
---muted-foreground: oklch(0.552 0.016 285.938); /* Muted text */
---accent: oklch(0.967 0.001 286.375); /* Accent background */
---accent-foreground: oklch(0.21 0.006 285.885); /* Text on accent */
---destructive: oklch(0.577 0.245 27.325); /* Red for errors */
---border: oklch(0.92 0.004 286.32); /* Border gray */
---input: oklch(0.92 0.004 286.32); /* Input border */
---ring: oklch(0.708 0 0); /* Focus ring */
-```
+### Core Design System
 
-### Semantic Colors (Custom)
+1. **[Color Palette](./design/phase1-color-palette.md)** - OKLCH colors, semantic mappings, usage guidelines
+2. **[Typography](./design/phase1-typography.md)** - Font families, hierarchy, responsive typography
+3. **[Design Tokens](./design/phase1-design-tokens.md)** - Border radius, shadows, transitions, spacing
 
-```css
-/* Success (Green) */
---success: oklch(0.629 0.176 152.87);
---success-foreground: oklch(0.2 0.15 152.87);
+### Quick Reference
 
-/* Warning (Amber) */
---warning: oklch(0.755 0.153 79.98);
---warning-foreground: oklch(0.3 0.14 79.98);
-```
+**Primary Colors**:
+- Dusty Rose: `oklch(0.7236 0.0755 28.44)` - #D1948B
+- Cream: `oklch(0.9821 0.0067 53.45)` - #FDF8F5
 
----
+**Typography**:
+- Headings: Playfair Display (serif, 400-700)
+- Body: Be Vietnam Pro (sans, 400-700)
 
-## Typography
-
-### Font Families
-
-```css
---font-sans:
-  "Montserrat", "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
---font-serif: "Playfair", ui-serif, Georgia, serif;
-```
-
-**Usage Guidelines**:
-
-- **Body text**: Use `font-sans` (Montserrat/Be Vietnam Pro)
-- **Headings**: Use `font-serif` (Playfair) for elegant headers
-- All fonts support Vietnamese diacritical marks
-
-### Type Scale
-
-- **Headings**: Applied automatically via `@layer base` (h1-h6 use `font-serif`)
-- **Body**: Default `text-base` (16px) on desktop, `text-sm` (14px) on mobile
-- **Small text**: `text-sm` for secondary information
-- **Extra small**: `text-xs` for labels, badges, captions
+**Design Tokens**:
+- Border radius: 12px (buttons) → 24px (cards) → 32px (sections)
+- Shadows: Minimal, soft (sm/md/lg)
+- Transitions: 200ms (fast) / 300ms (base) / 400ms (slow)
 
 ---
 
@@ -109,7 +81,6 @@ import {
 ```
 
 **Features**:
-
 - Blur backdrop (`backdrop-blur-sm`)
 - Keyboard navigation (Esc to close)
 - Focus trap inside dialog
@@ -118,23 +89,12 @@ import {
 - Accessible (ARIA labels, roles)
 
 **Styling**:
-
 - Max width: `max-w-lg` (512px) or `max-w-2xl` (672px) for detail modals
 - Max height: `max-h-[90vh]` for scrollable content
 - Border: `border-border`
 - Background: `bg-card`
 - Shadow: `shadow-lg`
 - Rounded corners: `rounded-lg`
-
-**IMPORTANT - Consistent Modal Pattern**:
-
-All modals across the application use Dialog (centered popup), NOT Sheet (side drawer):
-
-- **BannersPage**: BannerFormModal (Dialog)
-- **GalleryPage**: GalleryFormModal (Dialog)
-- **BookingsPage**: BookingDetailsModal (Dialog) ✨ Migrated from Sheet to Dialog
-- Form/detail modals: `max-w-2xl` + `max-h-[90vh]` + `overflow-y-auto`
-- Confirmation dialogs: `max-w-lg`
 
 ---
 
@@ -171,13 +131,6 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 | `inactive`  | X     | Gray bg, gray text   | Gray border, gray text   |
 | `isPrimary` | Star  | Blue bg, white text  | Blue border, blue text   |
 
-**Styling**:
-
-- Rounded: `rounded-full`
-- Padding: `px-3 py-1`
-- Text: `text-xs font-medium`
-- Icons: `h-3 w-3` (lucide-react)
-
 ---
 
 ### 3. ImageUpload Component
@@ -195,20 +148,7 @@ type ImageUploadProps = {
 };
 ```
 
-**Usage**:
-
-```tsx
-import { ImageUpload } from "@/components/shared/ImageUpload";
-
-<ImageUpload
-  value={imageUrl}
-  onChange={(url) => setValue("imageUrl", url)}
-  folder="banners"
-/>;
-```
-
 **Features**:
-
 - Drag-and-drop zone
 - File input click to upload
 - Image preview with thumbnail
@@ -217,19 +157,6 @@ import { ImageUpload } from "@/components/shared/ImageUpload";
 - File validation (JPG, PNG, WebP, max 5MB)
 - Firebase Storage integration
 - Toast notifications (sonner)
-
-**States**:
-
-- Empty: Shows upload zone with icon
-- Uploading: Shows spinner + progress bar
-- Uploaded: Shows image preview + action buttons
-
-**Styling**:
-
-- Upload zone: `border-2 border-dashed border-border bg-muted/50`
-- Dragging state: `border-primary bg-primary/10`
-- Preview: `h-48 w-full object-cover`
-- Progress bar: `bg-primary` with animated width
 
 ---
 
@@ -248,71 +175,12 @@ type VideoUploadProps = {
 };
 ```
 
-**Usage**:
-
-```tsx
-import { VideoUpload } from "@/components/shared/VideoUpload";
-
-<VideoUpload
-  value={videoUrl}
-  onChange={(url) => setValue("videoUrl", url)}
-  folder="banners"
-/>;
-```
-
 **Features**:
-
 - Drag-and-drop zone
-- File input click to upload
 - Video preview with controls
 - Upload progress bar
-- Replace and Remove buttons
 - File validation (MP4, WebM, max 50MB)
 - Firebase Storage integration
-- Toast notifications (sonner)
-
-**States**:
-
-- Empty: Shows upload zone with video icon
-- Uploading: Shows spinner + progress bar
-- Uploaded: Shows video player + action buttons
-
-**Styling**:
-
-- Upload zone: Same as ImageUpload
-- Preview: `h-64 w-full object-cover`
-- Video controls: Native browser controls
-
----
-
-## Design Tokens
-
-### Spacing
-
-- **xs**: 0.25rem (4px)
-- **sm**: 0.5rem (8px)
-- **md**: 1rem (16px)
-- **lg**: 1.5rem (24px)
-- **xl**: 2rem (32px)
-- **2xl**: 3rem (48px)
-
-### Border Radius
-
-```css
---radius: 0.65rem; /* Base radius */
---radius-sm: 0.45rem; /* Small radius */
---radius-md: 0.5rem; /* Medium radius */
---radius-lg: 0.65rem; /* Large radius */
---radius-xl: 0.85rem; /* Extra large radius */
-```
-
-**Usage**:
-
-- Buttons: `rounded-md`
-- Cards: `rounded-lg`
-- Badges: `rounded-full`
-- Inputs: `rounded-md`
-- Dialogs: `rounded-lg`
 
 ---
 
@@ -370,7 +238,7 @@ All components are designed mobile-first:
 ### Transition Classes
 
 ```css
-transition-colors  /* Color changes */
+transition-colors  /* Color changes (200ms) */
 transition-opacity /* Opacity changes */
 transition-all     /* All properties */
 ```
@@ -386,15 +254,6 @@ data-[state=closed]:fade-out-0
 data-[state=open]:fade-in-0
 data-[state=closed]:zoom-out-95
 data-[state=open]:zoom-in-95
-```
-
-### Upload Progress
-
-```tsx
-<div
-  className="h-full bg-primary transition-all duration-300"
-  style={{ width: `${uploadProgress}%` }}
-/>
 ```
 
 ---
@@ -548,6 +407,9 @@ className={cn(
 8. **Test keyboard navigation** on all interactive components
 9. **Ensure proper ARIA labels** for accessibility
 10. **Use forwardRef** for components that need refs
+11. **Prefer borders over shadows** for border-based design
+12. **Follow radius hierarchy** (parent > child)
+13. **Use OKLCH colors** for consistency and future-proofing
 
 ---
 
@@ -560,6 +422,9 @@ className={cn(
 - [ ] Add dark mode toggle UI
 - [ ] Create reusable form components
 - [ ] Add input mask components (phone, date, etc.)
+- [ ] Implement color scales (50-950) for all primary colors
+- [ ] Add Motion (Framer Motion) animations
+- [ ] Create organic shape components
 
 ---
 
