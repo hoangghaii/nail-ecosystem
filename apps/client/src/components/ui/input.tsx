@@ -9,12 +9,12 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
         ref={ref}
         type={type}
         className={cn(
-          // Base styles - no shadows, border-based design
-          "w-full rounded-[12px] border border-border bg-background px-4 py-3 font-sans text-foreground",
+          // Base styles
+          "w-full rounded-[12px] border-2 border-border bg-background/80 px-4 py-3 h-12 text-base font-sans text-foreground",
           // Transitions
-          "transition-colors duration-200",
+          "transition-all duration-200",
           // Focus state
-          "focus:border-primary focus:outline-none",
+          "focus:border-primary focus:bg-background focus:outline-none",
           // Placeholder
           "placeholder:text-muted-foreground",
           // Disabled state
