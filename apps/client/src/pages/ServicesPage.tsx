@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { ServiceCardSkeleton } from "@/components/shared/skeletons/ServiceCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useServicesPage } from "@/hooks/useServicesPage";
+import { getTransition, pageVariants } from "@/utils/animations";
 
 export function ServicesPage() {
   const {
@@ -21,7 +22,14 @@ export function ServicesPage() {
   } = useServicesPage();
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      animate="animate"
+      className="min-h-screen bg-background"
+      exit="exit"
+      initial="initial"
+      transition={getTransition(0.4)}
+      variants={pageVariants}
+    >
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
@@ -115,6 +123,6 @@ export function ServicesPage() {
           </Link>
         </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

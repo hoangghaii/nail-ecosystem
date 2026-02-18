@@ -9,6 +9,7 @@ import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GalleryItemSkeleton } from "@/components/shared/skeletons/GalleryItemSkeleton";
 import { useGalleryPage } from "@/hooks/useGalleryPage";
+import { getTransition, pageVariants } from "@/utils/animations";
 
 export function GalleryPage() {
   const {
@@ -28,7 +29,14 @@ export function GalleryPage() {
   } = useGalleryPage();
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      animate="animate"
+      className="min-h-screen bg-background"
+      exit="exit"
+      initial="initial"
+      transition={getTransition(0.4)}
+      variants={pageVariants}
+    >
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
@@ -105,6 +113,6 @@ export function GalleryPage() {
           </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

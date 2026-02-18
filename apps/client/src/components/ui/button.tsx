@@ -1,8 +1,10 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { motion, type HTMLMotionProps } from "motion/react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { getTransition, tapScale } from "@/utils/animations";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[16px] font-sans font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
@@ -37,23 +39,32 @@ const buttonVariants = cva(
   },
 );
 
-function Button({
-  asChild = false,
-  className,
-  size,
-  variant,
-  ...props
-}: {
+type ButtonProps = {
   asChild?: boolean;
 } & React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants>) {
-  const Comp = asChild ? Slot : "button";
+  VariantProps<typeof buttonVariants>;
+
+function Button({ asChild = false, className, size, variant, ...props }: ButtonProps) {
+  if (asChild) {
+    return (
+      <Slot
+        data-slot="button"
+        className={cn(buttonVariants({ className, size, variant }))}
+        {...props}
+      />
+    );
+  }
+
+  // Cast props to motion props, excluding conflicting event handlers
+  const motionProps = props as unknown as HTMLMotionProps<"button">;
 
   return (
-    <Comp
+    <motion.button
       data-slot="button"
       className={cn(buttonVariants({ className, size, variant }))}
-      {...props}
+      whileTap={tapScale}
+      transition={getTransition(0.15)}
+      {...motionProps}
     />
   );
 }

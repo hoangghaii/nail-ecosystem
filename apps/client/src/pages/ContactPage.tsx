@@ -1,3 +1,5 @@
+import { motion } from "motion/react";
+
 import { ContactForm } from "@/components/contact/contact-form";
 import { ContactInfoDisplay } from "@/components/contact/contact-info-display";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
@@ -5,6 +7,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { useBusinessInfo } from "@/hooks/api/useBusinessInfo";
 import { useContactPage } from "@/hooks/useContactPage";
 import { transformBusinessInfo } from "@/utils/businessInfo";
+import { getTransition, pageVariants } from "@/utils/animations";
 
 export function ContactPage() {
   useContactPage();
@@ -23,7 +26,14 @@ export function ContactPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <motion.div
+        animate="animate"
+        className="min-h-screen bg-background"
+        exit="exit"
+        initial="initial"
+        transition={getTransition(0.4)}
+        variants={pageVariants}
+      >
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -34,14 +44,21 @@ export function ContactPage() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   // Error state
   if (error || !displayData || !contactInfo || !businessHours) {
     return (
-      <div className="min-h-screen bg-background">
+      <motion.div
+        animate="animate"
+        className="min-h-screen bg-background"
+        exit="exit"
+        initial="initial"
+        transition={getTransition(0.4)}
+        variants={pageVariants}
+      >
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -54,12 +71,19 @@ export function ContactPage() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      animate="animate"
+      className="min-h-screen bg-background"
+      exit="exit"
+      initial="initial"
+      transition={getTransition(0.4)}
+      variants={pageVariants}
+    >
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
@@ -78,6 +102,6 @@ export function ContactPage() {
           <ContactForm />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

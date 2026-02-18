@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useBookingPage } from "@/hooks/useBookingPage";
 import { cn } from "@/lib/utils";
+import { getTransition, pageVariants } from "@/utils/animations";
 
 export function BookingPage() {
   const {
@@ -46,7 +47,14 @@ export function BookingPage() {
   // Show loading while validating/redirecting
   if (!isValidState || !selectedService) {
     return (
-      <div className="min-h-screen bg-background">
+      <motion.div
+        animate="animate"
+        className="min-h-screen bg-background"
+        exit="exit"
+        initial="initial"
+        transition={getTransition(0.4)}
+        variants={pageVariants}
+      >
         <div className="mx-auto max-w-6xl px-4 py-12">
           <div className="flex items-center justify-center">
             <Loader2 className="size-8 animate-spin text-primary" />
@@ -55,14 +63,21 @@ export function BookingPage() {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   // Show success confirmation
   if (isSuccess && bookingResult) {
     return (
-      <div className="min-h-screen bg-background">
+      <motion.div
+        animate="animate"
+        className="min-h-screen bg-background"
+        exit="exit"
+        initial="initial"
+        transition={getTransition(0.4)}
+        variants={pageVariants}
+      >
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <Breadcrumb />
           <PageHeader
@@ -75,12 +90,19 @@ export function BookingPage() {
             onClose={handleCloseConfirmation}
           />
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      animate="animate"
+      className="min-h-screen bg-background"
+      exit="exit"
+      initial="initial"
+      transition={getTransition(0.4)}
+      variants={pageVariants}
+    >
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <Breadcrumb />
         <PageHeader
@@ -484,6 +506,6 @@ export function BookingPage() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
