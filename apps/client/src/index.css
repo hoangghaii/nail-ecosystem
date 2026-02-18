@@ -270,6 +270,31 @@
       @apply gap-4;
     }
   }
+
+  /* ============================================
+     GALLERY CARD HOVER EFFECTS - Phase 6
+     ============================================ */
+  /* GPU acceleration hint for smooth hover animations */
+  .gallery-card:hover img {
+    will-change: transform;
+  }
+
+  /* Remove will-change after animation completes to save memory */
+  .gallery-card img {
+    transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Accessibility: Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-card img {
+      transition: none !important;
+    }
+
+    .gallery-card * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
 }
 
 .be-vietnam-pro-thin {

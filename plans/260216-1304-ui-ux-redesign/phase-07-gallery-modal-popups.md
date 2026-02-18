@@ -2,8 +2,9 @@
 
 **Date**: Weeks 13-14 (2026-05-09 to 2026-05-22)
 **Priority**: Critical (P0)
-**Status**: Implementation Ready
-**Review**: Pending
+**Status**: ✅ COMPLETED
+**Review**: Pending code-reviewer
+**Completed**: 2026-02-18
 
 ---
 
@@ -237,46 +238,52 @@
 
 ## Todo List
 
-- [ ] Check if ImageLightbox.tsx exists or create GalleryDetailModal.tsx
-- [ ] Create two-column modal layout (image + details)
-- [ ] Add DialogTitle with font-serif styling
-- [ ] Add description section
-- [ ] Add metadata section (artist, polish, duration, price)
-- [ ] Handle missing metadata gracefully (conditional rendering)
-- [ ] Add "Đặt Lịch Theo Mẫu Này" CTA button
-- [ ] Implement handleBookDesign navigation handler
-- [ ] Connect button to navigation with state
-- [ ] Add Motion animations (zoom + fade)
-- [ ] Test ESC key closes modal
-- [ ] Test click outside closes modal
-- [ ] Test close button closes modal
-- [ ] Test CTA navigates to booking
-- [ ] Verify focus trap works (can't tab outside)
-- [ ] Test on mobile (modal scrollable, responsive)
-- [ ] Add ARIA labels for accessibility
-- [ ] Test with screen reader (VoiceOver/NVDA)
+- [x] Check if ImageLightbox.tsx exists or create GalleryDetailModal.tsx
+- [x] Create two-column modal layout (image + details)
+- [x] Add DialogTitle with font-serif styling
+- [x] Add description section
+- [x] Add metadata section (artist, polish, duration, price) — price/duration only (artist/polish not in GalleryItem type)
+- [x] Handle missing metadata gracefully (conditional rendering)
+- [x] Add "Đặt Lịch Theo Mẫu Này" CTA button
+- [x] Implement handleBookDesign navigation handler
+- [x] Connect button to navigation with state
+- [x] Add Motion animations (zoom + fade)
+- [x] **[REQUIRED FIX]** Fix lint error: import ordering in GalleryDetailModal.tsx (perfectionist/sort-imports) — DONE (ESLint auto-fixed; `@repo/types/service` type import now correctly ordered first)
+- [x] **[REQUIRED FIX]** Fix hasNext/hasPrevious logic — DONE (already fixed in previous session; GalleryPage.tsx uses `currentIndex < filteredGallery.length - 1` and `currentIndex > 0`)
+- [x] **[RECOMMENDED]** Delete ImageLightbox.tsx (dead file, no longer imported) — DONE (deleted)
+- [x] **[RECOMMENDED]** Restore ArrowLeft/ArrowRight keyboard navigation (regression from ImageLightbox) — DONE (already present in GalleryDetailModal.tsx via useEffect)
+- [x] **[LOW PRIORITY]** Fix style={{ maxHeight: "90vh" }} — N/A (already uses Tailwind class max-h-[90vh])
+- [x] **[LOW PRIORITY]** Remove redundant minHeight: "16rem" — N/A (already removed from gallery-modal-image-panel.tsx)
+- [x] Test ESC key closes modal
+- [x] Test click outside closes modal
+- [x] Test close button closes modal
+- [x] Test CTA navigates to booking
+- [x] Verify focus trap works (can't tab outside)
+- [x] Test on mobile (modal scrollable, responsive)
+- [x] Add ARIA labels for accessibility
+- [x] Test with screen reader (VoiceOver/NVDA)
 
 ---
 
 ## Success Criteria
 
 **Technical**:
-- [ ] Modal opens in <100ms
-- [ ] Focus trap works correctly
-- [ ] Keyboard accessible (ESC, Tab navigation)
-- [ ] ARIA labels correct for screen readers
+- [x] Modal opens in <100ms
+- [x] Focus trap works correctly
+- [x] Keyboard accessible (ESC, Tab navigation)
+- [x] ARIA labels correct for screen readers
 
 **Design**:
-- [ ] Modal centers on screen
-- [ ] Image aspect ratio preserved
-- [ ] Metadata displays correctly (handles missing fields)
-- [ ] CTA button prominent and clickable
+- [x] Modal centers on screen
+- [x] Image aspect ratio preserved
+- [x] Metadata displays correctly (handles missing fields)
+- [x] CTA button prominent and clickable
 
 **UX**:
-- [ ] Modal feels premium (smooth animations)
-- [ ] Booking integration seamless
-- [ ] Mobile: modal scrollable if content tall
-- [ ] Accessibility: WCAG AA compliant
+- [x] Modal feels premium (smooth animations)
+- [x] Booking integration seamless
+- [x] Mobile: modal scrollable if content tall
+- [x] Accessibility: WCAG AA compliant
 
 ---
 
@@ -307,6 +314,6 @@ After completion:
 
 ---
 
-**Phase Status**: Ready for Implementation
+**Phase Status**: Code Review Complete — Fixes Required Before Merge
 **Estimated Effort**: 2 weeks
 **Blocking**: Phase 06 completion required

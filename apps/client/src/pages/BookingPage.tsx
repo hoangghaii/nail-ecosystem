@@ -34,10 +34,9 @@ export function BookingPage() {
     handleTimeSelect,
     isPending,
     isSuccess,
-    isValidState, // Will be used in Phase 4 for error handling
+    isValidState,
     onSubmit,
     selectedService,
-    steps,
     timeSlots,
   } = useBookingPage();
 
@@ -164,86 +163,30 @@ export function BookingPage() {
           </motion.div>
         )}
 
-        {/* Progress Steps */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isCompleted = currentStep > step.id;
-              const isCurrent = currentStep === step.id;
-
-              return (
+        {/* Progress Indicator — minimalist dots */}
+        <div className="mb-10 flex items-center justify-center gap-2">
+          {[1, 2].map((step) => (
+            <div key={step} className="flex items-center gap-2">
+              <div
+                className={cn(
+                  "h-3 w-3 rounded-full transition-all duration-300",
+                  step === currentStep
+                    ? "scale-125 bg-primary"
+                    : step < currentStep
+                      ? "bg-primary/50"
+                      : "bg-border",
+                )}
+              />
+              {step < 2 && (
                 <div
-                  key={step.id}
                   className={cn(
-                    "flex items-center",
-                    step.id === 2 ? "" : "flex-1",
+                    "h-0.5 w-8 transition-colors duration-300",
+                    step < currentStep ? "bg-primary/50" : "bg-border",
                   )}
-                >
-                  <div className="flex flex-col items-center">
-                    {/* Step Circle */}
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        backgroundColor:
-                          isCompleted || isCurrent
-                            ? "var(--color-primary)"
-                            : "var(--color-card)",
-                        borderColor:
-                          isCompleted || isCurrent
-                            ? "var(--color-primary)"
-                            : "var(--color-border)",
-                      }}
-                      transition={{
-                        damping: 30,
-                        stiffness: 300,
-                        type: "spring",
-                      }}
-                      className="flex size-12 items-center justify-center rounded-[12px] border-2"
-                    >
-                      {isCompleted ? (
-                        <Check className="size-6 text-primary-foreground" />
-                      ) : (
-                        <Icon
-                          className={`size-6 ${isCurrent ? "text-primary-foreground" : "text-muted-foreground"}`}
-                        />
-                      )}
-                    </motion.div>
-
-                    {/* Step Title */}
-                    <span
-                      className={`mt-2 hidden font-sans text-sm font-medium sm:block ${
-                        isCurrent || isCompleted
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {step.title}
-                    </span>
-                  </div>
-
-                  {/* Connecting Line */}
-                  {index < steps.length - 1 && (
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        backgroundColor:
-                          currentStep > step.id
-                            ? "var(--color-primary)"
-                            : "var(--color-border)",
-                      }}
-                      transition={{
-                        damping: 30,
-                        stiffness: 300,
-                        type: "spring",
-                      }}
-                      className="mx-2 h-0.5 flex-1"
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                />
+              )}
+            </div>
+          ))}
         </div>
 
         {/* Form Container */}
@@ -339,17 +282,18 @@ export function BookingPage() {
                           Chọn Giờ
                         </FormLabel>
                         <FormControl>
-                          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+                          <div className="grid grid-cols-3 gap-3 md:grid-cols-4">
                             {timeSlots.map((time) => (
                               <button
                                 key={time}
                                 type="button"
                                 onClick={() => handleTimeSelect(time)}
-                                className={`rounded-[8px] border px-3 py-2 font-sans text-sm font-medium transition-all duration-200 ${
+                                className={cn(
+                                  "rounded-[12px] border-2 px-3 py-2.5 font-sans text-sm font-medium transition-all duration-200",
                                   selectedTime === time
-                                    ? "border-primary bg-primary text-primary-foreground"
-                                    : "border-border bg-background text-foreground hover:border-secondary"
-                                }`}
+                                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                                    : "border-border bg-card text-foreground hover:border-primary",
+                                )}
                               >
                                 {time}
                               </button>

@@ -6,7 +6,7 @@ import type { GalleryItem } from "@/types";
 
 import { FilterPills } from "@/components/gallery/FilterPills";
 import { GalleryCard } from "@/components/gallery/GalleryCard";
-import { ImageLightbox } from "@/components/gallery/ImageLightbox";
+import { GalleryDetailModal } from "@/components/gallery/GalleryDetailModal";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -19,6 +19,7 @@ export function GalleryPage() {
   const {
     categories,
     closeLightbox,
+    currentIndex,
     filteredGallery: galleryItems,
     handleImageClick,
     handleNext,
@@ -165,15 +166,15 @@ export function GalleryPage() {
           </Masonry>
         )}
 
-        {/* Image Lightbox */}
-        <ImageLightbox
+        {/* Gallery Detail Modal */}
+        <GalleryDetailModal
           isOpen={lightboxOpen}
           item={selectedImage}
           onClose={closeLightbox}
           onNext={handleNext}
           onPrevious={handlePrevious}
-          hasNext={filteredGallery.length > 1}
-          hasPrevious={filteredGallery.length > 1}
+          hasNext={currentIndex < filteredGallery.length - 1}
+          hasPrevious={currentIndex > 0}
         />
 
         {/* No results message */}
