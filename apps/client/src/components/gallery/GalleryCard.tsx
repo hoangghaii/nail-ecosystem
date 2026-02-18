@@ -74,7 +74,7 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
       >
         <LazyImage
           alt={item.title}
-          className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105 md:h-80"
+          className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-105"
           src={item.imageUrl}
           placeholderClassName="rounded-[12px] md:rounded-[16px]"
         />

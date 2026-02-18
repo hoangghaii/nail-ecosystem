@@ -232,6 +232,44 @@
 
     @apply border border-border bg-background hover:bg-muted;
   }
+
+  /* ============================================
+     MASONRY LAYOUT - Phase 4
+     ============================================ */
+  .masonry-grid {
+    @apply flex w-full gap-6;
+  }
+
+  .masonry-column {
+    @apply flex flex-col gap-6;
+    background-clip: padding-box;
+  }
+
+  /* Prevent item splitting across columns */
+  .masonry-column > * {
+    break-inside: avoid;
+  }
+
+  /* Responsive gaps */
+  @media (max-width: 640px) {
+    .masonry-grid {
+      @apply gap-3;
+    }
+
+    .masonry-column {
+      @apply gap-3;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .masonry-grid {
+      @apply gap-4;
+    }
+
+    .masonry-column {
+      @apply gap-4;
+    }
+  }
 }
 
 .be-vietnam-pro-thin {

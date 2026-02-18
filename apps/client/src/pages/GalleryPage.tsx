@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import Masonry from "react-masonry-css";
 
 import type { GalleryItem } from "@/types";
 
@@ -27,6 +28,13 @@ export function GalleryPage() {
     selectedImage,
     setSelectedCategory,
   } = useGalleryPage();
+
+  // Masonry breakpoints: 3 cols (desktop >1024px), 2 cols (tablet/mobile)
+  const breakpointColumns = {
+    default: 3, // >1024px
+    1024: 2, // 640-1024px
+    640: 2, // <640px (mobile)
+  };
 
   return (
     <motion.div
@@ -64,20 +72,28 @@ export function GalleryPage() {
           ))}
         </div>
 
-        {/* Gallery Grid */}
+        {/* Gallery Masonry */}
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <Masonry
+            breakpointCols={breakpointColumns}
+            className="masonry-grid"
+            columnClassName="masonry-column"
+          >
             {Array.from({ length: 12 }).map((_, i) => (
               <GalleryItemSkeleton key={i} />
             ))}
-          </div>
+          </Masonry>
         ) : isError ? (
           <ErrorMessage
             message="Không thể tải thư viện. Vui lòng thử lại."
             onRetry={() => refetch()}
           />
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <Masonry
+            breakpointCols={breakpointColumns}
+            className="masonry-grid"
+            columnClassName="masonry-column"
+          >
             {filteredGallery.map((item: GalleryItem, index: number) => (
               <GalleryCard
                 key={item._id}
@@ -86,7 +102,7 @@ export function GalleryPage() {
                 onImageClick={() => handleImageClick(item, index)}
               />
             ))}
-          </div>
+          </Masonry>
         )}
 
         {/* Image Lightbox */}
