@@ -1,9 +1,13 @@
+import { useEffect } from "react";
+
 import type { Booking } from "@repo/types/booking";
 
 import { cn } from "@repo/utils/cn";
+import { motion } from "motion/react";
 import { Check, Calendar, Clock, User, Mail, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { celebrateBooking } from "@/utils/confetti";
 
 interface BookingConfirmationProps {
   booking: Booking;
@@ -26,8 +30,21 @@ export function BookingConfirmation({
     year: "numeric",
   });
 
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (!prefersReducedMotion) {
+      celebrateBooking();
+    }
+  }, []);
+
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
       className={cn(
         "border-2 border-green-500/50 bg-green-50/50 rounded-[24px] p-6 sm:p-8 space-y-6",
         className
@@ -74,7 +91,9 @@ export function BookingConfirmation({
           <div className="flex-1">
             <p className="text-sm text-muted-foreground mb-1">Giờ Hẹn</p>
             <p className="font-semibold text-foreground">
-              {typeof booking.timeSlot === 'string' ? booking.timeSlot : booking.timeSlot.time}
+              {typeof booking.timeSlot === "string"
+                ? booking.timeSlot
+                : booking.timeSlot.time}
             </p>
           </div>
         </div>
@@ -109,22 +128,18 @@ export function BookingConfirmation({
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <Button
-          size="lg"
-          onClick={onClose}
-          className="flex-1 rounded-full"
-        >
+        <Button size="lg" onClick={onClose} className="flex-1 rounded-full">
           Đặt Lịch Khác
         </Button>
         <Button
           variant="outline"
           size="lg"
-          onClick={() => window.location.href = "/"}
+          onClick={() => (window.location.href = "/")}
           className="flex-1 rounded-full"
         >
           Về Trang Chủ
         </Button>
       </div>
-    </div>
+    </motion.div>
   );
 }

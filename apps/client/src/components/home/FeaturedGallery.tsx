@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import type { GalleryItem } from "@/types";
 
-import { ImageLightbox } from "@/components/gallery/ImageLightbox";
+import { GalleryDetailModal } from "@/components/gallery/GalleryDetailModal";
 import { LazyImage } from "@/components/shared/LazyImage";
 import { GalleryItemSkeleton } from "@/components/shared/skeletons/GalleryItemSkeleton";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ const itemVariants: Variants = {
 export function FeaturedGallery() {
   const {
     closeLightbox,
+    currentIndex,
     featuredItems,
     handleImageClick,
     handleNext,
@@ -199,15 +200,14 @@ export function FeaturedGallery() {
         </motion.div>
       </div>
 
-      {/* Image Lightbox */}
-      <ImageLightbox
+      <GalleryDetailModal
         isOpen={lightboxOpen}
         item={selectedImage}
         onClose={closeLightbox}
         onNext={handleNext}
         onPrevious={handlePrevious}
-        hasNext={featuredItems.length > 1}
-        hasPrevious={featuredItems.length > 1}
+        hasNext={currentIndex < featuredItems.length - 1}
+        hasPrevious={currentIndex > 0}
       />
     </section>
   );

@@ -1,6 +1,6 @@
 import type { Service } from "@repo/types/service";
 
-import { Clock, DollarSign } from "lucide-react";
+import { Clock, DollarSign, Heart } from "lucide-react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -22,6 +22,9 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
 
   // Fetch active services for matching
   const { data: services = [] } = useServices({ isActive: true });
+
+  // Detect touch device
+  const isTouchDevice = "ontouchstart" in window;
 
   const handleBookNow = () => {
     // Match service by category
@@ -47,6 +50,12 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
     });
   };
 
+  const handleSaveDesign = () => {
+    // Placeholder for save design functionality (Phase 7 or future)
+    toast.info("Chức năng lưu thiết kế đang được phát triển");
+    // Future: Add to favorites, localStorage, or API
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -59,9 +68,9 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
       }}
       className="group flex h-full flex-col rounded-2xl border-2 border-secondary bg-card p-2 transition-colors duration-200 hover:border-primary md:rounded-[20px]"
     >
-      {/* Gold-framed image */}
+      {/* Image with hover effects */}
       <div
-        className="relative mb-3 cursor-pointer overflow-hidden rounded-sm md:mb-4 md:rounded-2xl"
+        className="gallery-card relative mb-3 cursor-pointer overflow-hidden rounded-sm md:mb-4 md:rounded-2xl"
         onClick={onImageClick}
         role="button"
         tabIndex={0}
@@ -74,15 +83,46 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
       >
         <LazyImage
           alt={item.title}
-          className="h-auto w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-auto w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
           src={item.imageUrl}
           placeholderClassName="rounded-[12px] md:rounded-[16px]"
         />
-        {/* Hover overlay hint */}
-        <div className="absolute inset-0 flex items-center justify-center rounded-sm bg-foreground/0 opacity-0 transition-all duration-200 group-hover:bg-foreground/10 group-hover:opacity-100 md:rounded-2xl">
-          <span className="rounded-xs border border-background bg-background/90 px-2 py-1 font-sans text-xs font-medium text-foreground md:px-3 md:py-1.5">
-            Nhấn để xem
-          </span>
+
+        {/* Dusty rose overlay - only on non-touch devices */}
+        {!isTouchDevice && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 0.4 }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 bg-primary pointer-events-none rounded-sm md:rounded-2xl"
+          />
+        )}
+
+        {/* Quick action buttons - appear on hover */}
+        <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <Button
+            size="sm"
+            variant="default"
+            className="shadow-lg"
+            onClick={(e) => {
+              e.stopPropagation();
+              onImageClick?.();
+            }}
+          >
+            Xem Chi Tiết
+          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            className="bg-white/90 backdrop-blur-sm"
+            aria-label="Lưu thiết kế này"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSaveDesign();
+            }}
+          >
+            <Heart className="size-4" />
+          </Button>
         </div>
       </div>
 

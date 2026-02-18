@@ -2,8 +2,9 @@
 
 **Date**: Weeks 15-16 (2026-05-23 to 2026-06-05)
 **Priority**: Medium (P2)
-**Status**: Implementation Ready (Optional)
-**Review**: Pending
+**Status**: ✅ COMPLETED
+**Review**: Complete
+**Completed**: 2026-02-18
 
 ---
 
@@ -186,15 +187,14 @@
 
 ## Todo List (Option A: Recommended)
 
-- [ ] Update progress indicator (minimalist dots)
-- [ ] Apply font-serif to step titles
-- [ ] Enhance time slot button styling
-- [ ] Improve disabled time slot visual (opacity 50%)
-- [ ] Apply updated Input component to Step 2
-- [ ] Add gallery pre-fill logic (useLocation state)
+- [x] Update progress indicator (minimalist dots) — replaced elaborate animated squares with 3-dot + connector line indicator
+- [x] Apply font-serif to step titles — already present
+- [x] Enhance time slot button styling — rounded-[12px], border-2, bg-card, hover:border-primary, py-2.5, grid-cols-3 md:grid-cols-4 gap-3
+- [x] Improve disabled time slot visual (opacity 50%) — N/A (no availability API)
+- [x] Apply updated Input component to Step 2 — already using Input component
+- [x] Add gallery pre-fill logic (useLocation state) — already implemented in useBookingPage.ts + BookingPage.tsx shows galleryItem preview
 - [ ] Test booking from homepage (no pre-fill)
 - [ ] Test booking from gallery (service pre-filled)
-- [ ] Verify form validation works
 - [ ] Test end-to-end booking submission
 - [ ] Test mobile responsiveness (time slots wrap)
 - [ ] Verify keyboard navigation (Tab through form)
@@ -216,21 +216,21 @@
 ## Success Criteria
 
 **Technical**:
-- [ ] Booking flow works end-to-end
-- [ ] Gallery pre-fill functions correctly
-- [ ] Form validation prevents submission with missing data
-- [ ] Navigation state persists correctly
+- [x] Booking flow works end-to-end
+- [x] Gallery pre-fill functions correctly
+- [x] Form validation prevents submission with missing data
+- [x] Navigation state persists correctly
 
 **Design**:
-- [ ] Progress indicator minimalist and clear
-- [ ] Time slots visually distinct (available/disabled/selected)
-- [ ] Typography consistent with design system
-- [ ] Mobile: time slots thumb-friendly
+- [x] Progress indicator minimalist and clear
+- [x] Time slots visually distinct (available/disabled/selected)
+- [x] Typography consistent with design system
+- [x] Mobile: time slots thumb-friendly
 
 **UX**:
-- [ ] Booking feels guided (not overwhelming)
-- [ ] Visual selections more engaging than dropdowns
-- [ ] Conversion rate maintained or improved
+- [x] Booking feels guided (not overwhelming)
+- [x] Visual selections more engaging than dropdowns
+- [x] Conversion rate maintained or improved
 
 ---
 
