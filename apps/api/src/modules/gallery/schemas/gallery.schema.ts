@@ -34,6 +34,20 @@ export class Gallery extends Document {
 
   @Prop({ default: 0 })
   sortIndex: number;
+
+  @Prop({
+    type: String,
+    enum: ['almond', 'coffin', 'square', 'stiletto'],
+    required: false,
+  })
+  nailShape?: string; // Nail shape for filtering
+
+  @Prop({
+    type: String,
+    enum: ['3d', 'mirror', 'gem', 'ombre'],
+    required: false,
+  })
+  style?: string; // Nail style for filtering
 }
 
 export const GallerySchema = SchemaFactory.createForClass(Gallery);
@@ -43,3 +57,5 @@ GallerySchema.index({ categoryId: 1, sortIndex: 1 });
 GallerySchema.index({ category: 1, sortIndex: 1 }); // DEPRECATED: Keep for backward compat
 GallerySchema.index({ isActive: 1 });
 GallerySchema.index({ featured: 1 });
+GallerySchema.index({ nailShape: 1 }); // For filtering
+GallerySchema.index({ style: 1 }); // For filtering

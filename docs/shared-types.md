@@ -31,18 +31,24 @@ type ServiceCategory = "extensions" | "manicure" | "nail-art" | "pedicure" | "sp
 
 ```typescript
 interface GalleryItem {
-  id: string
+  _id: string
   title: string
   imageUrl: string
-  category: GalleryCategory
+  category: string // Changed from enum to string for dynamic categories (category slug)
   description?: string
-  duration?: number
-  price?: number
+  duration?: string // e.g., "45 min", "1.5 hrs"
+  price?: string // e.g., "$45", "$60-80"
   featured: boolean
-  createdAt: Date
+  nailShape?: NailShape // Phase 5: Nail shape filtering
+  style?: NailStyle // Phase 5: Nail style filtering
+  createdAt?: Date
 }
 
 type GalleryCategory = "all" | "extensions" | "manicure" | "nail-art" | "pedicure" | "seasonal"
+
+// Phase 5: Filtering Enums
+type NailShape = "almond" | "coffin" | "square" | "stiletto"
+type NailStyle = "3d" | "mirror" | "gem" | "ombre"
 ```
 
 ---
@@ -182,4 +188,5 @@ When modifying shared types:
 
 ---
 
-**Last Updated**: 2026-01-16
+**Last Updated**: 2026-02-18
+**Latest**: Phase 5 Gallery filtering (nailShape, style fields)

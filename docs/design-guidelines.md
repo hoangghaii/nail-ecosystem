@@ -1,8 +1,8 @@
 # Design Guidelines - Pink Nail Salon Client Website
 
-**Last Updated**: 2026-02-16
-**Version**: 2.0.0 (Phase 1 Design Foundation)
-**Status**: Phase 1 Complete - OKLCH colors, typography, design tokens implemented
+**Last Updated**: 2026-02-18
+**Version**: 2.1.0 (Phase 5 Gallery Filtering)
+**Status**: Phase 5 Complete - FilterPills component, multi-dimensional filtering, Motion animations
 
 ---
 
@@ -45,7 +45,119 @@ Phase 1 design documentation is modularized for easier navigation:
 
 ## Component Patterns
 
-### 1. Dialog Component ✨ STANDARD MODAL PATTERN
+### 1. FilterPills Component ✨ PHASE 5 FILTERING PATTERN
+
+**Location**: `/src/components/gallery/FilterPills.tsx`
+
+**Purpose**: Reusable pill-style filter buttons with Motion animations
+
+**Props**:
+
+```typescript
+interface FilterPillsProps {
+  filters: Array<{ label: string; slug: string }>;
+  onSelect: (slug: string) => void;
+  selected: string;
+}
+```
+
+**Usage**:
+
+```tsx
+import { FilterPills } from "@/components/gallery/FilterPills";
+import { NAIL_SHAPES, NAIL_STYLES } from "@/data/filter-config";
+
+// Nail shape filter
+<FilterPills
+  filters={NAIL_SHAPES}
+  onSelect={setSelectedShape}
+  selected={selectedShape}
+/>
+
+// Nail style filter
+<FilterPills
+  filters={NAIL_STYLES}
+  onSelect={setSelectedStyle}
+  selected={selectedStyle}
+/>
+```
+
+**Features**:
+- Motion animations (scale on hover/tap)
+- Spring physics (stiffness: 300, damping: 30)
+- Active state styling (filled primary)
+- Inactive state styling (bordered outline)
+- Touch-friendly sizing (min-height: 48px)
+- Responsive layout (flex-wrap)
+- Accessibility (keyboard navigation, focus states)
+
+**Styling**:
+- Active: `bg-primary text-primary-foreground shadow-md`
+- Inactive: `border-2 border-border bg-card hover:border-primary hover:shadow-md`
+- Rounded: `rounded-full`
+- Padding: `px-6 py-2.5`
+
+**Filter Configuration** (`/src/data/filter-config.ts`):
+
+```typescript
+export const NAIL_SHAPES = [
+  { label: "Tất Cả", slug: "all" },
+  { label: "Almond", slug: "almond" },
+  { label: "Coffin", slug: "coffin" },
+  { label: "Square", slug: "square" },
+  { label: "Stiletto", slug: "stiletto" },
+];
+
+export const NAIL_STYLES = [
+  { label: "Tất Cả", slug: "all" },
+  { label: "Vẽ 3D", slug: "3d" },
+  { label: "Tráng Gương", slug: "mirror" },
+  { label: "Đính Đá", slug: "gem" },
+  { label: "Ombre", slug: "ombre" },
+];
+```
+
+**Multi-Dimensional Filtering Logic**:
+
+Gallery filtering uses AND logic for multiple filters:
+
+```typescript
+const filters = {
+  categoryId: selectedCategory !== 'all' ? selectedCategory : undefined,
+  nailShape: selectedShape !== 'all' ? selectedShape : undefined,
+  style: selectedStyle !== 'all' ? selectedStyle : undefined,
+};
+```
+
+**Reset Functionality**:
+
+All filters can be reset independently:
+
+```typescript
+const resetFilters = () => {
+  setSelectedCategory('all');
+  setSelectedShape('all');
+  setSelectedStyle('all');
+};
+```
+
+**Empty State Handling**:
+
+When no items match filters, show helpful message:
+
+```tsx
+{items.length === 0 && (
+  <div className="col-span-full py-16 text-center">
+    <p className="text-muted-foreground">
+      Không tìm thấy mẫu nail nào phù hợp
+    </p>
+  </div>
+)}
+```
+
+---
+
+### 2. Dialog Component ✨ STANDARD MODAL PATTERN
 
 **Location**: `/src/components/ui/dialog.tsx`
 
@@ -98,7 +210,7 @@ import {
 
 ---
 
-### 2. StatusBadge Component
+### 3. StatusBadge Component
 
 **Location**: `/src/components/shared/StatusBadge.tsx`
 
@@ -133,7 +245,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 
 ---
 
-### 3. ImageUpload Component
+### 4. ImageUpload Component
 
 **Location**: `/src/components/shared/ImageUpload.tsx`
 
@@ -160,7 +272,7 @@ type ImageUploadProps = {
 
 ---
 
-### 4. VideoUpload Component
+### 5. VideoUpload Component
 
 **Location**: `/src/components/shared/VideoUpload.tsx`
 

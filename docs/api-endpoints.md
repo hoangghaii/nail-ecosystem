@@ -293,13 +293,18 @@ Query Parameters (all optional):
 - category: DEPRECATED - Filter by category enum (use categoryId instead)
 - featured: Filter featured items (true/false)
 - isActive: Filter active items (true/false)
+- nailShape: Filter by nail shape (almond, coffin, square, stiletto)
+- style: Filter by nail style (3d, mirror, gem, ombre)
+- search: Search across title, description, and price
 - page: Page number (default: 1, min: 1)
 - limit: Items per page (default: 10, min: 1, max: 100)
 
 Examples:
 GET /gallery?categoryId=507f1f77bcf86cd799439011&isActive=true
 GET /gallery?featured=true
+GET /gallery?nailShape=almond&style=3d
 GET /gallery?categoryId=507f1f77bcf86cd799439011&page=2&limit=20
+GET /gallery?search=summer
 
 Response: 200 OK
 {
@@ -315,6 +320,10 @@ Response: 200 OK
       },
       "description": "Custom design",
       "featured": true,
+      "nailShape": "almond",
+      "style": "3d",
+      "price": "$45",
+      "duration": "60 minutes",
       "createdAt": "2025-12-31T00:00:00Z"
     }
   ],
@@ -338,15 +347,19 @@ Response: 200 OK
 ```
 POST /gallery
 Authorization: Bearer {accessToken}
-Content-Type: application/json
+Content-Type: multipart/form-data
 
 Body:
 {
+  "image": <binary>,
   "title": "Elegant Nail Art",
-  "imageUrl": "https://...",
-  "category": "nail-art",
+  "categoryId": "507f1f77bcf86cd799439011",
   "description": "Custom design",
-  "featured": true
+  "price": "$45",
+  "duration": "60 minutes",
+  "featured": true,
+  "nailShape": "almond",  // Optional: almond, coffin, square, stiletto
+  "style": "3d"           // Optional: 3d, mirror, gem, ombre
 }
 
 Response: 201 Created
@@ -670,6 +683,6 @@ Response: 200 OK
 
 ---
 
-**Last Updated**: 2026-01-17
-**API Version**: 0.1.4
-**Latest Addition**: Filter migration query parameter documentation (Services, Gallery, Bookings) (2026-01-17)
+**Last Updated**: 2026-02-18
+**API Version**: 0.1.5
+**Latest Addition**: Gallery filtering by nail shape and style (Phase 5) (2026-02-18)

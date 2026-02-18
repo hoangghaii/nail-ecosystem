@@ -96,6 +96,9 @@ export class GallerySeeder {
       ],
     };
 
+    const nailShapes = ['almond', 'coffin', 'square', 'stiletto'];
+    const nailStyles = ['3d', 'mirror', 'gem', 'ombre'];
+
     const items: Array<{
       title: string;
       description: string;
@@ -106,6 +109,8 @@ export class GallerySeeder {
       featured: boolean;
       isActive: boolean;
       sortIndex: number;
+      nailShape?: string;
+      style?: string;
     }> = [];
     let globalSortIndex = 0;
 
@@ -115,6 +120,11 @@ export class GallerySeeder {
 
       for (let i = 0; i < itemCount; i++) {
         const isFeatured = Math.random() > 0.7; // 30% featured
+        // Add nailShape and style for nail-art and extensions categories
+        const includeFilters = ['nail-art', 'extensions'].includes(
+          category.slug,
+        );
+
         items.push({
           title: categoryTitles[i],
           description: `Beautiful ${category.name.toLowerCase()} design showcasing our expertise and attention to detail`,
@@ -131,6 +141,12 @@ export class GallerySeeder {
           featured: isFeatured,
           isActive: true,
           sortIndex: globalSortIndex++,
+          nailShape: includeFilters
+            ? nailShapes[Math.floor(Math.random() * nailShapes.length)]
+            : undefined,
+          style: includeFilters
+            ? nailStyles[Math.floor(Math.random() * nailStyles.length)]
+            : undefined,
         });
       }
     }

@@ -6,8 +6,8 @@ import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { useBusinessInfo } from "@/hooks/api/useBusinessInfo";
 import { useContactPage } from "@/hooks/useContactPage";
-import { transformBusinessInfo } from "@/utils/businessInfo";
 import { getTransition, pageVariants } from "@/utils/animations";
+import { transformBusinessInfo } from "@/utils/businessInfo";
 
 export function ContactPage() {
   useContactPage();

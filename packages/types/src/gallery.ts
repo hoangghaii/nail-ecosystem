@@ -6,7 +6,9 @@ export type GalleryItem = {
   featured?: boolean;
   _id: string;
   imageUrl: string;
+  nailShape?: 'almond' | 'coffin' | 'square' | 'stiletto'; // Nail shape for filtering
   price?: string; // e.g., "$45", "$60-80"
+  style?: '3d' | 'mirror' | 'gem' | 'ombre'; // Nail style for filtering
   title: string;
 };
 

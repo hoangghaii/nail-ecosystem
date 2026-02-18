@@ -1,14 +1,17 @@
 import { motion } from "motion/react";
+import { useMemo, useState } from "react";
 import Masonry from "react-masonry-css";
 
 import type { GalleryItem } from "@/types";
 
+import { FilterPills } from "@/components/gallery/FilterPills";
 import { GalleryCard } from "@/components/gallery/GalleryCard";
 import { ImageLightbox } from "@/components/gallery/ImageLightbox";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GalleryItemSkeleton } from "@/components/shared/skeletons/GalleryItemSkeleton";
+import { NAIL_SHAPES, NAIL_STYLES } from "@/data/filter-config";
 import { useGalleryPage } from "@/hooks/useGalleryPage";
 import { getTransition, pageVariants } from "@/utils/animations";
 
@@ -16,7 +19,7 @@ export function GalleryPage() {
   const {
     categories,
     closeLightbox,
-    filteredGallery,
+    filteredGallery: galleryItems,
     handleImageClick,
     handleNext,
     handlePrevious,
@@ -29,11 +32,26 @@ export function GalleryPage() {
     setSelectedCategory,
   } = useGalleryPage();
 
+  // Filter state
+  const [selectedShape, setSelectedShape] = useState("all");
+  const [selectedStyle, setSelectedStyle] = useState("all");
+
+  // Multi-dimensional filtering (client-side)
+  const filteredGallery = useMemo(() => {
+    return galleryItems.filter((item: GalleryItem) => {
+      const shapeMatch =
+        selectedShape === "all" || item.nailShape === selectedShape;
+      const styleMatch =
+        selectedStyle === "all" || item.style === selectedStyle;
+      return shapeMatch && styleMatch;
+    });
+  }, [galleryItems, selectedShape, selectedStyle]);
+
   // Masonry breakpoints: 3 cols (desktop >1024px), 2 cols (tablet/mobile)
   const breakpointColumns = {
-    default: 3, // >1024px
     1024: 2, // 640-1024px
     640: 2, // <640px (mobile)
+    default: 3, // >1024px
   };
 
   return (
@@ -70,6 +88,48 @@ export function GalleryPage() {
               {category.label}
             </motion.button>
           ))}
+        </div>
+
+        {/* Nail Shape & Style Filters */}
+        <div className="mb-12 space-y-6">
+          {/* Nail Shapes */}
+          <div>
+            <h3 className="mb-3 text-center font-sans text-sm font-semibold text-muted-foreground">
+              Dáng Móng
+            </h3>
+            <FilterPills
+              filters={NAIL_SHAPES}
+              selected={selectedShape}
+              onSelect={setSelectedShape}
+            />
+          </div>
+
+          {/* Nail Styles */}
+          <div>
+            <h3 className="mb-3 text-center font-sans text-sm font-semibold text-muted-foreground">
+              Phong Cách
+            </h3>
+            <FilterPills
+              filters={NAIL_STYLES}
+              selected={selectedStyle}
+              onSelect={setSelectedStyle}
+            />
+          </div>
+
+          {/* Reset Filters Button */}
+          {(selectedShape !== "all" || selectedStyle !== "all") && (
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  setSelectedShape("all");
+                  setSelectedStyle("all");
+                }}
+                className="font-sans text-sm font-medium text-primary hover:underline"
+              >
+                Xóa Bộ Lọc
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Gallery Masonry */}
@@ -124,7 +184,7 @@ export function GalleryPage() {
             className="py-12 text-center"
           >
             <p className="font-sans text-lg text-muted-foreground">
-              Không tìm thấy mục nào trong danh mục này.
+              Không tìm thấy mẫu móng phù hợp. Thử bộ lọc khác?
             </p>
           </motion.div>
         )}

@@ -18,6 +18,20 @@ export enum GalleryCategory {
   SEASONAL = 'seasonal',
 }
 
+export enum NailShape {
+  ALMOND = 'almond',
+  COFFIN = 'coffin',
+  SQUARE = 'square',
+  STILETTO = 'stiletto',
+}
+
+export enum NailStyle {
+  THREE_D = '3d',
+  MIRROR = 'mirror',
+  GEM = 'gem',
+  OMBRE = 'ombre',
+}
+
 export class CreateGalleryDto {
   @ApiProperty({
     description: 'Image URL for the gallery item',
@@ -105,4 +119,22 @@ export class CreateGalleryDto {
   @IsNumber()
   @IsOptional()
   sortIndex?: number;
+
+  @ApiPropertyOptional({
+    description: 'Nail shape for filtering',
+    enum: NailShape,
+    example: NailShape.ALMOND,
+  })
+  @IsEnum(NailShape)
+  @IsOptional()
+  nailShape?: NailShape;
+
+  @ApiPropertyOptional({
+    description: 'Nail style for filtering',
+    enum: NailStyle,
+    example: NailStyle.THREE_D,
+  })
+  @IsEnum(NailStyle)
+  @IsOptional()
+  style?: NailStyle;
 }
