@@ -1,8 +1,8 @@
 import { motion } from "motion/react";
 
 import { AboutSection } from "@/components/home/AboutSection";
-import { FeaturedGallery } from "@/components/home/FeaturedGallery";
 import { HeroSection } from "@/components/home/HeroSection";
+import { LookbookHighlight } from "@/components/home/LookbookHighlight";
 import { ServicesOverview } from "@/components/home/ServicesOverview";
 import { useHomePage } from "@/hooks/useHomePage";
 import { getTransition, pageVariants } from "@/utils/animations";
@@ -20,9 +20,9 @@ export function HomePage() {
       variants={pageVariants}
     >
       <HeroSection />
-      <ServicesOverview />
-      <FeaturedGallery />
+      <LookbookHighlight />
       <AboutSection />
+      <ServicesOverview />
     </motion.div>
   );
 }

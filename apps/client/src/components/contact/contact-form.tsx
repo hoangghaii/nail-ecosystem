@@ -198,8 +198,14 @@ export function ContactForm() {
         </div>
 
         {/* Submit Button */}
-        <Button type="submit" size="lg" className="w-full" disabled={isPending}>
-          {isPending ? "Đang gửi..." : "Gửi Tin Nhắn"}
+        <Button
+          type="submit"
+          variant="pill"
+          size="lg"
+          className="w-full"
+          disabled={isPending}
+        >
+          {isPending ? "Đang Gửi..." : "Gửi Tin Nhắn"}
         </Button>
       </form>
     </div>

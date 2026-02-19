@@ -57,14 +57,16 @@ export function Header() {
           {/* Mobile Menu Button */}
           <button
             type="button"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
+            aria-label={mobileMenuOpen ? "Đóng menu" : "Mở menu"}
             className="rounded-[12px] border border-border p-2 text-muted-foreground transition-colors hover:text-foreground hover:border-foreground md:hidden focus-ring"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            <span className="sr-only">Open menu</span>
             {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
+              <X className="h-6 w-6" aria-hidden="true" />
             ) : (
-              <Menu className="h-6 w-6" />
+              <Menu className="h-6 w-6" aria-hidden="true" />
             )}
           </button>
         </div>
@@ -72,7 +74,7 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-border bg-background md:hidden">
+        <div id="mobile-menu" className="border-t border-border bg-background md:hidden">
           <div className="space-y-1 px-4 pb-4 pt-2">
             {navigation.map((item) => (
               <Link

@@ -1,6 +1,10 @@
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Link } from "react-router-dom";
+
+import { cn } from "@repo/utils/cn";
 
 import { Button } from "@/components/ui/button";
+import { getBusinessStatus } from "@/utils/business-hours";
 
 interface ContactInfoDisplayProps {
   businessHours: Array<{
@@ -22,10 +26,15 @@ interface ContactInfoDisplayProps {
   };
 }
 
+const iconContainerClass =
+  "flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center";
+
 export function ContactInfoDisplay({
   businessHours,
   contactInfo,
 }: ContactInfoDisplayProps) {
+  const { isOpen, message } = getBusinessStatus();
+
   return (
     <div className="space-y-8">
       {/* Contact Details Card */}
@@ -37,8 +46,8 @@ export function ContactInfoDisplay({
         <div className="space-y-6">
           {/* Phone */}
           <div className="flex items-start gap-4">
-            <div className="rounded-[12px] bg-muted p-3">
-              <Phone className="h-6 w-6 text-primary" />
+            <div className={iconContainerClass}>
+              <Phone className="h-5 w-5 text-primary" strokeWidth={1.5} />
             </div>
             <div>
               <p className="font-sans text-sm font-medium text-muted-foreground mb-1">
@@ -55,8 +64,8 @@ export function ContactInfoDisplay({
 
           {/* Email */}
           <div className="flex items-start gap-4">
-            <div className="rounded-[12px] bg-muted p-3">
-              <Mail className="h-6 w-6 text-primary" />
+            <div className={iconContainerClass}>
+              <Mail className="h-5 w-5 text-primary" strokeWidth={1.5} />
             </div>
             <div>
               <p className="font-sans text-sm font-medium text-muted-foreground mb-1">
@@ -73,8 +82,8 @@ export function ContactInfoDisplay({
 
           {/* Address */}
           <div className="flex items-start gap-4">
-            <div className="rounded-[12px] bg-muted p-3">
-              <MapPin className="h-6 w-6 text-primary" />
+            <div className={iconContainerClass}>
+              <MapPin className="h-5 w-5 text-primary" strokeWidth={1.5} />
             </div>
             <div>
               <p className="font-sans text-sm font-medium text-muted-foreground mb-1">
@@ -101,15 +110,34 @@ export function ContactInfoDisplay({
             </div>
           </div>
 
-          {/* Hours */}
+          {/* Hours with real-time status */}
           <div className="flex items-start gap-4">
-            <div className="rounded-[12px] bg-muted p-3">
-              <Clock className="h-6 w-6 text-primary" />
+            <div className={iconContainerClass}>
+              <Clock className="h-5 w-5 text-primary" strokeWidth={1.5} />
             </div>
             <div className="w-full">
-              <p className="font-sans text-sm font-medium text-muted-foreground mb-2">
-                Giờ Làm Việc
-              </p>
+              <div className="flex items-center gap-3 mb-2">
+                <p className="font-sans text-sm font-medium text-muted-foreground">
+                  Giờ Làm Việc
+                </p>
+                {/* Real-time open/closed badge */}
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium",
+                    isOpen
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full",
+                      isOpen ? "bg-green-500" : "bg-red-500",
+                    )}
+                  />
+                  {message}
+                </span>
+              </div>
               <div className="space-y-1">
                 {businessHours.map((schedule) => (
                   <div
@@ -138,13 +166,15 @@ export function ContactInfoDisplay({
         <p className="font-sans text-base opacity-90 mb-6">
           Đặt lịch hẹn trực tuyến và nhận xác nhận ngay lập tức.
         </p>
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 border-primary-foreground"
-        >
-          Đặt Lịch Hẹn
-        </Button>
+        <Link to="/booking" className="block">
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90 border-primary-foreground rounded-full"
+          >
+            Đặt Lịch Hẹn
+          </Button>
+        </Link>
       </div>
     </div>
   );

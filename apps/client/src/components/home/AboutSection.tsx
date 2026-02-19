@@ -1,7 +1,23 @@
+import { Check } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
+
+const features = [
+  {
+    title: "Nguyên Liệu Cao Cấp",
+    desc: "Sơn và phụ kiện nhập khẩu chính hãng",
+  },
+  {
+    title: "Kỹ Thuật Vẽ Tay",
+    desc: "Nghệ nhân với 5+ năm kinh nghiệm",
+  },
+  {
+    title: "Vệ Sinh Chuẩn Y Khoa",
+    desc: "Dụng cụ sát trùng kỹ sau mỗi khách",
+  },
+];
 
 export function AboutSection() {
   return (
@@ -67,7 +83,9 @@ export function AboutSection() {
               transition={{ delay: 0.1, duration: 0.3 }}
               className="font-serif text-4xl md:text-5xl font-semibold text-foreground"
             >
-              Về Chúng Tôi
+              Chúng Tôi Không Chỉ Đắp Móng,{" "}
+              <br className="hidden md:block" />
+              Chúng Tôi Tạo Ra Sự Tự Tin
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -76,23 +94,36 @@ export function AboutSection() {
               transition={{ delay: 0.15, duration: 0.3 }}
               className="mt-6 font-sans text-base lg:text-lg leading-relaxed text-muted-foreground"
             >
-              Chúng tôi tin vào việc tạo ra trải nghiệm sang trọng và thư giãn
-              cho mỗi khách hàng. Các chuyên viên nail của chúng tôi chỉ sử dụng
-              các sản phẩm cao cấp để đảm bảo móng của bạn luôn đẹp và khỏe
-              nhất.
+              Tại Pink Nail Art Studio, mỗi bộ móng là một tác phẩm nghệ thuật
+              được chăm chút tỉ mỉ bởi những nghệ nhân tài hoa — nơi sự sáng
+              tạo gặp gỡ đẳng cấp.
             </motion.p>
-            <motion.p
+
+            {/* Features List */}
+            <motion.ul
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.3 }}
-              className="mt-4 font-sans text-base lg:text-lg leading-relaxed text-muted-foreground"
+              className="mt-6 space-y-4 text-left"
             >
-              Bước vào không gian ấm cúng và tự nhiên của chúng tôi, để chúng
-              tôi chăm sóc bạn với các liệu trình đặc trưng. Từ làm móng cơ bản
-              đến nghệ thuật nail tinh xảo, chúng tôi biến ý tưởng của bạn thành
-              hiện thực.
-            </motion.p>
+              {features.map((feature) => (
+                <li key={feature.title} className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Check className="w-3 h-3 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-sans font-semibold text-foreground text-sm md:text-base">
+                      {feature.title}
+                    </h4>
+                    <p className="font-sans text-sm text-muted-foreground">
+                      {feature.desc}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </motion.ul>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

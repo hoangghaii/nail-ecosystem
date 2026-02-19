@@ -113,16 +113,16 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.3 }}
             >
-              Nơi Vẻ Đẹp Gặp Gỡ Nghệ Thuật
+              Nail Art Studio Cao Cấp
             </motion.p>
 
             <motion.h1
-              className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6"
+              className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.3 }}
             >
-              Chăm Sóc Móng Cao Cấp
+              Nơi Bộ Móng Trở Thành Tác Phẩm
             </motion.h1>
 
             <motion.p
@@ -131,8 +131,8 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.3 }}
             >
-              Trải nghiệm nghệ thuật làm móng đẹp với các chuyên viên giàu kinh
-              nghiệm và sản phẩm cao cấp. Bộ móng hoàn hảo đang chờ đón bạn.
+              Nơi sự sáng tạo gặp gỡ nghệ thuật — mỗi bộ móng là một tác phẩm
+              được chăm chút tỉ mỉ bởi những nghệ nhân tài hoa.
             </motion.p>
 
             <motion.div
@@ -141,21 +141,21 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.3 }}
             >
-              <Link to="/booking" className="w-full sm:w-auto">
+              <Link to="/gallery" className="w-full sm:w-auto">
                 <Button
                   size="default"
-                  className="h-12 w-full min-w-[160px] rounded-full text-sm font-semibold sm:w-auto md:h-14 md:min-w-[180px] md:text-base"
+                  className="h-12 w-full min-w-[160px] rounded-full text-sm font-semibold sm:w-auto md:h-14 md:min-w-[180px] md:text-base shadow-glow hover:scale-105 transition-transform"
                 >
-                  Đặt Lịch Ngay
+                  Khám Phá Lookbook
                 </Button>
               </Link>
-              <Link to="/services" className="w-full sm:w-auto">
+              <Link to="/booking" className="w-full sm:w-auto">
                 <Button
                   variant="secondary"
                   size="default"
                   className="h-12 w-full min-w-[160px] rounded-full text-sm font-semibold sm:w-auto md:h-14 md:min-w-[180px] md:text-base"
                 >
-                  Xem Dịch Vụ
+                  Đặt Lịch Ngay
                 </Button>
               </Link>
             </motion.div>
