@@ -28,8 +28,8 @@ services:
       # Mount entire monorepo for hot-reload
       - .:/app
       # Prevent node_modules from being overwritten
-      - /app/node_modules
-      - /app/apps/client/node_modules
+      # - /app/node_modules
+      # - /app/apps/client/node_modules
 
     env_file:
       - ./apps/client/.env
