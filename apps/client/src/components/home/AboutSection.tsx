@@ -6,16 +6,16 @@ import { Button } from "@/components/ui/button";
 
 const features = [
   {
-    title: "Nguyên Liệu Cao Cấp",
     desc: "Sơn và phụ kiện nhập khẩu chính hãng",
+    title: "Nguyên Liệu Cao Cấp",
   },
   {
-    title: "Kỹ Thuật Vẽ Tay",
     desc: "Nghệ nhân với 5+ năm kinh nghiệm",
+    title: "Kỹ Thuật Vẽ Tay",
   },
   {
-    title: "Vệ Sinh Chuẩn Y Khoa",
     desc: "Dụng cụ sát trùng kỹ sau mỗi khách",
+    title: "Vệ Sinh Chuẩn Y Khoa",
   },
 ];
 

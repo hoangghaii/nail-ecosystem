@@ -1,10 +1,9 @@
-import { useEffect } from "react";
-
 import type { Booking } from "@repo/types/booking";
 
 import { cn } from "@repo/utils/cn";
-import { motion } from "motion/react";
 import { Check, Calendar, Clock, User, Mail, Phone } from "lucide-react";
+import { motion } from "motion/react";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { celebrateBooking } from "@/utils/confetti";

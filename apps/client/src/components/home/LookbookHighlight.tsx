@@ -1,8 +1,7 @@
+import { cn } from "@repo/utils/cn";
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-
-import { cn } from "@repo/utils/cn";
 
 import { LazyImage } from "@/components/shared/LazyImage";
 import { GalleryItemSkeleton } from "@/components/shared/skeletons/GalleryItemSkeleton";
@@ -24,11 +23,11 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
-    y: 0,
     transition: {
       duration: 0.4,
       ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
     },
+    y: 0,
   },
 };
 

@@ -1,7 +1,6 @@
+import { cn } from "@repo/utils/cn";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-
-import { cn } from "@repo/utils/cn";
 
 import { Button } from "@/components/ui/button";
 import { getBusinessStatus } from "@/utils/business-hours";

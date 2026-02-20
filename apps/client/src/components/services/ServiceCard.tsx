@@ -5,9 +5,9 @@ import { toast } from "sonner";
 
 import type { Service, ServiceCategory } from "@/types";
 import type { BookingNavigationState } from "@/types/navigation";
-import { isValidServicesState } from "@/types/navigation";
 
 import { Button } from "@/components/ui/button";
+import { isValidServicesState } from "@/types/navigation";
 
 type ServiceCardProps = {
   index: number;

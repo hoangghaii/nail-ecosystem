@@ -9,11 +9,11 @@ export async function celebrateBooking(): Promise<void> {
   const duration = 3000;
   const animationEnd = Date.now() + duration;
   const defaults = {
-    startVelocity: 30,
+    colors: ["#D1948B", "#FDF8F5", "#333333"],
     spread: 360,
+    startVelocity: 30,
     ticks: 60,
     zIndex: 9999,
-    colors: ["#D1948B", "#FDF8F5", "#333333"],
   };
 
   function randomInRange(min: number, max: number) {
@@ -33,15 +33,15 @@ export async function celebrateBooking(): Promise<void> {
     // Fire from left
     confetti({
       ...defaults,
-      particleCount,
       origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+      particleCount,
     });
 
     // Fire from right
     confetti({
       ...defaults,
-      particleCount,
       origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+      particleCount,
     });
   }, 250);
 }

@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { Link, useLocation } from "react-router-dom";
 
 import type { GalleryItem } from "@/types";
+
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
