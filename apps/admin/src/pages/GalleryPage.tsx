@@ -1,43 +1,33 @@
 import type { GalleryItem } from "@repo/types/gallery";
-import type { GalleryCategoryItem } from "@repo/types/gallery-category";
 
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
-  CategoryFormModal,
-  DeleteCategoryDialog,
   DeleteGalleryDialog,
   GalleryCategoriesTab,
   GalleryFormModal,
   GalleryItemsTab,
+  NailOptionsTab,
 } from "@/components/gallery";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGalleryCategories } from "@/hooks/api/useGalleryCategory";
+import { useNailShapes, useNailStyles } from "@/hooks/api/useNailOptions";
+
+type TabValue = "items" | "nail-options" | "categories";
 
 export function GalleryPage() {
-  // Gallery items state
   const [selectedItem, setSelectedItem] = useState<GalleryItem | undefined>();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabValue>("items");
 
-  // Category management state
-  const [activeTab, setActiveTab] = useState<"items" | "categories">("items");
-  const [selectedCategory, setSelectedCategory] = useState<
-    GalleryCategoryItem | undefined
-  >();
-  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
-  const [isDeleteCategoryOpen, setIsDeleteCategoryOpen] = useState(false);
+  const { data: shapesData } = useNailShapes();
+  console.log("🚀 ~ GalleryPage ~ shapesData:", shapesData)
+  const { data: stylesData } = useNailStyles();
+  const nailShapes = useMemo(() => shapesData?.data ?? [], [shapesData]);
+  const nailStyles = useMemo(() => stylesData?.data ?? [], [stylesData]);
 
-  // Fetch categories
-  const { data: categoriesData } = useGalleryCategories();
-  const categories = useMemo(
-    () => categoriesData?.data ?? [],
-    [categoriesData],
-  );
-
-  // Gallery item handlers
   const handleCreateItem = () => {
     setSelectedItem(undefined);
     setIsFormModalOpen(true);
@@ -53,82 +43,60 @@ export function GalleryPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  // Category handlers
-  const handleCreateCategory = () => {
-    setSelectedCategory(undefined);
-    setIsCategoryFormOpen(true);
-  };
-
-  const handleEditCategory = (category: GalleryCategoryItem) => {
-    setSelectedCategory(category);
-    setIsCategoryFormOpen(true);
-  };
-
-  const handleDeleteCategory = (category: GalleryCategoryItem) => {
-    setSelectedCategory(category);
-    setIsDeleteCategoryOpen(true);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gallery</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Lookbook</h1>
           <p className="text-muted-foreground">
-            Manage your nail art gallery and categories
+            Manage your nail art lookbook, shapes, and styles
           </p>
         </div>
-
-        {/* Conditional Add Button */}
-        {activeTab === "items" ? (
+        {activeTab === "items" && (
           <Button onClick={handleCreateItem}>
             <Plus className="mr-2 h-4 w-4" />
             Add Item
-          </Button>
-        ) : (
-          <Button onClick={handleCreateCategory}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Category
           </Button>
         )}
       </div>
 
       {/* Tabs */}
-      <Tabs
-        value={activeTab}
-        onValueChange={(v: string) => setActiveTab(v as "items" | "categories")}
-      >
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)}>
         <TabsList>
-          <TabsTrigger value="items">Gallery Items</TabsTrigger>
+          <TabsTrigger value="items">Lookbook Items</TabsTrigger>
+          <TabsTrigger value="nail-options">Shapes & Styles</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Gallery Items */}
         <TabsContent value="items" className="space-y-6">
           <GalleryItemsTab
-            categories={categories}
+            nailShapes={nailShapes}
+            nailStyles={nailStyles}
             onCreateItem={handleCreateItem}
             onDeleteItem={handleDeleteItem}
             onEditItem={handleEditItem}
           />
         </TabsContent>
 
-        {/* Tab 2: Categories */}
+        <TabsContent value="nail-options" className="space-y-6">
+          <NailOptionsTab />
+        </TabsContent>
+
         <TabsContent value="categories" className="space-y-6">
           <GalleryCategoriesTab
-            categories={categories}
-            onCreateCategory={handleCreateCategory}
-            onDeleteCategory={handleDeleteCategory}
-            onEditCategory={handleEditCategory}
+            categories={[]}
+            onCreateCategory={() => {}}
+            onDeleteCategory={() => {}}
+            onEditCategory={() => {}}
           />
         </TabsContent>
       </Tabs>
 
-      {/* Gallery Modals */}
       <GalleryFormModal
-        categories={categories}
         galleryItem={selectedItem}
+        nailShapes={nailShapes}
+        nailStyles={nailStyles}
         open={isFormModalOpen}
         onOpenChange={setIsFormModalOpen}
       />
@@ -137,19 +105,6 @@ export function GalleryPage() {
         galleryItem={selectedItem}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-      />
-
-      {/* Category Modals */}
-      <CategoryFormModal
-        category={selectedCategory}
-        open={isCategoryFormOpen}
-        onOpenChange={setIsCategoryFormOpen}
-      />
-
-      <DeleteCategoryDialog
-        category={selectedCategory}
-        open={isDeleteCategoryOpen}
-        onOpenChange={setIsDeleteCategoryOpen}
       />
     </div>
   );

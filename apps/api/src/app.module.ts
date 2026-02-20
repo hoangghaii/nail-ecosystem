@@ -28,6 +28,7 @@ import { AccessTokenGuard } from './modules/auth/guards/access-token.guard';
 import { SeedModule } from './seeds/seed.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { NailOptionsModule } from './modules/nail-options/nail-options.module';
 
 @Module({
   imports: [
@@ -123,6 +124,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     SeedModule,
     ExpensesModule,
     AnalyticsModule,
+    NailOptionsModule,
   ],
   controllers: [AppController],
   providers: [

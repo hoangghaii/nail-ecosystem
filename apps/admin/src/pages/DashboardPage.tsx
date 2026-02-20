@@ -45,7 +45,7 @@ export function DashboardPage() {
     },
     {
       icon: Images,
-      label: "Gallery Items",
+      label: "Lookbook Items",
       value: galleryItems?.data?.length?.toString() || "0",
     },
     {
@@ -72,7 +72,7 @@ export function DashboardPage() {
       description: "Upload and organize portfolio images",
       href: "/gallery",
       icon: Images,
-      title: "Manage Gallery",
+      title: "Manage Lookbook",
     },
     {
       description: "View and update booking status",

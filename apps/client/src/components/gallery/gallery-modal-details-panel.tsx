@@ -25,7 +25,7 @@ export function GalleryModalDetailsPanel({
         stiffness: 300,
         type: "spring",
       }}
-      className="flex flex-col overflow-y-auto p-6 md:w-[45%] md:p-8 lg:p-10"
+      className="flex flex-col overflow-y-auto p-6 md:w-[35%] md:p-6 lg:p-8"
     >
       {/* Close Button */}
       <div className="mb-4 flex justify-end">
@@ -37,13 +37,13 @@ export function GalleryModalDetailsPanel({
         </DialogPrimitive.Close>
       </div>
 
-      {/* Title */}
-      <DialogPrimitive.Title
+      {/* Title — visual heading (sr-only DialogTitle is in parent modal) */}
+      <h2
         id="gallery-modal-title"
-        className="mb-3 font-serif text-2xl font-semibold text-foreground md:text-3xl"
+        className="mb-3 font-serif text-xl font-semibold text-foreground md:text-2xl"
       >
         {item.title}
-      </DialogPrimitive.Title>
+      </h2>
 
       {/* Description */}
       {item.description && (
@@ -56,7 +56,7 @@ export function GalleryModalDetailsPanel({
       {(item.price || item.duration) && (
         <div className="mb-6 space-y-3 border-t border-b border-border py-5">
           {item.price && (
-            <div className="flex items-center gap-3 rounded-[12px] border border-border bg-primary/5 px-3 py-2.5">
+            <div className="flex items-center gap-3 rounded-sm border border-border bg-primary/5 px-3 py-2.5">
               <DollarSign className="size-4 shrink-0 text-primary" />
               <span className="font-sans text-base font-semibold text-primary">
                 {item.price}
@@ -64,7 +64,7 @@ export function GalleryModalDetailsPanel({
             </div>
           )}
           {item.duration && (
-            <div className="flex items-center gap-3 rounded-[12px] border border-border bg-secondary/10 px-3 py-2.5">
+            <div className="flex items-center gap-3 rounded-sm border border-border bg-secondary/10 px-3 py-2.5">
               <Clock className="size-4 shrink-0 text-secondary" />
               <span className="font-sans text-sm text-foreground md:text-base">
                 {item.duration}

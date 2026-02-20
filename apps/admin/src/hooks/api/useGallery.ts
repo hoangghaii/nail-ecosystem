@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+
 import {
   galleryService,
   type GalleriesQueryParams,
@@ -30,19 +31,19 @@ type UseGalleriesOptions = GalleriesQueryParams &
  */
 export function useGalleryItems(options?: UseGalleriesOptions) {
   const {
-    categoryId,
     featured,
     isActive,
     limit,
+    nailShape,
+    nailStyle,
     page,
     search,
     ...queryOptions
   } = options || {};
 
-  // Build filter object for queryKey and service call
   const filters: GalleriesQueryParams | undefined =
-    categoryId || featured || isActive || search || page || limit
-      ? { categoryId, featured, isActive, limit, page, search }
+    featured || isActive || search || page || limit || nailShape || nailStyle
+      ? { featured, isActive, limit, nailShape, nailStyle, page, search }
       : undefined;
 
   return useQuery({
@@ -147,57 +148,4 @@ export function useDeleteGalleryItem() {
   });
 }
 
-/**
- * Mutation: Toggle gallery item featured status (optimistic update)
- */
-export function useToggleGalleryFeatured() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ featured, id }: { featured: boolean; id: string }) =>
-      galleryService.update(id, { featured }),
-
-    // Rollback on error
-    onError: (
-      _err,
-      _variables,
-      context: { previousItems?: GalleryItem[] } | undefined,
-    ) => {
-      if (context?.previousItems) {
-        queryClient.setQueryData(
-          queryKeys.gallery.lists(),
-          context.previousItems,
-        );
-      }
-      toast.error("Failed to update gallery item");
-    },
-
-    // Optimistic update
-    onMutate: async ({ featured, id }) => {
-      // Cancel outgoing queries
-      await queryClient.cancelQueries({ queryKey: queryKeys.gallery.all });
-
-      // Snapshot previous value
-      const previousItems = queryClient.getQueryData<GalleryItem[]>(
-        queryKeys.gallery.lists(),
-      );
-
-      // Optimistically update cache
-      if (previousItems) {
-        queryClient.setQueryData<GalleryItem[]>(
-          queryKeys.gallery.lists(),
-          previousItems.map((item) =>
-            item._id === id ? { ...item, featured } : item,
-          ),
-        );
-      }
-
-      return { previousItems };
-    },
-
-    // Always refetch after error or success
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.gallery.all });
-    },
-  });
-}
+export { useToggleGalleryFeatured } from "./useToggleGalleryFeatured";

@@ -13,6 +13,14 @@ import {
   GallerySchema,
 } from '../modules/gallery/schemas/gallery.schema';
 import {
+  NailShape,
+  NailShapeSchema,
+} from '../modules/nail-options/schemas/nail-shape.schema';
+import {
+  NailStyle,
+  NailStyleSchema,
+} from '../modules/nail-options/schemas/nail-style.schema';
+import {
   Booking,
   BookingSchema,
 } from '../modules/bookings/schemas/booking.schema';
@@ -34,6 +42,8 @@ import { BannersSeeder } from './seeders/banners.seeder';
       { name: Service.name, schema: ServiceSchema },
       { name: GalleryCategory.name, schema: GalleryCategorySchema },
       { name: Gallery.name, schema: GallerySchema },
+      { name: NailShape.name, schema: NailShapeSchema },
+      { name: NailStyle.name, schema: NailStyleSchema },
       { name: Booking.name, schema: BookingSchema },
       { name: Contact.name, schema: ContactSchema },
       { name: Banner.name, schema: BannerSchema },

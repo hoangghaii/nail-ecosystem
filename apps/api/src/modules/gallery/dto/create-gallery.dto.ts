@@ -1,36 +1,12 @@
 import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
   IsBoolean,
+  IsNotEmpty,
   IsNumber,
+  IsOptional,
+  IsString,
   MinLength,
-  IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
-export enum GalleryCategory {
-  ALL = 'all',
-  EXTENSIONS = 'extensions',
-  MANICURE = 'manicure',
-  NAIL_ART = 'nail-art',
-  PEDICURE = 'pedicure',
-  SEASONAL = 'seasonal',
-}
-
-export enum NailShape {
-  ALMOND = 'almond',
-  COFFIN = 'coffin',
-  SQUARE = 'square',
-  STILETTO = 'stiletto',
-}
-
-export enum NailStyle {
-  THREE_D = '3d',
-  MIRROR = 'mirror',
-  GEM = 'gem',
-  OMBRE = 'ombre',
-}
 
 export class CreateGalleryDto {
   @ApiProperty({
@@ -58,25 +34,6 @@ export class CreateGalleryDto {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @ApiPropertyOptional({
-    description:
-      'Gallery category ID (defaults to "all" category if not provided)',
-    example: '507f1f77bcf86cd799439011',
-  })
-  @IsString()
-  @IsOptional()
-  categoryId?: string;
-
-  @ApiPropertyOptional({
-    description: 'DEPRECATED: Use categoryId instead. Gallery category enum',
-    enum: GalleryCategory,
-    example: GalleryCategory.NAIL_ART,
-    deprecated: true,
-  })
-  @IsEnum(GalleryCategory)
-  @IsOptional()
-  category?: GalleryCategory;
 
   @ApiProperty({
     description: 'Price for this design',
@@ -121,20 +78,18 @@ export class CreateGalleryDto {
   sortIndex?: number;
 
   @ApiPropertyOptional({
-    description: 'Nail shape for filtering',
-    enum: NailShape,
-    example: NailShape.ALMOND,
+    description: 'Nail shape value for filtering (references NailShape.value)',
+    example: 'almond',
   })
-  @IsEnum(NailShape)
+  @IsString()
   @IsOptional()
-  nailShape?: NailShape;
+  nailShape?: string;
 
   @ApiPropertyOptional({
-    description: 'Nail style for filtering',
-    enum: NailStyle,
-    example: NailStyle.THREE_D,
+    description: 'Nail style value for filtering (references NailStyle.value)',
+    example: '3d',
   })
-  @IsEnum(NailStyle)
+  @IsString()
   @IsOptional()
-  style?: NailStyle;
+  style?: string;
 }

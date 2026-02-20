@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, HydratedDocument, Types } from 'mongoose';
+import { Document, HydratedDocument } from 'mongoose';
 
 export type GalleryDocument = HydratedDocument<Gallery>;
 
@@ -13,12 +13,6 @@ export class Gallery extends Document {
 
   @Prop()
   description?: string;
-
-  @Prop({ type: Types.ObjectId, ref: 'GalleryCategory', default: null })
-  categoryId: Types.ObjectId | null;
-
-  @Prop({ required: false })
-  category?: string; // DEPRECATED: all, extensions, manicure, nail-art, pedicure, seasonal
 
   @Prop()
   price?: string; // e.g., "$45", "$60-80"
@@ -35,27 +29,17 @@ export class Gallery extends Document {
   @Prop({ default: 0 })
   sortIndex: number;
 
-  @Prop({
-    type: String,
-    enum: ['almond', 'coffin', 'square', 'stiletto'],
-    required: false,
-  })
-  nailShape?: string; // Nail shape for filtering
+  @Prop({ required: false })
+  nailShape?: string; // References NailShape.value
 
-  @Prop({
-    type: String,
-    enum: ['3d', 'mirror', 'gem', 'ombre'],
-    required: false,
-  })
-  style?: string; // Nail style for filtering
+  @Prop({ required: false })
+  style?: string; // References NailStyle.value (field kept as 'style' in DB)
 }
 
 export const GallerySchema = SchemaFactory.createForClass(Gallery);
 
-// Indexes
-GallerySchema.index({ categoryId: 1, sortIndex: 1 });
-GallerySchema.index({ category: 1, sortIndex: 1 }); // DEPRECATED: Keep for backward compat
 GallerySchema.index({ isActive: 1 });
 GallerySchema.index({ featured: 1 });
-GallerySchema.index({ nailShape: 1 }); // For filtering
-GallerySchema.index({ style: 1 }); // For filtering
+GallerySchema.index({ nailShape: 1 });
+GallerySchema.index({ style: 1 });
+GallerySchema.index({ sortIndex: 1, createdAt: -1 });

@@ -1,0 +1,213 @@
+================================================================================
+GALLERY CONSTANTS & FILTERING - QUICK FACTS
+================================================================================
+Date: 2026-02-19
+
+NAIL_SHAPES CONSTANT
+────────────────────
+Location: apps/client/src/data/filter-config.ts (lines 1-7)
+Values: [all, almond, coffin, square, stiletto]
+Used In: GalleryPage.tsx (2 places)
+Type: Static hardcoded array with { label, slug }
+
+NAIL_STYLES CONSTANT
+────────────────────
+Location: apps/client/src/data/filter-config.ts (lines 9-15)
+Values: [all, 3d, mirror, gem, ombre]
+Used In: GalleryPage.tsx (2 places)
+Type: Static hardcoded array with { label, slug }
+
+GALLERY FILTERING ARCHITECTURE
+──────────────────────────────
+Tier 1 - Backend (categoryId):
+  ├─ User selects category
+  ├─ Client converts slug to categoryId
+  ├─ API query: GET /gallery?categoryId=507f...
+  └─ MongoDB filters and returns results
+
+Tier 2 - Client-Side (nailShape & style):
+  ├─ User selects shape (pill button)
+  ├─ User selects style (pill button)
+  ├─ useMemo filters items in real-time
+  └─ Renders filtered masonry gallery
+
+SHARED TYPES
+────────────
+GalleryItem (packages/types/src/gallery.ts):
+  - _id: string
+  - title: string
+  - imageUrl: string
+  - category: string (slug)
+  - nailShape?: 'almond' | 'coffin' | 'square' | 'stiletto'
+  - style?: '3d' | 'mirror' | 'gem' | 'ombre'
+  - price?, duration?, featured?, createdAt?
+
+GalleryCategoryItem (packages/types/src/gallery-category.ts):
+  - _id: string (ObjectId)
+  - name: string
+  - slug: string
+  - description?: string
+  - sortIndex: number
+  - isActive: boolean
+
+MONGODB SCHEMA FIELDS
+─────────────────────
+Gallery Collection:
+  ├─ imageUrl (required)
+  ├─ title (required)
+  ├─ categoryId (ObjectId ref, indexed with sortIndex)
+  ├─ category (string, deprecated)
+  ├─ nailShape (enum: almond|coffin|square|stiletto, indexed)
+  ├─ style (enum: 3d|mirror|gem|ombre, indexed)
+  ├─ price?, duration?, description?
+  ├─ featured (boolean, indexed)
+  ├─ isActive (boolean, indexed)
+  └─ sortIndex (number)
+
+GALLERY CATEGORIES (Seeded)
+───────────────────────────
+1. Manicure (slug: manicure)
+2. Pedicure (slug: pedicure)
+3. Nail Art (slug: nail-art)
+4. Extensions (slug: extensions)
+5. Special Occasions (slug: special-occasions)
+6. Seasonal Collections (slug: seasonal)
+
+Note: "all" is NOT a real category - it's a UI filter value
+
+CLIENT FILTERING
+────────────────
+File: apps/client/src/pages/GalleryPage.tsx
+
+State:
+  ├─ selectedCategory (from useGalleryPage hook)
+  ├─ selectedShape (local state, "all" default)
+  └─ selectedStyle (local state, "all" default)
+
+Category Filtering:
+  ├─ useGalleryPage() converts slug to categoryId
+  ├─ useInfiniteGalleryItems({ categoryId })
+  └─ Backend returns paginated items
+
+Shape & Style Filtering:
+  ├─ useMemo filters items by nailShape & style
+  ├─ Returns immediately (no API call)
+  └─ Applied to infinite-scroll results
+
+ADMIN FORM
+──────────
+File: apps/admin/src/components/gallery/GalleryFormModal.tsx
+
+Current Fields:
+  ✅ Title (required, text input)
+  ✅ Category (required, dropdown, disabled in edit)
+  ✅ Image (required create, read-only edit)
+  ✅ Description (optional, textarea)
+  ✅ Price (optional, text input)
+  ✅ Duration (optional, text input)
+  ✅ Featured (optional, toggle switch)
+
+Missing Fields:
+  ❌ nailShape (not editable via admin)
+  ❌ style (not editable via admin)
+
+Issue: These values must be set directly in DB or via API
+
+API ENDPOINTS
+─────────────
+POST /api/gallery
+  ├─ Upload with image
+  ├─ Body: FormData with image, title, category, price, duration
+  └─ Accepts: categoryId (new) or category (deprecated)
+
+GET /api/gallery
+  ├─ Query params:
+  │  ├─ categoryId (new)
+  │  ├─ category (deprecated)
+  │  ├─ featured (boolean)
+  │  ├─ isActive (boolean)
+  │  ├─ search (string)
+  │  ├─ page (number)
+  │  └─ limit (number)
+  └─ Note: nailShape & style NOT queryable (returned only)
+
+PATCH /api/gallery/:id
+  ├─ Update existing item
+  ├─ Body: JSON (no image change allowed)
+  └─ Can update: title, description, category, price, duration, featured
+
+DELETE /api/gallery/:id
+  └─ Delete gallery item
+
+FILE LOCATIONS SUMMARY
+──────────────────────
+Constants:
+  └─ apps/client/src/data/filter-config.ts
+
+Types:
+  ├─ packages/types/src/gallery.ts
+  └─ packages/types/src/gallery-category.ts
+
+Client Components:
+  ├─ apps/client/src/pages/GalleryPage.tsx
+  ├─ apps/client/src/hooks/useGalleryPage.ts
+  └─ apps/client/src/components/gallery/FilterPills.tsx
+
+Admin Components:
+  └─ apps/admin/src/components/gallery/GalleryFormModal.tsx
+
+API:
+  ├─ apps/api/src/modules/gallery/schemas/gallery.schema.ts
+  ├─ apps/api/src/modules/gallery/dto/create-gallery.dto.ts
+  ├─ apps/api/src/modules/gallery/dto/query-gallery.dto.ts
+  ├─ apps/api/src/modules/gallery/gallery.service.ts
+  ├─ apps/api/src/modules/gallery/gallery.controller.ts
+  └─ apps/api/src/seeds/data/gallery-categories.data.ts
+
+KEY DECISIONS
+─────────────
+1. Client-side filtering for shape/style
+   └─ Rationale: Keep UI responsive, filter all returned items
+
+2. Backend filtering for category only
+   └─ Rationale: Categories are primary filter, need pagination
+
+3. Admin form doesn't have shape/style fields
+   └─ Rationale: Keep form simple, users rarely change these
+
+4. Support both category (deprecated) and categoryId
+   └─ Rationale: Smooth migration from old system
+
+5. nailShape & style indexed but not used server-side
+   └─ Rationale: Prepared for future server-side filtering
+
+KNOWN ISSUES
+────────────
+1. Admin cannot set nailShape or style values
+   └─ Workaround: Manual DB edit or API call
+
+2. No server-side filtering for shape/style
+   └─ Impact: Negligible for current data size
+
+3. Type annotation category is unclear
+   └─ Actually stores slug, not full category name
+   └─ Should be renamed to categorySlug for clarity
+
+4. Legacy category field still in schema
+   └─ Plan: Remove in future migration
+
+TOTAL ANALYSIS COVERAGE
+───────────────────────
+Files Analyzed: 13
+Occurrences Documented: 50+
+Total Lines in Analysis: 2,067
+Status: Complete
+
+Documents Generated:
+  ✅ README.md (index and overview)
+  ✅ SUMMARY.md (quick reference)
+  ✅ DETAILED_OCCURRENCES.md (line-by-line)
+  ✅ scout-report.md (comprehensive)
+  ✅ QUICK_FACTS.txt (this file)
+
+================================================================================

@@ -51,10 +51,10 @@ export function DeleteGalleryDialog({
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10">
               <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
-            <DialogTitle>Delete Gallery Item</DialogTitle>
+            <DialogTitle>Delete Lookbook Item</DialogTitle>
           </div>
           <DialogDescription>
-            Are you sure you want to delete this gallery item? This action
+            Are you sure you want to delete this lookbook item? This action
             cannot be undone.
           </DialogDescription>
         </DialogHeader>

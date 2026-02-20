@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { Layout } from "@/components/layout/Layout";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
@@ -10,9 +10,10 @@ import { HomePage } from "@/pages/HomePage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 
 // Lazy-load non-critical pages to reduce initial bundle size
-const ServicesPage = lazy(() =>
-  import("@/pages/ServicesPage").then((m) => ({ default: m.ServicesPage })),
-);
+// TEMP: ServicesPage hidden — booking flows through Lookbook
+// const ServicesPage = lazy(() =>
+//   import("@/pages/ServicesPage").then((m) => ({ default: m.ServicesPage })),
+// );
 const GalleryPage = lazy(() =>
   import("@/pages/GalleryPage").then((m) => ({ default: m.GalleryPage })),
 );
@@ -31,14 +32,16 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
-            <Route
+            {/* TEMP: /services redirects to /gallery — booking flows through Lookbook */}
+            <Route path="/services" element={<Navigate to="/gallery" replace />} />
+            {/* <Route
               path="/services"
               element={
                 <Suspense fallback={<PageLoader />}>
                   <ServicesPage />
                 </Suspense>
               }
-            />
+            /> */}
             <Route
               path="/gallery"
               element={

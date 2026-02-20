@@ -21,7 +21,7 @@ const routeLabels: Record<string, string> = {
   "": "Home",
   booking: "Book Appointment",
   contact: "Contact Us",
-  gallery: "Gallery",
+  gallery: "Lookbook",
   services: "Services",
 };
 

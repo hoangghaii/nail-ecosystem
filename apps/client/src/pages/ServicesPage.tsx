@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
+import type { GalleryItem } from "@/types";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { Breadcrumb } from "@/components/shared/Breadcrumb";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
@@ -8,9 +9,15 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { ServiceCardSkeleton } from "@/components/shared/skeletons/ServiceCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useServicesPage } from "@/hooks/useServicesPage";
+import { isValidServicesState } from "@/types/navigation";
 import { getTransition, pageVariants } from "@/utils/animations";
 
 export function ServicesPage() {
+  const location = useLocation();
+  const galleryItem: GalleryItem | null = isValidServicesState(location.state)
+    ? location.state.galleryItem
+    : null;
+
   const {
     categories,
     filteredServices,
@@ -36,6 +43,27 @@ export function ServicesPage() {
           subtitle="Khám phá các dịch vụ chăm sóc móng cao cấp được thiết kế để bạn trông và cảm thấy tốt nhất"
           title="Dịch Vụ Của Chúng Tôi"
         />
+
+        {/* Gallery Context Banner — shown only when navigating from lookbook */}
+        {galleryItem && (
+          <div className="mb-8 rounded-[16px] border-2 border-secondary bg-card p-4">
+            <div className="flex items-center gap-4">
+              <img
+                src={galleryItem.imageUrl}
+                alt={galleryItem.title}
+                className="h-14 w-14 flex-shrink-0 rounded-[10px] object-cover"
+              />
+              <div>
+                <p className="font-sans text-xs font-medium text-muted-foreground">
+                  Đặt lịch theo thiết kế:
+                </p>
+                <p className="font-serif text-base font-semibold text-foreground">
+                  {galleryItem.title}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Category Filter */}
         <div className="mb-12 flex flex-wrap justify-center gap-3">

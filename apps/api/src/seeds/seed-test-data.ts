@@ -35,6 +35,7 @@ async function bootstrap() {
     logger.log('🌱 Starting seed process...\n');
 
     const services = await servicesSeeder.seed();
+    await gallerySeeder.seedNailOptions();
     const categories = await gallerySeeder.seedCategories();
     const gallery = await gallerySeeder.seedGalleryItems(categories);
     const bookings = await bookingsSeeder.seed(40);
@@ -65,6 +66,8 @@ async function dropCollections() {
     'services',
     'gallerycategories',
     'galleries',
+    'nail_shapes',
+    'nail_styles',
     'bookings',
     'contacts',
     'banners',

@@ -3,7 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { GalleryCategory } from '../../modules/gallery-category/schemas/gallery-category.schema';
 import { Gallery } from '../../modules/gallery/schemas/gallery.schema';
+import { NailShape } from '../../modules/nail-options/schemas/nail-shape.schema';
+import { NailStyle } from '../../modules/nail-options/schemas/nail-style.schema';
 import { galleryCategoriesData } from '../data/gallery-categories.data';
+import { galleryItemTitles, galleryImageSizes } from '../data/gallery-items.data';
+import { nailShapesSeedData, nailStylesSeedData } from '../data/nail-options.data';
 
 @Injectable()
 export class GallerySeeder {
@@ -13,23 +17,40 @@ export class GallerySeeder {
     @InjectModel(GalleryCategory.name)
     private categoryModel: Model<GalleryCategory>,
     @InjectModel(Gallery.name) private galleryModel: Model<Gallery>,
+    @InjectModel(NailShape.name) private nailShapeModel: Model<NailShape>,
+    @InjectModel(NailStyle.name) private nailStyleModel: Model<NailStyle>,
   ) {}
+
+  async seedNailOptions(): Promise<void> {
+    this.logger.log('Seeding nail shapes and styles...');
+
+    const shapesCount = await this.nailShapeModel.countDocuments();
+    if (shapesCount === 0) {
+      await this.nailShapeModel.insertMany(nailShapesSeedData);
+      this.logger.log(`✅ Created ${nailShapesSeedData.length} nail shapes`);
+    } else {
+      this.logger.log(`ℹ️  Nail shapes already exist (${shapesCount}). Skipping...`);
+    }
+
+    const stylesCount = await this.nailStyleModel.countDocuments();
+    if (stylesCount === 0) {
+      await this.nailStyleModel.insertMany(nailStylesSeedData);
+      this.logger.log(`✅ Created ${nailStylesSeedData.length} nail styles`);
+    } else {
+      this.logger.log(`ℹ️  Nail styles already exist (${stylesCount}). Skipping...`);
+    }
+  }
 
   async seedCategories(): Promise<GalleryCategory[]> {
     this.logger.log('Seeding gallery categories...');
 
-    // Check if categories already exist
     const existingCount = await this.categoryModel.countDocuments();
     if (existingCount > 0) {
-      this.logger.log(
-        `ℹ️  Gallery categories already exist (${existingCount} found). Skipping...`,
-      );
+      this.logger.log(`ℹ️  Gallery categories already exist (${existingCount}). Skipping...`);
       return await this.categoryModel.find().exec();
     }
 
-    const categories = await this.categoryModel.insertMany(
-      galleryCategoriesData,
-    );
+    const categories = await this.categoryModel.insertMany(galleryCategoriesData);
     this.logger.log(`✅ Created ${categories.length} gallery categories`);
     return categories;
   }
@@ -37,73 +58,14 @@ export class GallerySeeder {
   async seedGalleryItems(categories: GalleryCategory[]): Promise<Gallery[]> {
     this.logger.log('Seeding gallery items...');
 
-    const titles: Record<string, string[]> = {
-      manicure: [
-        'Classic French Tips',
-        'Gel Polish Shine',
-        'Natural Nude Elegance',
-        'Red Glamour Nails',
-        'Pastel Pink Perfection',
-        'Matte Black Chic',
-        'Glitter Accent Nails',
-        'Minimalist Line Art',
-      ],
-      pedicure: [
-        'Summer Coral Toes',
-        'Spa Luxury Pedicure',
-        'French Pedicure Classic',
-        'Tropical Beach Vibes',
-        'Burgundy Wine Elegance',
-        'Glitter Toe Sparkle',
-        'Natural Nude Pedicure',
-        'Hot Stone Treatment',
-      ],
-      'nail-art': [
-        'Floral Garden Design',
-        'Geometric Patterns',
-        'Abstract Art Nails',
-        'Butterfly Wings',
-        'Galaxy Star Effect',
-        'Marble Swirl Design',
-        'Animal Print Chic',
-        'Watercolor Blend',
-        'Chrome Mirror Finish',
-        'Rainbow Ombre',
-      ],
-      extensions: [
-        'Stiletto Acrylic Set',
-        'Coffin Shape Extensions',
-        'Almond Natural Look',
-        'Square Tip Perfection',
-        'Dip Powder Strength',
-        'Long Gel Extensions',
-        'Short Rounded Acrylics',
-      ],
-      'special-occasions': [
-        'Bridal White Elegance',
-        'Anniversary Romance',
-        'Birthday Celebration',
-        'Prom Night Glam',
-        'Holiday Party Sparkle',
-      ],
-      seasonal: [
-        'Spring Blossom',
-        'Summer Sunshine',
-        'Autumn Leaves',
-        'Winter Wonderland',
-        'Christmas Festive',
-        'Valentine Hearts',
-      ],
-    };
-
-    const nailShapes = ['almond', 'coffin', 'square', 'stiletto'];
-    const nailStyles = ['3d', 'mirror', 'gem', 'ombre'];
+    const shapeValues = nailShapesSeedData.map((s) => s.value);
+    const styleValues = nailStylesSeedData.map((s) => s.value);
+    const filterSlugs = ['nail-art', 'extensions'];
 
     const items: Array<{
       title: string;
       description: string;
       imageUrl: string;
-      categoryId: any;
       price?: string;
       duration?: string;
       featured: boolean;
@@ -112,40 +74,28 @@ export class GallerySeeder {
       nailShape?: string;
       style?: string;
     }> = [];
-    let globalSortIndex = 0;
+    let idx = 0;
 
     for (const category of categories) {
-      const categoryTitles = titles[category.slug] || [];
-      const itemCount = categoryTitles.length;
+      const titles = galleryItemTitles[category.slug] || [];
+      const includeFilters = filterSlugs.includes(category.slug);
 
-      for (let i = 0; i < itemCount; i++) {
-        const isFeatured = Math.random() > 0.7; // 30% featured
-        // Add nailShape and style for nail-art and extensions categories
-        const includeFilters = ['nail-art', 'extensions'].includes(
-          category.slug,
-        );
-
+      for (let i = 0; i < titles.length; i++) {
+        const size = galleryImageSizes[idx % galleryImageSizes.length];
         items.push({
-          title: categoryTitles[i],
+          title: titles[i],
           description: `Beautiful ${category.name.toLowerCase()} design showcasing our expertise and attention to detail`,
-          imageUrl: `https://picsum.photos/800/600?random=${globalSortIndex}`,
-          categoryId: category._id,
-          price:
-            Math.random() > 0.5
-              ? `$${Math.floor(Math.random() * 50) + 30}`
-              : undefined,
-          duration:
-            Math.random() > 0.5
-              ? `${Math.floor(Math.random() * 3) + 1} hrs`
-              : undefined,
-          featured: isFeatured,
+          imageUrl: `https://picsum.photos/${size.w}/${size.h}?random=${idx}`,
+          price: Math.random() > 0.5 ? `$${Math.floor(Math.random() * 50) + 30}` : undefined,
+          duration: Math.random() > 0.5 ? `${Math.floor(Math.random() * 3) + 1} hrs` : undefined,
+          featured: Math.random() > 0.7,
           isActive: true,
-          sortIndex: globalSortIndex++,
+          sortIndex: idx++,
           nailShape: includeFilters
-            ? nailShapes[Math.floor(Math.random() * nailShapes.length)]
+            ? shapeValues[Math.floor(Math.random() * shapeValues.length)]
             : undefined,
           style: includeFilters
-            ? nailStyles[Math.floor(Math.random() * nailStyles.length)]
+            ? styleValues[Math.floor(Math.random() * styleValues.length)]
             : undefined,
         });
       }

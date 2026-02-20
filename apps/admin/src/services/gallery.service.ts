@@ -11,10 +11,11 @@ import { apiClient } from "@/lib/apiClient";
 
 // Query params type for type-safe API calls
 export type GalleriesQueryParams = {
-  categoryId?: string;
   featured?: boolean;
   isActive?: boolean;
   limit?: number;
+  nailShape?: string;
+  nailStyle?: string;
   page?: number;
   search?: string;
 };
@@ -83,17 +84,6 @@ export class GalleryService {
     }
   }
 
-  async getByCategory(category: string): Promise<GalleryItem[]> {
-    try {
-      const items = await this.getAll();
-      if (category === "all") return items?.data || [];
-      return items?.data?.filter((item) => item.category === category) || [];
-    } catch (error) {
-      console.error("Failed to get gallery items by category:", error);
-      return [];
-    }
-  }
-
   /**
    * Builds query string from params
    * @private
@@ -103,11 +93,10 @@ export class GalleryService {
 
     const searchParams = new URLSearchParams();
 
-    if (params.categoryId) searchParams.append("categoryId", params.categoryId);
-    if (params.featured)
-      searchParams.append("featured", params.featured.toString());
-    if (params.isActive)
-      searchParams.append("isActive", params.isActive.toString());
+    if (params.nailShape) searchParams.append("nailShape", params.nailShape);
+    if (params.nailStyle) searchParams.append("nailStyle", params.nailStyle);
+    if (params.featured !== undefined) searchParams.append("featured", params.featured.toString());
+    if (params.isActive !== undefined) searchParams.append("isActive", params.isActive.toString());
     if (params.search) searchParams.append("search", params.search);
     if (params.page) searchParams.append("page", params.page.toString());
     if (params.limit) searchParams.append("limit", params.limit.toString());

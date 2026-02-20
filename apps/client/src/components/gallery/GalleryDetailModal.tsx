@@ -1,14 +1,10 @@
-import type { Service } from "@repo/types/service";
-
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 import type { GalleryItem } from "@/types";
-
-import { useServices } from "@/hooks/api/useServices";
+import type { ServicesNavigationState } from "@/types/navigation";
 
 import { GalleryModalDetailsPanel } from "./gallery-modal-details-panel";
 import { GalleryModalImagePanel } from "./gallery-modal-image-panel";
@@ -33,7 +29,6 @@ export function GalleryDetailModal({
   onPrevious,
 }: GalleryDetailModalProps) {
   const navigate = useNavigate();
-  const { data: services = [] } = useServices({ isActive: true });
 
   // Arrow key navigation (restores behaviour from ImageLightbox)
   useEffect(() => {
@@ -48,20 +43,8 @@ export function GalleryDetailModal({
 
   const handleBookDesign = () => {
     if (!item) return;
-
-    const matchedService = services.find(
-      (s: Service) => s.category === item.category
-    );
-
-    if (!matchedService) {
-      toast.error(
-        "Không tìm thấy dịch vụ phù hợp. Vui lòng liên hệ với chúng tôi."
-      );
-      return;
-    }
-
-    navigate("/booking", {
-      state: { fromGallery: true, galleryItem: item, service: matchedService },
+    navigate("/services", {
+      state: { fromGallery: true, galleryItem: item } satisfies ServicesNavigationState,
     });
     onClose();
   };
@@ -93,9 +76,13 @@ export function GalleryDetailModal({
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 8 }}
                   transition={{ damping: 30, stiffness: 300, type: "spring" }}
-                  className="fixed left-1/2 top-1/2 z-50 flex max-h-[90vh] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[24px] border border-border bg-background shadow-2xl md:max-w-5xl"
+                  className="fixed left-1/2 top-1/2 z-50 flex max-h-[70vh] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[24px] border border-border bg-background shadow-2xl md:h-[65vh] md:max-w-5xl"
                   onClick={(e) => e.stopPropagation()}
                 >
+                  {/* Accessibility: sr-only title required by Radix DialogContent */}
+                  <DialogPrimitive.Title className="sr-only">
+                    {item.title}
+                  </DialogPrimitive.Title>
                   <div className="flex flex-col md:flex-row md:h-full">
                     <GalleryModalImagePanel
                       alt={item.title}

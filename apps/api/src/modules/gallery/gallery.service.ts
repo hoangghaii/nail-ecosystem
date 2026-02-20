@@ -10,7 +10,6 @@ import { CreateGalleryDto } from './dto/create-gallery.dto';
 import { UpdateGalleryDto } from './dto/update-gallery.dto';
 import { QueryGalleryDto } from './dto/query-gallery.dto';
 import { StorageService } from '../storage/storage.service';
-import { GalleryCategoryService } from '../gallery-category/gallery-category.service';
 
 @Injectable()
 export class GalleryService {
@@ -18,39 +17,17 @@ export class GalleryService {
     @InjectModel(Gallery.name)
     private readonly galleryModel: Model<GalleryDocument>,
     private readonly storageService: StorageService,
-    private readonly galleryCategoryService: GalleryCategoryService,
   ) {}
 
   async create(createGalleryDto: CreateGalleryDto): Promise<Gallery> {
-    let categoryId = createGalleryDto.categoryId;
-
-    // Auto-assign 'all' category if not provided
-    if (!categoryId) {
-      const allCategory = await this.galleryCategoryService.findBySlug('all');
-      categoryId = allCategory._id.toString();
-    } else {
-      // Validate categoryId exists
-      await this.galleryCategoryService.findOne(categoryId);
-    }
-
-    const gallery = new this.galleryModel({
-      ...createGalleryDto,
-      categoryId: new Types.ObjectId(categoryId),
-    });
-
-    const saved = await gallery.save();
-    const populated = await this.galleryModel
-      .findById(saved._id)
-      .populate('categoryId', 'name slug description')
-      .exec();
-
-    return populated!;
+    const gallery = new this.galleryModel(createGalleryDto);
+    return await gallery.save();
   }
 
   async findAll(query: QueryGalleryDto) {
     const {
-      categoryId,
-      category,
+      nailShape,
+      nailStyle,
       featured,
       isActive,
       search,
@@ -60,32 +37,18 @@ export class GalleryService {
 
     const filter: any = {};
 
-    // NEW: Filter by categoryId
-    if (categoryId) {
-      if (!Types.ObjectId.isValid(categoryId)) {
-        throw new BadRequestException('Invalid category ID');
-      }
-      filter.categoryId = new Types.ObjectId(categoryId);
-    }
-
-    // DEPRECATED: Filter by category string (backward compat)
-    if (category) {
-      filter.category = category;
-    }
-
+    if (nailShape) filter.nailShape = nailShape;
+    if (nailStyle) filter.style = nailStyle; // DB field is 'style'
     if (featured !== undefined) filter.featured = featured;
     if (isActive !== undefined) filter.isActive = isActive;
 
-    // Text search implementation (same pattern as Bookings)
     if (search && search.trim()) {
-      // Escape special regex characters to prevent ReDoS attacks
       const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const searchRegex = new RegExp(escapedSearch, 'i'); // case-insensitive
-
+      const searchRegex = new RegExp(escapedSearch, 'i');
       filter.$or = [
         { title: searchRegex },
         { description: searchRegex },
-        { price: searchRegex }, // Will only match if price exists
+        { price: searchRegex },
       ];
     }
 
@@ -94,7 +57,6 @@ export class GalleryService {
     const [data, total] = await Promise.all([
       this.galleryModel
         .find(filter)
-        .populate('categoryId', 'name slug description')
         .sort({ sortIndex: 1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -118,10 +80,7 @@ export class GalleryService {
       throw new BadRequestException('Invalid gallery ID');
     }
 
-    const gallery = await this.galleryModel
-      .findById(id)
-      .populate('categoryId', 'name slug description')
-      .exec();
+    const gallery = await this.galleryModel.findById(id).exec();
 
     if (!gallery) {
       throw new NotFoundException(`Gallery item with ID ${id} not found`);
@@ -130,24 +89,13 @@ export class GalleryService {
     return gallery;
   }
 
-  async update(
-    id: string,
-    updateGalleryDto: UpdateGalleryDto,
-  ): Promise<Gallery> {
+  async update(id: string, updateGalleryDto: UpdateGalleryDto): Promise<Gallery> {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid gallery ID');
     }
 
-    // Validate categoryId if provided
-    const updateData: any = { ...updateGalleryDto };
-    if (updateGalleryDto.categoryId) {
-      await this.galleryCategoryService.findOne(updateGalleryDto.categoryId);
-      updateData.categoryId = new Types.ObjectId(updateGalleryDto.categoryId);
-    }
-
     const gallery = await this.galleryModel
-      .findByIdAndUpdate(id, updateData, { new: true })
-      .populate('categoryId', 'name slug description')
+      .findByIdAndUpdate(id, updateGalleryDto, { new: true })
       .exec();
 
     if (!gallery) {
@@ -168,12 +116,10 @@ export class GalleryService {
       throw new NotFoundException(`Gallery item with ID ${id} not found`);
     }
 
-    // Delete image from Cloudinary if it exists and is a Cloudinary URL
     if (gallery.imageUrl?.includes('res.cloudinary.com')) {
       try {
         await this.storageService.deleteFile(gallery.imageUrl);
       } catch (error) {
-        // Log error but continue with deletion
         console.warn(
           `Failed to delete image from storage: ${(error as Error).message}`,
         );

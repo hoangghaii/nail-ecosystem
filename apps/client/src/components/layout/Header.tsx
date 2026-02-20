@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 
 const navigation = [
   { href: "/", name: "Trang Chủ" },
-  { href: "/services", name: "Dịch Vụ" },
-  { href: "/gallery", name: "Thư Viện" },
+  // { href: "/services", name: "Dịch Vụ" }, // TEMP: hidden — booking flows through Lookbook
+  { href: "/gallery", name: "Lookbook" },
   { href: "/booking", name: "Đặt Lịch" },
   { href: "/contact", name: "Liên Hệ" },
 ];

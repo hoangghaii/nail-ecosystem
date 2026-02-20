@@ -27,9 +27,9 @@ services:
     volumes:
       # Mount entire monorepo for hot-reload
       - .:/app
-      # Prevent node_modules from being overwritten
-      # - /app/node_modules
-      # - /app/apps/client/node_modules
+      # Prevent host node_modules (macOS native binaries) from overwriting container's (Linux)
+      - /app/node_modules
+      - /app/apps/client/node_modules
 
     env_file:
       - ./apps/client/.env
@@ -50,7 +50,7 @@ services:
 
     # Health check
     healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:5173']
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:5173']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -90,7 +90,7 @@ services:
     tty: true
 
     healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:5174']
+      test: ['CMD', 'wget', '--spider', '-q', 'http://127.0.0.1:5174']
       interval: 30s
       timeout: 10s
       retries: 3

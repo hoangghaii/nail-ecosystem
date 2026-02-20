@@ -1,0 +1,234 @@
+================================================================================
+GALLERY CONSTANTS & FILTERING ANALYSIS
+Index & Document Guide
+================================================================================
+
+START HERE: README.md (284 lines)
+├─ Overview of what was analyzed
+├─ Quick key findings summary
+├─ Architecture overview
+├─ Current implementation status
+├─ Known gaps and issues
+├─ File locations reference
+├─ How to use this analysis
+└─ Document navigation guide
+
+FOR QUICK REFERENCE: SUMMARY.md (266 lines)
+├─ NAIL_SHAPES constant (lines 1-7) with Vietnamese labels
+├─ NAIL_STYLES constant (lines 9-15) with Vietnamese labels
+├─ GalleryItem type definition with all fields
+├─ GalleryCategoryItem type definition
+├─ MongoDB schema with indexes
+├─ Client filtering logic (two-tier system)
+├─ API endpoints with all query parameters
+├─ Admin form fields (what's there and what's missing)
+├─ Gallery categories (6 seeded categories)
+├─ Filter flow diagram
+├─ API DTO enums
+└─ Key implementation details
+
+FOR EXACT LINE NUMBERS: DETAILED_OCCURRENCES.md (531 lines)
+├─ NAIL_SHAPES definition (filter-config.ts:1-7)
+├─ NAIL_SHAPES usages (2 locations)
+├─ NAIL_STYLES definition (filter-config.ts:9-15)
+├─ NAIL_STYLES usages (2 locations)
+├─ category field usage (6 locations across stack)
+├─ nailShape field usage (6 locations)
+├─ style field usage (6 locations)
+├─ categoryId field usage (8 locations)
+├─ GalleryCategory enum definition
+├─ NailShape enum definition
+├─ NailStyle enum definition
+├─ Gallery categories seed data (all 6 entries)
+└─ Summary table with exact line numbers
+
+FOR COMPREHENSIVE UNDERSTANDING: scout-report.md (986 lines)
+├─ Executive summary
+├─ All NAIL_SHAPES and NAIL_STYLES constants with full code
+├─ Gallery type definitions (shared @repo/types)
+├─ Gallery category type definitions
+├─ MongoDB schema with all fields and indexes
+├─ API DTOs with enums (GalleryCategory, NailShape, NailStyle)
+├─ Query DTO with all filter parameters
+├─ API service filtering logic with code examples
+├─ Client-side hook implementation (category to categoryId conversion)
+├─ Admin form modal implementation (all 7 current fields)
+├─ Seeded gallery categories data
+├─ Filter pills component
+├─ File usage summary table
+├─ Current filtering architecture with diagrams
+├─ API filtering flow with detailed explanations
+├─ Admin form data flow during create/edit
+├─ Known gaps and issues (4 major gaps documented)
+├─ Implementation pattern analysis
+├─ Recommendations for improvements
+└─ Complete files checklist
+
+FOR QUICK FACTS: QUICK_FACTS.txt (this format)
+├─ NAIL_SHAPES at a glance
+├─ NAIL_STYLES at a glance
+├─ Gallery filtering architecture summary
+├─ Shared types quick reference
+├─ MongoDB schema field list
+├─ Gallery categories quick list
+├─ Client filtering logic summary
+├─ Admin form checklist (✅ and ❌)
+├─ API endpoints summary
+├─ File locations reference
+├─ Key design decisions explained
+├─ Known issues with workarounds
+└─ Total analysis coverage statistics
+
+================================================================================
+
+WHAT WAS ANALYZED
+─────────────────
+
+1. NAIL_SHAPES Constant
+   ✓ Found definition in: apps/client/src/data/filter-config.ts (lines 1-7)
+   ✓ Found 2 usages in: apps/client/src/pages/GalleryPage.tsx (lines 15, 109)
+   ✓ Contains 5 items: all, almond, coffin, square, stiletto
+
+2. NAIL_STYLES Constant
+   ✓ Found definition in: apps/client/src/data/filter-config.ts (lines 9-15)
+   ✓ Found 2 usages in: apps/client/src/pages/GalleryPage.tsx (lines 15, 121)
+   ✓ Contains 5 items: all, 3d, mirror, gem, ombre
+
+3. Gallery "category" Field Usage
+   ✓ Type definition: packages/types/src/gallery.ts (line 2)
+   ✓ Schema field: apps/api/src/modules/gallery/schemas/gallery.schema.ts (line 21)
+   ✓ DTO field: apps/api/src/modules/gallery/dto/create-gallery.dto.ts (line 79)
+   ✓ Query field: apps/api/src/modules/gallery/dto/query-gallery.dto.ts (line 31)
+   ✓ Service filter: apps/api/src/modules/gallery/gallery.service.ts (line 73)
+   ✓ Admin form: apps/admin/src/components/gallery/GalleryFormModal.tsx (lines 36, 104, 165, 193)
+
+4. Current Filter Implementation (Client)
+   ✓ Category filtering: Backend via useGalleryPage hook (lines 18-22)
+   ✓ Shape filtering: Client-side useMemo in GalleryPage (lines 45-53)
+   ✓ Style filtering: Client-side useMemo in GalleryPage (lines 45-53)
+   ✓ Filter UI: FilterPills component (apps/client/src/components/gallery/FilterPills.tsx)
+
+5. Current Filter Implementation (Admin)
+   ✓ Form schema: Zod validation (lines 35-51)
+   ✓ Category dropdown: Select component (lines 247-277)
+   ✓ Missing: No nailShape or style fields
+
+6. Shared Types
+   ✓ GalleryItem: packages/types/src/gallery.ts (lines 1-30)
+   ✓ GalleryCategoryItem: packages/types/src/gallery-category.ts (lines 1-20)
+
+7. MongoDB Schema
+   ✓ Full schema: apps/api/src/modules/gallery/schemas/gallery.schema.ts (lines 1-62)
+   ✓ All indexes documented
+
+8. API DTOs
+   ✓ CreateGalleryDto: apps/api/src/modules/gallery/dto/create-gallery.dto.ts (lines 1-140)
+   ✓ QueryGalleryDto: apps/api/src/modules/gallery/dto/query-gallery.dto.ts (lines 1-82)
+   ✓ All enums: GalleryCategory, NailShape, NailStyle
+
+================================================================================
+
+HOW TO USE THESE DOCUMENTS
+──────────────────────────
+
+Use Case 1: "I need to understand how gallery filtering works"
+├─ Start: README.md (overview)
+├─ Then: SUMMARY.md (code snippets)
+└─ Deep Dive: scout-report.md (architecture diagrams)
+
+Use Case 2: "I need to find a specific constant or field"
+├─ Use: DETAILED_OCCURRENCES.md (with exact line numbers)
+└─ Quick Check: QUICK_FACTS.txt (file locations summary)
+
+Use Case 3: "I need to add a new nail shape"
+├─ Reference: SUMMARY.md (step-by-step process)
+└─ Details: scout-report.md (all affected files)
+
+Use Case 4: "I want to make shape/style dynamic"
+├─ Understand: README.md (recommendations section)
+├─ Plan: scout-report.md (architecture section)
+└─ Implement: SUMMARY.md (current implementation pattern)
+
+Use Case 5: "I need admin to edit shape/style"
+├─ Current: QUICK_FACTS.txt (admin form checklist)
+├─ Form Code: DETAILED_OCCURRENCES.md (GalleryFormModal lines)
+└─ Full Form: scout-report.md (section 8)
+
+================================================================================
+
+QUICK STAT SUMMARY
+──────────────────
+
+Constants Found: 2
+  └─ NAIL_SHAPES, NAIL_STYLES
+
+Type Definitions: 2
+  └─ GalleryItem, GalleryCategoryItem
+
+Shared Type Files: 2
+  └─ packages/types/src/gallery.ts, gallery-category.ts
+
+Schema Fields (Gallery): 10
+  └─ imageUrl, title, categoryId, category, nailShape, style,
+     price, duration, featured, isActive, sortIndex
+
+Files Analyzed: 13
+  ├─ Client: 4 files
+  ├─ Admin: 1 file
+  ├─ Shared Types: 2 files
+  └─ API: 6 files
+
+Total Occurrences: 50+
+  ├─ NAIL_SHAPES: 3 (definition + 2 usages)
+  ├─ NAIL_STYLES: 3 (definition + 2 usages)
+  ├─ category: 7 (in different contexts)
+  ├─ nailShape: 6
+  ├─ style: 6
+  ├─ categoryId: 8
+  └─ Other constants: ~12
+
+Gallery Categories Seeded: 6
+  ├─ Manicure
+  ├─ Pedicure
+  ├─ Nail Art
+  ├─ Extensions
+  ├─ Special Occasions
+  └─ Seasonal Collections
+
+Document Pages: 5
+  ├─ README.md: 284 lines
+  ├─ SUMMARY.md: 266 lines
+  ├─ DETAILED_OCCURRENCES.md: 531 lines
+  ├─ scout-report.md: 986 lines
+  └─ QUICK_FACTS.txt: ~130 lines
+
+Total Documentation: 2,067+ lines
+
+================================================================================
+
+DOCUMENT SELECTION GUIDE
+────────────────────────
+
+Quick (5 min read)
+  └─ QUICK_FACTS.txt
+
+For Implementation (15 min read)
+  ├─ README.md
+  └─ SUMMARY.md
+
+For Reference (5 min lookup)
+  └─ DETAILED_OCCURRENCES.md
+
+For Deep Dive (30 min read)
+  └─ scout-report.md
+
+For Complete Understanding (1 hour)
+  ├─ README.md
+  ├─ SUMMARY.md
+  ├─ DETAILED_OCCURRENCES.md
+  └─ scout-report.md
+
+================================================================================
+Generated: 2026-02-19
+Status: Complete Analysis Ready for Reference
+================================================================================

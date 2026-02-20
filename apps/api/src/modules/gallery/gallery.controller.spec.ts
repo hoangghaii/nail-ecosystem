@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GalleryController } from './gallery.controller';
 import { GalleryService } from './gallery.service';
-import { CreateGalleryDto, GalleryCategory } from './dto/create-gallery.dto';
+import { CreateGalleryDto } from './dto/create-gallery.dto';
 import { UpdateGalleryDto } from './dto/update-gallery.dto';
 import { QueryGalleryDto } from './dto/query-gallery.dto';
 import { StorageService } from '../storage/storage.service';
@@ -15,8 +15,8 @@ describe('GalleryController', () => {
     imageUrl: 'https://example.com/image.jpg',
     title: 'Beautiful Nails',
     description: 'Artistic nail design',
-    categoryId: '507f1f77bcf86cd799439099',
-    category: 'designs',
+    nailShape: 'almond',
+    style: 'minimalist',
     price: '$45',
     duration: '60 minutes',
     featured: true,

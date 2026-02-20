@@ -61,7 +61,7 @@ export function FeaturedGallery() {
           className="mb-8 text-center md:mb-12"
         >
           <h2 className="font-serif text-4xl font-semibold text-foreground md:text-5xl">
-            Thư viện ảnh
+            Lookbook
           </h2>
           <p className="mx-auto mt-4 max-w-2xl font-sans text-base leading-relaxed text-muted-foreground lg:text-lg">
             Khám phá bộ sưu tập nghệ thuật nail và thiết kế tuyệt đẹp của chúng
@@ -182,7 +182,7 @@ export function FeaturedGallery() {
           <Link to="/gallery">
             <Button variant="outline" size="lg" className="group">
               <span className="font-sans text-base font-semibold">
-                Xem Toàn Bộ Thư Viện
+                Xem Lookbook
               </span>
               <motion.span
                 className="ml-2 inline-block"

@@ -15,7 +15,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/" },
   { icon: Image, label: "Banners", to: "/banners" },
   { icon: Scissors, label: "Services", to: "/services" },
-  { icon: Images, label: "Gallery", to: "/gallery" },
+  { icon: Images, label: "Lookbook", to: "/gallery" },
   { icon: Calendar, label: "Bookings", to: "/bookings" },
   { icon: MessageSquare, label: "Contacts", to: "/contacts" },
   { icon: DollarSign, label: "Expenses", to: "/expenses" },

@@ -14,3 +14,6 @@ export { GalleryFormModal } from "./GalleryFormModal";
 export type { GalleryFormModalProps } from "./GalleryFormModal";
 export { GalleryItemsTab } from "./gallery-items-tab";
 export type { GalleryItemsTabProps } from "./gallery-items-tab";
+export { NailOptionFormModal } from "./NailOptionFormModal";
+export type { NailOptionFormModalProps } from "./NailOptionFormModal";
+export { NailOptionsTab } from "./nail-options-tab";

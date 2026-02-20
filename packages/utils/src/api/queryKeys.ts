@@ -25,12 +25,28 @@ export const queryKeys = {
     all: ['gallery'] as const,
     lists: () => [...queryKeys.gallery.all, 'list'] as const,
     list: (filters?: {
-      categoryId?: string;
+      nailShape?: string;
+      nailStyle?: string;
       isActive?: boolean;
       featured?: boolean;
+      search?: string;
     }) => [...queryKeys.gallery.lists(), filters] as const,
     details: () => [...queryKeys.gallery.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.gallery.details(), id] as const,
+  },
+
+  // Nail shapes
+  nailShapes: {
+    all: ['nail-shapes'] as const,
+    lists: () => [...queryKeys.nailShapes.all, 'list'] as const,
+    detail: (id: string) => [...queryKeys.nailShapes.all, 'detail', id] as const,
+  },
+
+  // Nail styles
+  nailStyles: {
+    all: ['nail-styles'] as const,
+    lists: () => [...queryKeys.nailStyles.all, 'list'] as const,
+    detail: (id: string) => [...queryKeys.nailStyles.all, 'detail', id] as const,
   },
 
   // Gallery categories

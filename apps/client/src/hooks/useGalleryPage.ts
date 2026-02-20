@@ -1,36 +1,40 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useMemo } from "react";
 
 import type { GalleryItem } from "@/types";
 
-import { useGalleryItems } from "./api/useGallery";
-import { useGalleryCategories } from "./useGalleryCategories";
+import { useInfiniteGalleryItems, useNailShapes, useNailStyles } from "./api/useGallery";
 
 export function useGalleryPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedShape, setSelectedShape] = useState<string>("all");
+  const [selectedStyle, setSelectedStyle] = useState<string>("all");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<GalleryItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch categories
-  const { categories, isLoading: isLoadingCategories } = useGalleryCategories();
+  // Fetch dynamic filter options
+  const { data: nailShapesData, isLoading: isLoadingShapes } = useNailShapes();
+  const { data: nailStylesData, isLoading: isLoadingStyles } = useNailStyles();
 
-  // Find categoryId from slug
-  const categoryId = useMemo(() => {
-    if (selectedCategory === "all") return undefined;
-    const category = categories.find((c) => c.slug === selectedCategory);
-    return category?._id;
-  }, [selectedCategory, categories]);
-
-  // Backend filtering by categoryId
+  // Server-side filtering by nailShape and nailStyle
   const {
-    data: galleryItems = [],
+    data,
+    fetchNextPage,
+    hasNextPage,
     isError,
+    isFetchingNextPage,
     isLoading: isLoadingItems,
     refetch,
-  } = useGalleryItems({
-    categoryId,
+  } = useInfiniteGalleryItems({
     isActive: true,
+    nailShape: selectedShape !== "all" ? selectedShape : undefined,
+    nailStyle: selectedStyle !== "all" ? selectedStyle : undefined,
   });
+
+  const galleryItems = useMemo(
+    () => data?.pages.flatMap((page) => page.data) ?? [],
+    [data],
+  );
 
   const handleImageClick = (item: GalleryItem, index: number) => {
     setSelectedImage(item);
@@ -45,8 +49,7 @@ export function useGalleryPage() {
   };
 
   const handlePrevious = () => {
-    const prevIndex =
-      (currentIndex - 1 + galleryItems.length) % galleryItems.length;
+    const prevIndex = (currentIndex - 1 + galleryItems.length) % galleryItems.length;
     setCurrentIndex(prevIndex);
     setSelectedImage(galleryItems[prevIndex]);
   };
@@ -57,19 +60,26 @@ export function useGalleryPage() {
   };
 
   return {
-    categories,
     closeLightbox,
     currentIndex,
-    filteredGallery: galleryItems, // Already filtered by backend
+    fetchNextPage,
+    galleryItems,
     handleImageClick,
     handleNext,
     handlePrevious,
+    hasNextPage,
     isError,
-    isLoading: isLoadingItems || isLoadingCategories,
+    isFetchingNextPage,
+    isLoading: isLoadingItems || isLoadingShapes || isLoadingStyles,
+    isLoadingItems,
     lightboxOpen,
+    nailShapes: nailShapesData ?? [],
+    nailStyles: nailStylesData ?? [],
     refetch,
-    selectedCategory,
     selectedImage,
-    setSelectedCategory,
+    selectedShape,
+    selectedStyle,
+    setSelectedShape,
+    setSelectedStyle,
   };
 }

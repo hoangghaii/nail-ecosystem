@@ -1,10 +1,11 @@
 import { Clock, DollarSign } from "lucide-react";
 import { motion } from "motion/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import type { Service, ServiceCategory } from "@/types";
 import type { BookingNavigationState } from "@/types/navigation";
+import { isValidServicesState } from "@/types/navigation";
 
 import { Button } from "@/components/ui/button";
 
@@ -23,6 +24,7 @@ const categoryLabels: Record<ServiceCategory, string> = {
 
 export function ServiceCard({ index, service }: ServiceCardProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBookNow = () => {
     // Validate service prop exists (defensive programming)
@@ -31,13 +33,14 @@ export function ServiceCard({ index, service }: ServiceCardProps) {
       return;
     }
 
-    // Navigate with service pre-selected
-    navigate("/booking", {
-      state: {
-        fromService: true,
-        service: service,
-      } as BookingNavigationState,
-    });
+    // Forward gallery context to booking if user came from lookbook
+    const galleryState = isValidServicesState(location.state) ? location.state : null;
+
+    const bookingState: BookingNavigationState = galleryState
+      ? { fromGallery: true, galleryItem: galleryState.galleryItem, service }
+      : { fromService: true, service };
+
+    navigate("/booking", { state: bookingState });
   };
 
   return (

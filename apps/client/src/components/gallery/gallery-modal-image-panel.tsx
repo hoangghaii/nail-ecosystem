@@ -19,8 +19,8 @@ export function GalleryModalImagePanel({
   onPrevious,
 }: GalleryModalImagePanelProps) {
   return (
-    <div className="relative md:w-[55%] flex-shrink-0 overflow-hidden bg-muted">
-      <div className="relative h-64 md:h-full">
+    <div className="relative shrink-0 overflow-hidden bg-muted md:w-[65%]">
+      <div className="relative h-80 md:h-full">
         <img
           src={imageUrl}
           alt={alt}

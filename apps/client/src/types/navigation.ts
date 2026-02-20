@@ -46,3 +46,28 @@ export function isValidBookingState(
 
   return false;
 }
+
+/**
+ * Navigation state passed to ServicesPage when entering from Gallery.
+ * Carries the gallery item so ServiceCard can forward it to BookingPage.
+ */
+export type ServicesNavigationState = {
+  fromGallery: true;
+  galleryItem: GalleryItem;
+};
+
+/**
+ * Type guard for ServicesNavigationState
+ */
+export function isValidServicesState(
+  state: unknown
+): state is ServicesNavigationState {
+  if (!state || typeof state !== "object") return false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const s = state as any;
+  return (
+    s.fromGallery === true &&
+    !!s.galleryItem &&
+    typeof s.galleryItem._id === "string"
+  );
+}

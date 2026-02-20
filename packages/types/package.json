@@ -15,7 +15,8 @@
     "./banner": "./src/banner.ts",
     "./hero-settings": "./src/hero-settings.ts",
     "./expense": "./src/expense.ts",
-    "./analytics": "./src/analytics.ts"
+    "./analytics": "./src/analytics.ts",
+    "./nail-options": "./src/nail-options.ts"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",

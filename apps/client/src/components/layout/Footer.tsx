@@ -46,20 +46,21 @@ export function Footer() {
           <div>
             <h4 className="font-sans text-lg font-semibold">Liên Kết Nhanh</h4>
             <ul className="mt-4 space-y-2">
-              <li>
+              {/* TEMP: hidden — booking flows through Lookbook */}
+              {/* <li>
                 <Link
                   to="/services"
                   className="text-sm transition-opacity hover:opacity-80"
                 >
                   Dịch Vụ Của Chúng Tôi
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/gallery"
                   className="text-sm transition-opacity hover:opacity-80"
                 >
-                  Thư Viện Ảnh
+                  Lookbook
                 </Link>
               </li>
               <li>

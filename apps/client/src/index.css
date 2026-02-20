@@ -237,11 +237,11 @@
      MASONRY LAYOUT - Phase 4
      ============================================ */
   .masonry-grid {
-    @apply flex w-full gap-6;
+    @apply flex w-full gap-2.5;
   }
 
   .masonry-column {
-    @apply flex flex-col gap-6;
+    @apply flex flex-col gap-2.5;
     background-clip: padding-box;
   }
 
@@ -253,21 +253,21 @@
   /* Responsive gaps */
   @media (max-width: 640px) {
     .masonry-grid {
-      @apply gap-3;
+      @apply gap-2;
     }
 
     .masonry-column {
-      @apply gap-3;
+      @apply gap-2;
     }
   }
 
   @media (min-width: 641px) and (max-width: 1024px) {
     .masonry-grid {
-      @apply gap-4;
+      @apply gap-2.5;
     }
 
     .masonry-column {
-      @apply gap-4;
+      @apply gap-2.5;
     }
   }
 

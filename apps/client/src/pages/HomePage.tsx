@@ -3,7 +3,8 @@ import { motion } from "motion/react";
 import { AboutSection } from "@/components/home/AboutSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { LookbookHighlight } from "@/components/home/LookbookHighlight";
-import { ServicesOverview } from "@/components/home/ServicesOverview";
+// TEMP: ServicesOverview hidden — booking flows through Lookbook
+// import { ServicesOverview } from "@/components/home/ServicesOverview";
 import { useHomePage } from "@/hooks/useHomePage";
 import { getTransition, pageVariants } from "@/utils/animations";
 
@@ -22,7 +23,8 @@ export function HomePage() {
       <HeroSection />
       <LookbookHighlight />
       <AboutSection />
-      <ServicesOverview />
+      {/* TEMP: hidden — booking flows through Lookbook */}
+      {/* <ServicesOverview /> */}
     </motion.div>
   );
 }

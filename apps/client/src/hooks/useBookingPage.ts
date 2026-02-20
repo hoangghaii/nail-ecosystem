@@ -74,16 +74,16 @@ export function useBookingPage() {
     const navState = location.state as BookingNavigationState | null;
 
     if (!isValidBookingState(navState)) {
-      // Invalid state: redirect to services
-      toast.error("Vui lòng chọn dịch vụ trước khi đặt lịch");
-      navigate("/services", { replace: true });
+      // Invalid state: redirect to lookbook
+      toast.error("Vui lòng chọn mẫu thiết kế từ Lookbook trước khi đặt lịch");
+      navigate("/gallery", { replace: true });
       return;
     }
 
     // Additional validation: check service exists
     if (!navState.service || !navState.service._id) {
-      toast.error("Dịch vụ không hợp lệ. Vui lòng chọn lại");
-      navigate("/services", { replace: true });
+      toast.error("Dịch vụ không hợp lệ. Vui lòng chọn lại từ Lookbook");
+      navigate("/gallery", { replace: true });
       return;
     }
   }, [location.state, navigate]);

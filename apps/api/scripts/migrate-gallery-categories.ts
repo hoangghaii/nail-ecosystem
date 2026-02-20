@@ -65,15 +65,16 @@ async function bootstrap() {
         try {
           let categoryId = allCategoryId; // Default to 'all'
 
-          // Try to map category string to categoryId
-          if (gallery.category) {
-            const mappedId = categoryMap.get(gallery.category);
+          // Try to map category string to categoryId (legacy field)
+          const legacyCategory = (gallery as any).category as string | undefined;
+          if (legacyCategory) {
+            const mappedId = categoryMap.get(legacyCategory);
             if (mappedId) {
               categoryId = mappedId;
               migrated++;
             } else {
               console.log(
-                `⚠️  Unknown category "${gallery.category}" for gallery "${gallery.title}", using "all"`,
+                `⚠️  Unknown category "${legacyCategory}" for gallery "${gallery.title}", using "all"`,
               );
               defaulted++;
             }

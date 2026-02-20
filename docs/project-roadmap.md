@@ -2,8 +2,8 @@
 
 Pink Nail Salon - Turborepo Monorepo
 
-**Last Updated**: 2026-02-18
-**Current Version**: 0.1.10
+**Last Updated**: 2026-02-19
+**Current Version**: 0.1.11
 **Status**: Production-ready
 
 ---
@@ -291,6 +291,33 @@ Pink Nail Salon - Turborepo Monorepo
   - Detailed status: See plans/260216-1304-ui-ux-redesign/phase-06-gallery-hover-effects.md
   - Completion report: See plans/260216-1304-ui-ux-redesign/STATUS-UPDATE-PHASE-06-COMPLETE.md
 
+- ✅ Dynamic Gallery Filters System (2026-02-19 - Complete)
+  - All 8 phases complete (100%): API, shared types, admin UI, client filtering
+  - **API Changes**:
+    - New `nail-options` module: NailShape + NailStyle MongoDB collections
+    - REST endpoints: GET /nail-shapes, GET /nail-styles (public), POST/PATCH/DELETE (JWT-protected)
+    - Slug validation (@Matches regex) on value field
+    - Gallery module updated: removed categoryId/category, added nailShape/nailStyle server-side filtering
+  - **Shared Types Updates**:
+    - New exports: NailShapeItem, NailStyleItem, CreateNailOptionDto, UpdateNailOptionDto
+    - Gallery.ts updated: removed category field, added nailShape?:string, style?:string
+    - queryKeys.ts updated: added nailShapes, nailStyles key factories
+  - **Admin App**:
+    - New "Shapes & Styles" management tab in Gallery page
+    - Full CRUD UI for nail shapes and nail styles (create, read, update, delete)
+    - Gallery form uses dynamic dropdowns from API
+  - **Client App**:
+    - Gallery filters fetched from API via useNailShapes() / useNailStyles() hooks
+    - Server-side filtering replaces client-side useMemo (60-85% data reduction)
+    - Booking "Book Now" from gallery navigates to /services page (with toast guidance)
+  - **Architectural Decision**: nailStyle query param maps to style DB field for backward compatibility
+  - Type-check: PASS (0 errors across client/admin/api)
+  - Build: PASS (all apps)
+  - Code review: APPROVED (production-ready)
+  - Files modified: 18 across API, Admin, Client, and shared packages
+  - QA Status: APPROVED FOR DEPLOYMENT
+  - Detailed status: See plans/260219-dynamic-gallery-filters/plan.md
+
 **Testing & Validation**:
 - 🔄 Docker dev mode hot-reload testing
 - 🔄 Docker prod mode deployment testing
@@ -517,6 +544,42 @@ Pink Nail Salon - Turborepo Monorepo
 ---
 
 ## Version History
+
+### v0.1.11 (2026-02-19)
+
+**Dynamic Gallery Filters System Complete**:
+- ✅ All 8 phases complete (100%): API nail-options module, gallery update, shared types, admin CRUD, client filtering
+- ✅ New NailShape + NailStyle MongoDB collections with CRUD endpoints
+- ✅ Gallery schema refactored: removed categoryId/category, added nailShape/nailStyle
+- ✅ Admin "Shapes & Styles" management tab with full CRUD UI
+- ✅ Client gallery filters API-driven: useNailShapes() + useNailStyles() hooks
+- ✅ Server-side filtering: 60-85% expected data transfer reduction
+- ✅ Slug validation (@Matches regex) on all nail option values
+- ✅ Backward compatibility: nailStyle query param maps to style DB field
+- ✅ Type-check PASS (0 errors), Build PASS (all apps), Code review APPROVED
+- ✅ 18 files modified across API, Admin, Client, and shared packages
+- ✅ Production-ready, approved for immediate deployment
+
+**Architectural Decision**:
+- Booking "Book Now" from gallery navigates to /services page with toast guidance (category-based service matching removed)
+- nailStyle query param backward compatibility maintained via DB field mapping
+
+**Files Changed**: 18 total across 4 apps
+- API: nail-options module (2 controllers, 2 services, 2 schemas)
+- Admin: Gallery page (Shapes & Styles tab), Gallery form (dynamic dropdowns)
+- Client: Gallery hooks, gallery filters, seeder
+- Shared: @repo/types updates (nail-options DTOs, gallery schema)
+
+**Achievement**:
+- Fully dynamic, database-driven gallery filtering system
+- Complete decoupling from hardcoded enums
+- Admin-controllable nail shapes and styles
+- Type-safe API contracts across all apps
+- Ready for feature expansion (custom shapes/styles management)
+
+**Detailed Reports**:
+- Plan: plans/260219-dynamic-gallery-filters/plan.md
+- Phase details: plans/260219-dynamic-gallery-filters/phase-*.md
 
 ### v0.1.10 (2026-02-18)
 

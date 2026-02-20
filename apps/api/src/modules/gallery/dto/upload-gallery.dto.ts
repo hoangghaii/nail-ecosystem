@@ -1,14 +1,12 @@
 import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
   IsBoolean,
+  IsNotEmpty,
   IsNumber,
+  IsOptional,
+  IsString,
   MinLength,
-  IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { GalleryCategory } from './create-gallery.dto';
 
 export class UploadGalleryDto {
   @ApiProperty({
@@ -28,25 +26,6 @@ export class UploadGalleryDto {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @ApiPropertyOptional({
-    description:
-      'Gallery category ID (defaults to "all" category if not provided)',
-    example: '507f1f77bcf86cd799439011',
-  })
-  @IsString()
-  @IsOptional()
-  categoryId?: string;
-
-  @ApiPropertyOptional({
-    description: 'DEPRECATED: Use categoryId instead. Gallery category enum',
-    enum: GalleryCategory,
-    example: GalleryCategory.NAIL_ART,
-    deprecated: true,
-  })
-  @IsEnum(GalleryCategory)
-  @IsOptional()
-  category?: GalleryCategory;
 
   @ApiProperty({
     description: 'Price for this design',
@@ -89,4 +68,20 @@ export class UploadGalleryDto {
   @IsNumber()
   @IsOptional()
   sortIndex?: number;
+
+  @ApiPropertyOptional({
+    description: 'Nail shape value for filtering',
+    example: 'almond',
+  })
+  @IsString()
+  @IsOptional()
+  nailShape?: string;
+
+  @ApiPropertyOptional({
+    description: 'Nail style value for filtering',
+    example: '3d',
+  })
+  @IsString()
+  @IsOptional()
+  style?: string;
 }

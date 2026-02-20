@@ -1,15 +1,12 @@
-import type { Service } from "@repo/types/service";
-
-import { Clock, DollarSign, Heart } from "lucide-react";
+import { CalendarCheck, Clock } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 import type { GalleryItem } from "@/types";
+import type { ServicesNavigationState } from "@/types/navigation";
 
-import { LazyImage } from "@/components/shared/LazyImage";
-import { Button } from "@/components/ui/button";
-import { useServices } from "@/hooks/api/useServices";
+import { Button } from "../ui/button";
 
 type GalleryCardProps = {
   index: number;
@@ -19,42 +16,32 @@ type GalleryCardProps = {
 
 export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
   const navigate = useNavigate();
+  const [touchOverlayVisible, setTouchOverlayVisible] = useState(false);
 
-  // Fetch active services for matching
-  const { data: services = [] } = useServices({ isActive: true });
-
-  // Detect touch device
+  // Detect touch device once per render
   const isTouchDevice = "ontouchstart" in window;
 
   const handleBookNow = () => {
-    // Match service by category
-    const matchedService = services.find(
-      (service: Service) => service.category === item.category
-    );
-
-    // Validate service found
-    if (!matchedService) {
-      toast.error(
-        "Không tìm thấy dịch vụ phù hợp. Vui lòng liên hệ với chúng tôi."
-      );
-      return;
-    }
-
-    // Navigate with matched service
-    navigate("/booking", {
-      state: {
-        fromGallery: true,
-        galleryItem: item,
-        service: matchedService,
-      },
+    navigate("/services", {
+      state: { fromGallery: true, galleryItem: item } satisfies ServicesNavigationState,
     });
   };
 
-  const handleSaveDesign = () => {
-    // Placeholder for save design functionality (Phase 7 or future)
-    toast.info("Chức năng lưu thiết kế đang được phát triển");
-    // Future: Add to favorites, localStorage, or API
+  const handleCardClick = () => {
+    if (isTouchDevice) {
+      // Toggle overlay on touch devices (Pinterest mobile behavior)
+      setTouchOverlayVisible((v) => !v);
+    } else {
+      onImageClick?.();
+    }
   };
+
+  // Overlay visibility: CSS hover on desktop, state on touch
+  const overlayClass = isTouchDevice
+    ? touchOverlayVisible
+      ? "opacity-100"
+      : "opacity-0"
+    : "opacity-0 group-hover:opacity-100";
 
   return (
     <motion.div
@@ -62,30 +49,28 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{
         damping: 30,
-        delay: index * 0.05,
+        delay: (index % 12) * 0.04,
         stiffness: 300,
         type: "spring",
       }}
-      className="group flex h-full flex-col rounded-2xl border-2 border-secondary bg-card p-2 transition-colors duration-200 hover:border-primary md:rounded-[20px]"
     >
-      {/* Image with hover effects */}
       <div
-        className="gallery-card relative mb-3 cursor-pointer overflow-hidden rounded-sm md:mb-4 md:rounded-2xl"
-        onClick={onImageClick}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl"
+        onClick={handleCardClick}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            onImageClick?.();
+            handleCardClick();
           }
         }}
       >
-        <LazyImage
+        <img
           alt={item.title}
-          className="h-auto w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
           src={item.imageUrl}
-          placeholderClassName="rounded-[12px] md:rounded-[16px]"
+          loading="lazy"
+          className="block h-auto w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
 
         {/* Dusty rose overlay - only on non-touch devices */}
@@ -98,78 +83,63 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
           />
         )}
 
-        {/* Quick action buttons - appear on hover */}
-        <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <Button
-            size="sm"
-            variant="default"
-            className="shadow-lg"
-            onClick={(e) => {
-              e.stopPropagation();
-              onImageClick?.();
-            }}
-          >
-            Xem Chi Tiết
-          </Button>
-          <Button
-            size="icon"
-            variant="outline"
-            className="bg-white/90 backdrop-blur-sm"
-            aria-label="Lưu thiết kế này"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSaveDesign();
-            }}
-          >
-            <Heart className="size-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Content area - grows to fill space */}
-      <div className="flex flex-1 flex-col px-1.5 md:px-2">
-        {/* Title */}
-        <h3 className="mb-1.5 font-serif text-lg font-semibold text-foreground md:mb-2 md:text-xl">
-          {item.title}
-        </h3>
-
-        {/* Description */}
-        {item.description && (
-          <p className="mb-3 flex-1 font-sans text-sm leading-relaxed text-muted-foreground md:mb-4">
-            {item.description}
-          </p>
-        )}
-
-        {/* Price and Duration - Separate rows with different backgrounds */}
-        <div className="flex justify-between items-center gap-3 mb-3 space-y-2 md:mb-4">
-          {item.price && (
-            <div className="flex flex-1 mb-0 items-center gap-2 rounded-sm border border-border bg-primary/5 p-2 md:p-2.5">
-              <DollarSign className="size-4 text-primary" />
-              <span className="font-sans text-sm font-semibold text-primary md:text-base">
-                {item.price}
-              </span>
-            </div>
-          )}
-
-          {item.duration && (
-            <div className="flex flex-1 items-center gap-2 rounded-sm border border-border bg-secondary/10 p-2 md:p-2.5">
-              <Clock className="size-4 text-secondary" />
-              <span className="font-sans text-sm font-foreground md:text-base">
-                {item.duration}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Book Now Button */}
-        <Button
-          className="w-full rounded-sm mt-auto text-sm md:text-base"
-          onClick={handleBookNow}
-          size="default"
-          variant="default"
+        {/* Hover / touch overlay */}
+        <div
+          className={`absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-300 ${overlayClass}`}
         >
-          Đặt Lịch Ngay
-        </Button>
+
+          {/* Quick action buttons - appear on hover */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <Button
+              size="sm"
+              variant="default"
+              className="shadow-lg"
+              onClick={(e) => {
+                e.stopPropagation();
+                onImageClick?.();
+              }}
+            >
+              Xem Chi Tiết
+            </Button>
+          </div>
+
+          {/* Title + description — bottom area */}
+          <div className="absolute left-3 right-14 bottom-3">
+            <h3 className="line-clamp-1 font-serif text-sm font-semibold text-white">
+              {item.title}
+            </h3>
+            {item.description && (
+              <p className="mt-0.5 line-clamp-2 font-sans text-xs text-white/70">
+                {item.description}
+              </p>
+            )}
+          </div>
+
+          {/* Action strip — bottom-right, vertical */}
+          <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1">
+            <span className="font-sans text-xs font-semibold text-white">
+              {item.price || "$30"} 
+            </span>
+          
+            <span className="flex items-center gap-0.5 font-sans text-xs text-white/80">
+              <Clock className="size-3" />
+              {item.duration|| "2hrs"} 
+            </span>
+
+            <button
+              title="Đặt lịch ngay"
+              type="button"
+              aria-label="Đặt lịch ngay"
+              className="mt-0.5 flex size-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm transition-colors hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBookNow();
+              }}
+            >
+              <CalendarCheck className="size-4 text-white" />
+            </button>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

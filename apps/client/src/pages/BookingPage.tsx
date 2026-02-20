@@ -154,10 +154,10 @@ export function BookingPage() {
             {/* Optional: Change Service Link */}
             <div className="mt-4 border-t border-border pt-4">
               <Link
-                to="/services"
+                to="/gallery"
                 className="font-sans text-sm text-secondary hover:underline"
               >
-                ← Thay đổi dịch vụ
+                ← Xem Lookbook
               </Link>
             </div>
           </motion.div>
