@@ -1,6 +1,5 @@
-import { lazy, Suspense } from "react";
-
 import { motion } from "motion/react";
+import { lazy, Suspense } from "react";
 
 import { ContactForm } from "@/components/contact/contact-form";
 import { ContactInfoDisplay } from "@/components/contact/contact-info-display";

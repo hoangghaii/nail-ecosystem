@@ -1,8 +1,12 @@
 import "leaflet/dist/leaflet.css";
+
 import "@/utils/leaflet-icon-fix";
 
 import { MapPin } from "lucide-react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+
+import { createSalonMarker } from "./salon-map-marker";
+import { SALON_MAP_STYLES } from "./salon-map-styles";
 
 interface SalonMapProps {
   address: string;
@@ -41,31 +45,68 @@ export function SalonMap({
   if (!hasCoords) return <MapPlaceholder address={address} />;
 
   return (
-    <div className="overflow-hidden rounded-[24px] border border-border">
+    <div className="salon-map-container overflow-hidden rounded-[24px] border border-border">
+      <style>{SALON_MAP_STYLES}</style>
       <MapContainer
-        center={[latitude, longitude]}
-        zoom={16}
-        className="h-80 w-full sm:h-96"
         aria-label="Salon location map"
+        center={[latitude, longitude]}
+        className="h-[480px] w-full"
         scrollWheelZoom={false}
+        zoom={16}
+        zoomControl={true}
       >
+        {/* CartoDB Voyager — warm colourful tiles, no API key needed */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
-        <Marker position={[latitude, longitude]}>
+        <Marker icon={createSalonMarker()} position={[latitude, longitude]}>
           <Popup>
-            <strong>{salonName}</strong>
-            <br />
-            {address}
-            <br />
-            <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Chỉ đường
-            </a>
+            <div style={{ minWidth: "190px" }}>
+              <p
+                style={{
+                  color: "#2d1f1d",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  margin: "0 0 4px",
+                }}
+              >
+                {salonName}
+              </p>
+              <p
+                style={{
+                  color: "#6b4f4b",
+                  fontFamily: "'Be Vietnam Pro', sans-serif",
+                  fontSize: "13px",
+                  lineHeight: "1.55",
+                  margin: "0 0 14px",
+                }}
+              >
+                {address}
+              </p>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+                rel="noopener noreferrer"
+                style={{
+                  alignItems: "center",
+                  background: "rgba(209,148,139,0.1)",
+                  border: "1px solid rgba(209,148,139,0.3)",
+                  borderRadius: "20px",
+                  color: "#C97E74",
+                  display: "inline-flex",
+                  fontFamily: "'Be Vietnam Pro', sans-serif",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  gap: "5px",
+                  padding: "6px 14px",
+                  textDecoration: "none",
+                }}
+                target="_blank"
+              >
+                Chỉ đường &rarr;
+              </a>
+            </div>
           </Popup>
         </Marker>
       </MapContainer>
