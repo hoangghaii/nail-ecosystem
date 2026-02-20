@@ -2,9 +2,29 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.preferences.includePackageJsonAutoImports": "on",
+
+  // ESLint: run per-app from its own CWD so tsconfigRootDir resolves correctly
   "eslint.workingDirectories": [
     { "directory": "apps/client", "changeProcessCWD": true },
     { "directory": "apps/admin", "changeProcessCWD": true },
     { "directory": "apps/api", "changeProcessCWD": true }
-  ]
+  ],
+  // Only lint JS/TS — prevents "Could not find config file" on JSON/markdown files
+  "eslint.probe": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  // ESLint is a linter, not a formatter — Prettier handles formatting
+  "eslint.format.enable": false,
+
+  // Prettier as default formatter for all file types
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+
+  // On save: ESLint auto-fixes linting issues; Prettier formats
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
 }
