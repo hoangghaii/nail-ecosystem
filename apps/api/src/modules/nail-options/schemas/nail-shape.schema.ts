@@ -22,5 +22,4 @@ export class NailShape extends Document {
 }
 
 export const NailShapeSchema = SchemaFactory.createForClass(NailShape);
-NailShapeSchema.index({ value: 1 }, { unique: true });
 NailShapeSchema.index({ isActive: 1, sortIndex: 1 });
