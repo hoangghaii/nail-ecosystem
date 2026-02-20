@@ -23,9 +23,7 @@ export const queryClient = new QueryClient({
           // Handle 401 Unauthorized - redirect to login
           if (error.statusCode === 401) {
             toast.error("Session expired. Please login again.");
-            // Clear auth data
-            storage.remove("auth_token");
-            storage.remove("refresh_token");
+            // Clear cached user data (tokens are HttpOnly cookies cleared by server)
             storage.remove("auth_user");
             // Redirect after a short delay
             setTimeout(() => {

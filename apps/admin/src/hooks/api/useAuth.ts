@@ -9,7 +9,8 @@ import { useAuthStore } from "@/store/authStore";
 
 /**
  * Login mutation hook
- * Authenticates user and syncs with Zustand store
+ * Authenticates user and syncs with Zustand store.
+ * Tokens are set as HttpOnly cookies by the server — not handled here.
  */
 export function useLogin() {
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ export function useLogin() {
     mutationFn: (credentials: LoginCredentials) =>
       authService.login(credentials),
     onSuccess: (response) => {
-      // Sync with Zustand store
-      login(response.admin, response.accessToken, response.refreshToken);
+      // Sync user with Zustand store (tokens are HttpOnly cookies — invisible to JS)
+      login(response.admin);
       toast.success("Login successful");
       navigate("/");
     },
@@ -29,7 +30,7 @@ export function useLogin() {
 
 /**
  * Logout mutation hook
- * Clears auth state and cache
+ * Calls server to clear HttpOnly cookies, then clears local state and cache.
  */
 export function useLogout() {
   const navigate = useNavigate();

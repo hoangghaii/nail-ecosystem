@@ -13,15 +13,15 @@ import { toast } from "sonner";
 import type { GetServicesParams } from "@/services/services.service";
 
 import { servicesService } from "@/services/services.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Query: Get all services (paginated)
  */
 export function useServices(params: GetServicesParams = {}) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    // Don't run query if no auth token (prevents 401 errors on mount)
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     queryFn: () => servicesService.getAll(params),
     queryKey: queryKeys.services.list(params),
   });
@@ -33,6 +33,7 @@ export function useServices(params: GetServicesParams = {}) {
 export function useInfiniteServices(
   params: Omit<GetServicesParams, "page"> = {},
 ) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useInfiniteQuery<
     PaginationResponse<Service>,
     Error,
@@ -40,7 +41,7 @@ export function useInfiniteServices(
     ReturnType<typeof queryKeys.services.list>,
     number
   >({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {
         return lastPage.pagination.page + 1;

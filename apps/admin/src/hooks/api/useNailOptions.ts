@@ -14,13 +14,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { nailShapesService, nailStylesService } from "@/services/nailOptions.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 // ── Nail Shapes ────────────────────────────────────────────────────────────
 
 export function useNailShapes() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     queryFn: () => nailShapesService.getAll(),
     queryKey: queryKeys.nailShapes.lists(),
     staleTime: 60_000,
@@ -71,8 +72,9 @@ export function useDeleteNailShape() {
 // ── Nail Styles ────────────────────────────────────────────────────────────
 
 export function useNailStyles() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     queryFn: () => nailStylesService.getAll(),
     queryKey: queryKeys.nailStyles.lists(),
     staleTime: 60_000,

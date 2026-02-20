@@ -31,10 +31,26 @@ export const businessInfoSchema = z.object({
   address: z.string().min(1, "Address is required"),
   businessHours: z.array(dayScheduleSchema).length(7, "Must have 7 days"),
   email: z.string().email("Invalid email address"),
+  latitude: z.preprocess(
+    (v) => (typeof v === "number" && isNaN(v) ? undefined : v),
+    z.number().min(-90).max(90).optional(),
+  ),
+  longitude: z.preprocess(
+    (v) => (typeof v === "number" && isNaN(v) ? undefined : v),
+    z.number().min(-180).max(180).optional(),
+  ),
   phone: z
     .string()
     .min(1, "Phone number is required")
     .regex(phoneRegex, "Invalid phone number format"),
 });
 
-export type BusinessInfoFormData = z.infer<typeof businessInfoSchema>;
+// z.preprocess infers output as `unknown` — define the type explicitly
+export type BusinessInfoFormData = {
+  address: string;
+  businessHours: z.infer<typeof dayScheduleSchema>[];
+  email: string;
+  latitude?: number;
+  longitude?: number;
+  phone: string;
+};

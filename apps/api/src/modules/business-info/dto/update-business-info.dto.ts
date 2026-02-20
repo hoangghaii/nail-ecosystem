@@ -9,6 +9,9 @@ import {
   IsBoolean,
   IsOptional,
   Matches,
+  IsNumber,
+  Min,
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -94,6 +97,20 @@ export class UpdateBusinessInfoDto {
   @IsNotEmpty()
   @IsOptional()
   address?: string;
+
+  @ApiPropertyOptional({ description: 'Latitude (WGS84 decimal degrees)', example: 10.7769 })
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  @IsOptional()
+  latitude?: number;
+
+  @ApiPropertyOptional({ description: 'Longitude (WGS84 decimal degrees)', example: 106.7009 })
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  @IsOptional()
+  longitude?: number;
 
   @ApiPropertyOptional({
     description: 'Business hours for all 7 days of the week',

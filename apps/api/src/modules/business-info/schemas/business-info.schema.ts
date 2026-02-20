@@ -41,6 +41,12 @@ export class BusinessInfo extends Document {
   @Prop({ required: true })
   address: string;
 
+  @Prop({ required: false, type: Number })
+  latitude?: number;
+
+  @Prop({ required: false, type: Number })
+  longitude?: number;
+
   @Prop({ required: true, type: [DaySchedule] })
   businessHours: DaySchedule[];
 }

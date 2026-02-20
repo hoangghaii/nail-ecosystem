@@ -18,12 +18,13 @@ import { toast } from "sonner";
 import type { ApiError } from "@/types/api";
 
 import { galleryCategoryService } from "@/services/galleryCategory.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 // Query hook - Fetch all categories
 export function useGalleryCategories() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     queryFn: () => galleryCategoryService.getAll(),
     queryKey: queryKeys.galleryCategories.lists(),
   });

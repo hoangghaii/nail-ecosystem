@@ -1,19 +1,19 @@
-import type { AuthResponse, LoginCredentials } from "@repo/types/auth";
+import type { LoginCredentials, User } from "@repo/types/auth";
 
 import { apiClient } from "@/lib/apiClient";
 
 import { storage } from "./storage.service";
 
 export class AuthService {
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    return apiClient.post<AuthResponse>("/auth/login", credentials);
+  async login(credentials: LoginCredentials): Promise<{ admin: User }> {
+    return apiClient.post<{ admin: User }>("/auth/login", credentials);
   }
 
   async logout(): Promise<void> {
     try {
-      await apiClient.post("/auth/logout");
+      await apiClient.post("/auth/logout"); // server clears HttpOnly cookies
     } finally {
-      // Always clear local storage even if API call fails
+      // Always clear local user data even if API call fails
       storage.clear();
     }
   }

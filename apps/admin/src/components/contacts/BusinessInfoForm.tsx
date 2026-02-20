@@ -45,10 +45,13 @@ export function BusinessInfoForm() {
           address: businessInfo.address,
           businessHours: businessInfo.businessHours,
           email: businessInfo.email,
+          latitude: businessInfo.latitude,
+          longitude: businessInfo.longitude,
           phone: businessInfo.phone,
         }
       : undefined,
-    resolver: zodResolver(businessInfoSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(businessInfoSchema) as any,
   });
 
   // Reset form when business info changes
@@ -58,6 +61,8 @@ export function BusinessInfoForm() {
         address: businessInfo.address,
         businessHours: businessInfo.businessHours,
         email: businessInfo.email,
+        latitude: businessInfo.latitude,
+        longitude: businessInfo.longitude,
         phone: businessInfo.phone,
       });
     }
@@ -79,6 +84,8 @@ export function BusinessInfoForm() {
         address: businessInfo.address,
         businessHours: businessInfo.businessHours,
         email: businessInfo.email,
+        latitude: businessInfo.latitude,
+        longitude: businessInfo.longitude,
         phone: businessInfo.phone,
       });
     }
@@ -160,6 +167,37 @@ export function BusinessInfoForm() {
           {errors.address && (
             <p className="text-destructive text-sm">{errors.address.message}</p>
           )}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="latitude">Latitude (optional)</Label>
+            <Input
+              id="latitude"
+              type="number"
+              step="any"
+              placeholder="e.g. 10.7769"
+              disabled={!isEditing}
+              {...register("latitude", { valueAsNumber: true })}
+            />
+            {errors.latitude && (
+              <p className="text-destructive text-sm">{errors.latitude.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="longitude">Longitude (optional)</Label>
+            <Input
+              id="longitude"
+              type="number"
+              step="any"
+              placeholder="e.g. 106.7009"
+              disabled={!isEditing}
+              {...register("longitude", { valueAsNumber: true })}
+            />
+            {errors.longitude && (
+              <p className="text-destructive text-sm">{errors.longitude.message}</p>
+            )}
+          </div>
         </div>
       </div>
 

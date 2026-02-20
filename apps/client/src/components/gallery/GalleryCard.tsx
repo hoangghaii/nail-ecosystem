@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { GalleryItem } from "@/types";
-import type { ServicesNavigationState } from "@/types/navigation";
+import type { BookingNavigationState } from "@/types/navigation";
 
 import { Button } from "../ui/button";
 
@@ -22,8 +22,8 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
   const isTouchDevice = "ontouchstart" in window;
 
   const handleBookNow = () => {
-    navigate("/services", {
-      state: { fromGallery: true, galleryItem: item } satisfies ServicesNavigationState,
+    navigate("/booking", {
+      state: { fromGallery: true, galleryItem: item } satisfies BookingNavigationState,
     });
   };
 

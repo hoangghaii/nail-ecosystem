@@ -44,7 +44,7 @@ export class AuthService {
 
     return {
       admin: {
-        id: admin._id.toString(),
+        _id: admin._id.toString(),
         email: admin.email,
         name: admin.name,
         role: admin.role,
@@ -79,7 +79,7 @@ export class AuthService {
 
     return {
       admin: {
-        id: admin._id.toString(),
+        _id: admin._id.toString(),
         email: admin.email,
         name: admin.name,
         role: admin.role,
@@ -164,7 +164,7 @@ export class AuthService {
       return null;
     }
     return {
-      id: admin._id.toString(),
+      _id: admin._id.toString(),
       email: admin.email,
       name: admin.name,
       role: admin.role,

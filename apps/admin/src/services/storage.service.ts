@@ -24,6 +24,7 @@ class StorageService {
     Object.keys(localStorage)
       .filter((key) => key.startsWith(this.prefix))
       .forEach((key) => localStorage.removeItem(key));
+    // Note: auth tokens are HttpOnly cookies — cleared server-side via POST /auth/logout
   }
 }
 

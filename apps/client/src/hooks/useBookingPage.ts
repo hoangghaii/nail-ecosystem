@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import type { Service } from "@/types";
+import type { GalleryItem, Service } from "@/types";
 import type { BookingNavigationState } from "@/types/navigation";
 
 import { useCreateBooking } from "@/hooks/api/useBookings";
@@ -48,43 +48,36 @@ export function useBookingPage() {
   // Booking mutation
   const { data: bookingResult, isPending, isSuccess, mutate: createBooking } = useCreateBooking();
 
-  // Extract service from navigation state
+  // Extract navigation state
   const navState = location.state as BookingNavigationState | null;
 
   // Validate navigation state
   const isValidState = isValidBookingState(navState);
 
-  // Extract service based on navigation source
-  const preSelectedService = isValidState ? navState.service : null;
+  // Extract service (from Services page flow) or gallery item (from Gallery flow)
+  const preSelectedService: Service | null =
+    isValidState && "fromService" in navState && navState.fromService
+      ? navState.service
+      : null;
 
-  // Extract gallery item (if from gallery)
-  const galleryItem =
+  const galleryItem: GalleryItem | null =
     isValidState && "fromGallery" in navState && navState.fromGallery
       ? navState.galleryItem
       : null;
 
-  const initialServiceId = preSelectedService?._id ?? "";
+  // Service ID: use gallery item's _id when booking from lookbook
+  const initialServiceId = preSelectedService?._id ?? galleryItem?._id ?? "";
 
-  const [currentStep, setCurrentStep] = useState(1); // Always start at step 1 (Date/Time)
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedService] = useState<Service | null>(preSelectedService);
-  // Note: No setter needed (service immutable once set)
 
-  // Validate navigation state on mount
+  // Validate navigation state on mount — redirect if invalid
   useEffect(() => {
     const navState = location.state as BookingNavigationState | null;
 
     if (!isValidBookingState(navState)) {
-      // Invalid state: redirect to lookbook
       toast.error("Vui lòng chọn mẫu thiết kế từ Lookbook trước khi đặt lịch");
       navigate("/gallery", { replace: true });
-      return;
-    }
-
-    // Additional validation: check service exists
-    if (!navState.service || !navState.service._id) {
-      toast.error("Dịch vụ không hợp lệ. Vui lòng chọn lại từ Lookbook");
-      navigate("/gallery", { replace: true });
-      return;
     }
   }, [location.state, navigate]);
 
@@ -108,7 +101,6 @@ export function useBookingPage() {
   const handleNext = () => {
     if (currentStep < 2) {
       setCurrentStep(currentStep + 1);
-      // Scroll to top smoothly when moving to next step
       window.scrollTo({ behavior: "smooth", top: 0 });
     }
   };
@@ -116,22 +108,19 @@ export function useBookingPage() {
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      // Scroll to top smoothly when moving to previous step
       window.scrollTo({ behavior: "smooth", top: 0 });
     }
   };
 
   const onSubmit = form.handleSubmit((data) => {
-    // Transform form data to match API DTO
     const bookingDto = {
-      customerInfo: data.customerInfo,
-      date: data.date.toISOString().split('T')[0], // Convert Date to "YYYY-MM-DD"
-      notes: "", // Optional field
+      customerInfo: { ...data.customerInfo, email: data.customerInfo.email ?? "" },
+      date: data.date.toISOString().split('T')[0],
+      notes: "",
       serviceId: data.serviceId,
-      timeSlot: data.timeSlot, // Already a string like "14:00"
+      timeSlot: data.timeSlot,
     };
 
-    // Submit to API
     createBooking(bookingDto, {
       onError: () => {
         toast.error("Không thể đặt lịch. Vui lòng thử lại hoặc liên hệ với chúng tôi.");
@@ -139,7 +128,6 @@ export function useBookingPage() {
     });
   });
 
-  // Reset form after successful booking
   const handleCloseConfirmation = () => {
     form.reset();
     setCurrentStep(1);
@@ -147,18 +135,15 @@ export function useBookingPage() {
 
   const canProceed = () => {
     if (currentStep === 1) {
-      // Step 1: Date & Time
       const date = form.getValues("date");
       const timeSlot = form.getValues("timeSlot");
       return date instanceof Date && timeSlot !== "";
     }
     if (currentStep === 2) {
-      // Step 2: Customer Info
       const { customerInfo } = form.getValues();
       return (
         customerInfo.firstName !== "" &&
         customerInfo.lastName !== "" &&
-        customerInfo.email !== "" &&
         customerInfo.phone !== ""
       );
     }

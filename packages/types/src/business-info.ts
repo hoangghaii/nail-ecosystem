@@ -22,6 +22,8 @@ export type BusinessInfo = {
   phone: string;
   email: string;
   address: string;
+  latitude?: number;   // WGS84 decimal degrees
+  longitude?: number;  // WGS84 decimal degrees
   businessHours: DaySchedule[];
   createdAt: string;
   updatedAt: string;

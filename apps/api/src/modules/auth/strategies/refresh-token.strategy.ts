@@ -15,7 +15,9 @@ export class RefreshTokenStrategy extends PassportStrategy(
       throw new Error('JWT refresh secret not configured');
     }
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => req?.cookies?.nail_admin_refresh_token ?? null,
+      ]),
       secretOrKey: secret,
       passReqToCallback: true,
       ignoreExpiration: false,
@@ -23,12 +25,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
   }
 
   validate(req: Request, payload: { sub: string; email: string }) {
-    const refreshToken = req
-      .get('Authorization')
-      ?.replace('Bearer ', '')
-      .trim();
+    const refreshToken = req.cookies?.nail_admin_refresh_token as
+      | string
+      | undefined;
     if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token malformed');
+      throw new UnauthorizedException('Refresh token missing');
     }
     return { ...payload, refreshToken };
   }

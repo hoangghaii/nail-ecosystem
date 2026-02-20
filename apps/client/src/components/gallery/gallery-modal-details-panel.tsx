@@ -53,26 +53,23 @@ export function GalleryModalDetailsPanel({
       )}
 
       {/* Metadata */}
-      {(item.price || item.duration) && (
-        <div className="mb-6 space-y-3 border-t border-b border-border py-5">
-          {item.price && (
-            <div className="flex items-center gap-3 rounded-sm border border-border bg-primary/5 px-3 py-2.5">
-              <DollarSign className="size-4 shrink-0 text-primary" />
-              <span className="font-sans text-base font-semibold text-primary">
-                {item.price}
-              </span>
-            </div>
-          )}
-          {item.duration && (
-            <div className="flex items-center gap-3 rounded-sm border border-border bg-secondary/10 px-3 py-2.5">
-              <Clock className="size-4 shrink-0 text-secondary" />
-              <span className="font-sans text-sm text-foreground md:text-base">
-                {item.duration}
-              </span>
-            </div>
-          )}
+      <div className="mb-6 space-y-3 border-t border-b border-border py-5">
+        <div className="flex items-center gap-3 rounded-sm border border-border bg-primary/5 px-3 py-2.5">
+          <DollarSign className="size-4 shrink-0 text-primary" />
+          <span className="font-sans text-base font-semibold text-primary">
+            {item.price || "$30"}
+          </span>
         </div>
-      )}
+
+
+        <div className="flex items-center gap-3 rounded-sm border border-border bg-secondary/10 px-3 py-2.5">
+          <Clock className="size-4 shrink-0 text-secondary" />
+          <span className="font-sans text-sm text-foreground md:text-base">
+            {item.duration || "2hrs"}
+          </span>
+        </div>
+      </div>
+
 
       {/* CTA */}
       <Button

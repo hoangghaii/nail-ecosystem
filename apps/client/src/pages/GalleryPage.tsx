@@ -48,14 +48,15 @@ export function GalleryPage() {
   } = useGalleryPage();
 
   // Build filter pills with "All" prepended
-  const shapeFilters = [
+  const shapeFilters = nailShapes.length > 0 ? [
     { label: "Tất Cả", slug: "all" },
     ...nailShapes.map((s) => ({ label: s.labelVi, slug: s.value })),
-  ];
-  const styleFilters = [
+  ] : [];
+
+  const styleFilters = nailStyles.length > 0 ? [
     { label: "Tất Cả", slug: "all" },
     ...nailStyles.map((s) => ({ label: s.labelVi, slug: s.value })),
-  ];
+  ] : [];
 
   const hasActiveFilters = selectedShape !== "all" || selectedStyle !== "all";
 
@@ -78,7 +79,7 @@ export function GalleryPage() {
 
           {/* Nail Shape & Style Filters */}
           <div className="mb-6 space-y-6">
-            <div>
+            {shapeFilters.length > 0 && <div>
               <h3 className="mb-3 text-center font-sans text-sm font-semibold text-muted-foreground">
                 Dáng Móng
               </h3>
@@ -87,9 +88,9 @@ export function GalleryPage() {
                 selected={selectedShape}
                 onSelect={setSelectedShape}
               />
-            </div>
+            </div>}
 
-            <div>
+            {styleFilters.length > 0 && <div>
               <h3 className="mb-3 text-center font-sans text-sm font-semibold text-muted-foreground">
                 Phong Cách
               </h3>
@@ -98,7 +99,7 @@ export function GalleryPage() {
                 selected={selectedStyle}
                 onSelect={setSelectedStyle}
               />
-            </div>
+            </div>}
 
             {hasActiveFilters && (
               <div className="text-center">

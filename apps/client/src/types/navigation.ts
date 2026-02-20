@@ -3,7 +3,8 @@ import type { Service } from "@repo/types/service";
 
 /**
  * Navigation state for BookingPage
- * Supports navigation from Services or Gallery pages
+ * - fromService: navigating from Services page (service selected)
+ * - fromGallery: navigating from Gallery/Lookbook (gallery item selected, no service required)
  */
 export type BookingNavigationState =
   | {
@@ -13,7 +14,6 @@ export type BookingNavigationState =
   | {
       fromGallery: true;
       galleryItem: GalleryItem;
-      service: Service;
     };
 
 /**
@@ -36,12 +36,7 @@ export function isValidBookingState(
   }
 
   if (s.fromGallery === true) {
-    return (
-      !!s.galleryItem &&
-      typeof s.galleryItem._id === "string" &&
-      !!s.service &&
-      typeof s.service._id === "string"
-    );
+    return !!s.galleryItem && typeof s.galleryItem._id === "string";
   }
 
   return false;

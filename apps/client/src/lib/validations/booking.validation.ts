@@ -6,8 +6,11 @@ import { z } from "zod";
 export const customerInfoSchema = z.object({
   email: z
     .string()
-    .min(1, "Email là bắt buộc")
-    .email("Địa chỉ email không hợp lệ"),
+    .optional()
+    .or(z.literal(""))
+    .refine((val) => !val || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val), {
+      message: "Địa chỉ email không hợp lệ",
+    }),
   firstName: z
     .string()
     .min(1, "Tên là bắt buộc")

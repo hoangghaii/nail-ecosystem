@@ -16,14 +16,15 @@ import {
   contactsService,
   type ContactsQueryParams,
 } from "@/services/contacts.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Query: Get all contacts with backend filtering
  */
 export function useContacts(filters?: ContactsQueryParams) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery<Contact[]>({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     // @ts-expect-error - keepPreviousData exists in v4
     keepPreviousData: true, // Show old data while fetching new (smooth UX)
     queryFn: () => contactsService.getAll(filters),
@@ -40,6 +41,7 @@ export function useContacts(filters?: ContactsQueryParams) {
 export function useInfiniteContacts(
   params: Omit<ContactsQueryParams, "page"> = {},
 ) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useInfiniteQuery<
     PaginationResponse<Contact>,
     Error,
@@ -47,7 +49,7 @@ export function useInfiniteContacts(
     ReturnType<typeof queryKeys.contacts.list>,
     number
   >({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {
         return lastPage.pagination.page + 1;

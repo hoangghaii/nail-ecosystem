@@ -5,15 +5,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { businessInfoService } from "@/services/businessInfo.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Query: Get business info (singleton)
  */
 export function useBusinessInfo() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    // Don't run query if no auth token (prevents 401 errors on mount)
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     queryFn: () => businessInfoService.get(),
     queryKey: queryKeys.businessInfo.detail(),
   });

@@ -18,7 +18,7 @@ import {
   bannersService,
   type BannersQueryParams,
 } from "@/services/banners.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 type UseBannersOptions = BannersQueryParams &
   Omit<
@@ -39,9 +39,9 @@ export function useBanners(options?: UseBannersOptions) {
       ? { active, isPrimary, limit, page, type }
       : undefined;
 
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    // Don't run query if no auth token (prevents 401 errors on mount)
-    enabled: queryOptions?.enabled !== false && !!storage.get("auth_token", ""),
+    enabled: queryOptions?.enabled !== false && isAuthenticated,
     // @ts-expect-error - keepPreviousData exists in v4
     keepPreviousData: true,
     queryFn: () => bannersService.getAll(filters),
@@ -57,6 +57,7 @@ export function useBanners(options?: UseBannersOptions) {
 export function useInfiniteBanners(
   params: Omit<BannersQueryParams, "page"> = {},
 ) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useInfiniteQuery<
     PaginationResponse<Banner>,
     Error,
@@ -64,7 +65,7 @@ export function useInfiniteBanners(
     ReturnType<typeof queryKeys.banners.list>,
     number
   >({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {
         return lastPage.pagination.page + 1;

@@ -44,7 +44,7 @@ export function BookingPage() {
   const selectedTime = form.watch("timeSlot");
 
   // Show loading while validating/redirecting
-  if (!isValidState || !selectedService) {
+  if (!isValidState) {
     return (
       <motion.div
         animate="animate"
@@ -109,49 +109,57 @@ export function BookingPage() {
           title="Đặt Lịch Hẹn"
         />
 
-        {/* Selected Service Summary */}
-        {selectedService && (
+        {/* Booking Item Summary — service (from Services page) or gallery item (from Lookbook) */}
+        {(selectedService || galleryItem) && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-8 rounded-[24px] border-2 border-primary bg-primary/5 p-6"
           >
             <p className="mb-3 font-sans text-sm font-medium text-muted-foreground">
-              Dịch Vụ Đã Chọn
+              {selectedService ? "Dịch Vụ Đã Chọn" : "Thiết Kế Đã Chọn"}
             </p>
 
             <div className="flex items-start gap-4">
-              {selectedService.imageUrl && (
+              {(selectedService?.imageUrl ?? galleryItem?.imageUrl) && (
                 <img
-                  src={selectedService.imageUrl}
-                  alt={selectedService.name}
-                  className="h-20 w-20 rounded-[12px] object-cover"
+                  src={selectedService?.imageUrl ?? galleryItem?.imageUrl}
+                  alt={selectedService?.name ?? galleryItem?.title}
+                  className="h-20 w-20 rounded-sm object-cover"
                 />
               )}
 
               <div className="flex-1">
                 <h3 className="mb-2 font-serif text-xl font-semibold text-foreground">
-                  {selectedService.name}
+                  {selectedService?.name ?? galleryItem?.title}
                 </h3>
 
                 <div className="flex flex-wrap gap-4 font-sans text-sm">
-                  <span className="font-bold text-primary">
-                    ${selectedService.price}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {selectedService.duration} phút
-                  </span>
+                  {selectedService ? (
+                    <>
+                      <span className="font-bold text-primary">${selectedService.price}</span>
+                      <span className="text-muted-foreground">{selectedService.duration} phút</span>
+                    </>
+                  ) : (
+                    <>
+                      {galleryItem?.price && (
+                        <span className="font-bold text-primary">{galleryItem.price}</span>
+                      )}
+                      {galleryItem?.duration && (
+                        <span className="text-muted-foreground">{galleryItem.duration}</span>
+                      )}
+                    </>
+                  )}
                 </div>
 
-                {selectedService.description && (
+                {(selectedService?.description ?? galleryItem?.description) && (
                   <p className="mt-2 font-sans text-sm text-muted-foreground">
-                    {selectedService.description}
+                    {selectedService?.description ?? galleryItem?.description}
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Optional: Change Service Link */}
             <div className="mt-4 border-t border-border pt-4">
               <Link
                 to="/gallery"
@@ -205,44 +213,17 @@ export function BookingPage() {
                   Chọn Ngày & Giờ
                 </h3>
 
-                {/* Selected Service Summary */}
-                {selectedService && (
-                  <div className="mb-6 space-y-4">
-                    {/* Gallery Item Preview (if coming from gallery) */}
-                    {galleryItem && (
-                      <div className="rounded-[16px] border-2 border-secondary bg-card p-3">
-                        <div className="flex gap-4">
-                          <div className="flex-shrink-0">
-                            <img
-                              src={galleryItem.imageUrl}
-                              alt={galleryItem.title}
-                              className="h-20 w-20 rounded-[12px] object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <p className="mb-1 font-sans text-xs text-muted-foreground">
-                              Thiết Kế Đã Chọn
-                            </p>
-                            <h4 className="mb-1 font-serif text-base font-semibold text-foreground">
-                              {galleryItem.title}
-                            </h4>
-                            {galleryItem.description && (
-                              <p className="font-sans text-xs text-muted-foreground">
-                                {galleryItem.description}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Service Summary */}
-                    <div className="rounded-[12px] border border-border bg-background p-4">
+                {/* Booking item summary (service or gallery item) */}
+                {(selectedService || galleryItem) && (
+                  <div className="mb-6">
+                    <div className="rounded-sm border border-border bg-background p-4">
                       <p className="mb-1 font-sans text-sm text-muted-foreground">
-                        Dịch Vụ Đã Chọn
+                        {selectedService ? "Dịch Vụ Đã Chọn" : "Thiết Kế Đã Chọn"}
                       </p>
                       <p className="font-sans text-lg font-semibold text-foreground">
-                        {selectedService.name} - ${selectedService.price}
+                        {selectedService
+                          ? `${selectedService.name} - $${selectedService.price}`
+                          : galleryItem?.title}
                       </p>
                     </div>
                   </div>
@@ -289,7 +270,7 @@ export function BookingPage() {
                                 type="button"
                                 onClick={() => handleTimeSelect(time)}
                                 className={cn(
-                                  "rounded-[12px] border-2 px-3 py-2.5 font-sans text-sm font-medium transition-all duration-200",
+                                  "rounded-sm border-2 px-3 py-2.5 font-sans text-sm font-medium transition-all duration-200",
                                   selectedTime === time
                                     ? "border-primary bg-primary text-primary-foreground shadow-sm"
                                     : "border-border bg-card text-foreground hover:border-primary",
@@ -364,7 +345,7 @@ export function BookingPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="font-sans text-sm font-medium text-foreground">
-                            Email *
+                            Email
                           </FormLabel>
                           <FormControl>
                             <Input
@@ -411,7 +392,7 @@ export function BookingPage() {
               size="lg"
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="rounded-[12px] flex-shrink-0"
+              className="rounded-sm shrink-0"
             >
               <ChevronLeft className="size-4 sm:size-5" />
               <span className="hidden sm:inline">Quay Lại</span>
@@ -422,7 +403,7 @@ export function BookingPage() {
                 size="lg"
                 onClick={handleNext}
                 disabled={!canProceed()}
-                className="rounded-[12px] flex-1 sm:flex-initial"
+                className="rounded-sm flex-1 sm:flex-initial"
               >
                 <span className="sm:inline">Tiếp Theo</span>
                 <ChevronRight className="size-4 sm:size-5" />
@@ -432,7 +413,7 @@ export function BookingPage() {
                 size="lg"
                 onClick={onSubmit}
                 disabled={!canProceed() || isPending}
-                className="rounded-[12px] flex-1 sm:flex-initial text-xs sm:text-base"
+                className="rounded-sm flex-1 sm:flex-initial text-xs sm:text-base"
               >
                 {isPending ? (
                   <>

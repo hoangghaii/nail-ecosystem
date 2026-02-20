@@ -7,9 +7,7 @@ export type User = {
 };
 
 export type AuthResponse = {
-  accessToken: string;
   admin: User;
-  refreshToken: string;
 };
 
 export type LoginCredentials = {

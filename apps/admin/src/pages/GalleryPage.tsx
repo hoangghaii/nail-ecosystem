@@ -23,7 +23,6 @@ export function GalleryPage() {
   const [activeTab, setActiveTab] = useState<TabValue>("items");
 
   const { data: shapesData } = useNailShapes();
-  console.log("🚀 ~ GalleryPage ~ shapesData:", shapesData)
   const { data: stylesData } = useNailStyles();
   const nailShapes = useMemo(() => shapesData?.data ?? [], [shapesData]);
   const nailStyles = useMemo(() => stylesData?.data ?? [], [stylesData]);
@@ -86,9 +85,9 @@ export function GalleryPage() {
         <TabsContent value="categories" className="space-y-6">
           <GalleryCategoriesTab
             categories={[]}
-            onCreateCategory={() => {}}
-            onDeleteCategory={() => {}}
-            onEditCategory={() => {}}
+            onCreateCategory={() => { }}
+            onDeleteCategory={() => { }}
+            onEditCategory={() => { }}
           />
         </TabsContent>
       </Tabs>

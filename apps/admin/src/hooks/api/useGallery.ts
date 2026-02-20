@@ -17,7 +17,7 @@ import {
   galleryService,
   type GalleriesQueryParams,
 } from "@/services/gallery.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 type UseGalleriesOptions = GalleriesQueryParams &
   Omit<
@@ -45,8 +45,9 @@ export function useGalleryItems(options?: UseGalleriesOptions) {
       ? { featured, isActive, limit, nailShape, nailStyle, page, search }
       : undefined;
 
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    enabled: queryOptions.enabled !== false && !!storage.get("auth_token", ""),
+    enabled: queryOptions.enabled !== false && isAuthenticated,
     // @ts-expect-error - keepPreviousData exists in v4
     keepPreviousData: true, // Show old data while fetching new (smooth UX)
     queryFn: () => galleryService.getAll(filters),
@@ -62,6 +63,7 @@ export function useGalleryItems(options?: UseGalleriesOptions) {
 export function useInfiniteGalleryItems(
   params: Omit<GalleriesQueryParams, "page"> = {},
 ) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useInfiniteQuery<
     PaginationResponse<GalleryItem>,
     Error,
@@ -69,7 +71,7 @@ export function useInfiniteGalleryItems(
     ReturnType<typeof queryKeys.gallery.list>,
     number
   >({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {
         return lastPage.pagination.page + 1;

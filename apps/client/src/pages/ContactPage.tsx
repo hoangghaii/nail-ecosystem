@@ -1,3 +1,5 @@
+import { lazy, Suspense } from "react";
+
 import { motion } from "motion/react";
 
 import { ContactForm } from "@/components/contact/contact-form";
@@ -8,6 +10,12 @@ import { useBusinessInfo } from "@/hooks/api/useBusinessInfo";
 import { useContactPage } from "@/hooks/useContactPage";
 import { getTransition, pageVariants } from "@/utils/animations";
 import { transformBusinessInfo } from "@/utils/businessInfo";
+
+const SalonMap = lazy(() =>
+  import("@/components/contact/salon-map").then((m) => ({
+    default: m.SalonMap,
+  })),
+);
 
 export function ContactPage() {
   useContactPage();
@@ -101,6 +109,26 @@ export function ContactPage() {
           {/* Contact Form */}
           <ContactForm />
         </div>
+
+        {/* Map */}
+        {businessInfoData && (
+          <div className="mt-12">
+            <h2 className="mb-6 font-serif text-2xl font-semibold text-foreground">
+              Tìm Chúng Tôi
+            </h2>
+            <Suspense
+              fallback={
+                <div className="h-80 animate-pulse rounded-[24px] border border-border bg-card sm:h-96" />
+              }
+            >
+              <SalonMap
+                address={businessInfoData.address}
+                latitude={businessInfoData.latitude}
+                longitude={businessInfoData.longitude}
+              />
+            </Suspense>
+          </div>
+        )}
       </div>
     </motion.div>
   );

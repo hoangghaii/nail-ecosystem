@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Request } from 'express';
 import { AuthService } from '../auth.service';
 
 @Injectable()
@@ -15,7 +16,9 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new Error('JWT access secret not configured');
     }
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => req?.cookies?.nail_admin_access_token ?? null,
+      ]),
       secretOrKey: secret,
       ignoreExpiration: false,
     });

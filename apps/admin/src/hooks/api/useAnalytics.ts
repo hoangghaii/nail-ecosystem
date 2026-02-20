@@ -10,14 +10,15 @@ import { queryKeys } from '@repo/utils/api';
 import { useQuery } from '@tanstack/react-query';
 
 import { analyticsService } from '@/services/analytics.service';
-import { storage } from '@/services/storage.service';
+import { useAuthStore } from '@/store/authStore';
 
 /**
  * Query: Get profit analytics
  */
 export function useProfitAnalytics(params: ProfitQueryParams) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery<ProfitAnalytics, Error>({
-    enabled: !!storage.get('auth_token', '') && !!params.startDate && !!params.endDate,
+    enabled: isAuthenticated && !!params.startDate && !!params.endDate,
     queryFn: () => analyticsService.getProfit(params),
     queryKey: queryKeys.analytics.profit(params),
     staleTime: 60_000, // 60s cache for aggregated data

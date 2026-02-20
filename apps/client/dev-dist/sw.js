@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-d587bca8'], (function (workbox) { 'use strict';
+define(['./workbox-e735f606'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -82,7 +82,7 @@ define(['./workbox-d587bca8'], (function (workbox) { 'use strict';
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
     "url": "index.html",
-    "revision": "0.pir72pgv7fc"
+    "revision": "0.0r1qd22prig"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
@@ -90,21 +90,21 @@ define(['./workbox-d587bca8'], (function (workbox) { 'use strict';
   }));
   workbox.registerRoute(/^https:\/\/res\.cloudinary\.com\/.*/i, new workbox.CacheFirst({
     "cacheName": "cloudinary-images",
-    plugins: [new workbox.ExpirationPlugin({
-      maxEntries: 100,
-      maxAgeSeconds: 604800
-    }), new workbox.CacheableResponsePlugin({
+    plugins: [new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
+    }), new workbox.ExpirationPlugin({
+      maxAgeSeconds: 604800,
+      maxEntries: 100
     })]
   }), 'GET');
   workbox.registerRoute(/\/api\/(gallery|services)/, new workbox.NetworkFirst({
     "cacheName": "api-responses",
     "networkTimeoutSeconds": 5,
-    plugins: [new workbox.ExpirationPlugin({
-      maxEntries: 50,
-      maxAgeSeconds: 86400
-    }), new workbox.CacheableResponsePlugin({
+    plugins: [new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
+    }), new workbox.ExpirationPlugin({
+      maxAgeSeconds: 86400,
+      maxEntries: 50
     })]
   }), 'GET');
 

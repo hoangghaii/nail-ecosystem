@@ -17,7 +17,7 @@ import {
   bookingsService,
   type BookingsQueryParams,
 } from "@/services/bookings.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 type UseBookingsOptions = BookingsQueryParams &
   Omit<
@@ -54,8 +54,9 @@ export function useBookings(options?: UseBookingsOptions) {
       ? { date, limit, page, search, serviceId, sortBy, sortOrder, status }
       : undefined;
 
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    enabled: queryOptions.enabled !== false && !!storage.get("auth_token", ""),
+    enabled: queryOptions.enabled !== false && isAuthenticated,
     // @ts-expect-error - keepPreviousData exists in v4
     keepPreviousData: true, // Show old data while fetching new (smooth UX)
     queryFn: () => bookingsService.getAll(filters),
@@ -74,6 +75,7 @@ export function useBookings(options?: UseBookingsOptions) {
 export function useInfiniteBookings(
   params: Omit<BookingsQueryParams, "page"> = {},
 ) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useInfiniteQuery<
     PaginationResponse<Booking>,
     Error,
@@ -81,7 +83,7 @@ export function useInfiniteBookings(
     ReturnType<typeof queryKeys.bookings.list>,
     number
   >({
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {
         return lastPage.pagination.page + 1;

@@ -18,7 +18,7 @@ import {
 import { toast } from 'sonner';
 
 import { expenseService } from '@/services/expense.service';
-import { storage } from '@/services/storage.service';
+import { useAuthStore } from '@/store/authStore';
 
 type UseExpensesOptions = ExpenseQueryParams &
   Omit<
@@ -46,8 +46,9 @@ export function useExpenses(options?: UseExpensesOptions) {
       ? { category, endDate, limit, page, sortBy, sortOrder, startDate }
       : undefined;
 
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    enabled: queryOptions.enabled !== false && !!storage.get('auth_token', ''),
+    enabled: queryOptions.enabled !== false && isAuthenticated,
     queryFn: () => expenseService.getAll(filters),
     queryKey: queryKeys.expenses.list(filters),
     staleTime: 30_000,
@@ -61,6 +62,7 @@ export function useExpenses(options?: UseExpensesOptions) {
 export function useInfiniteExpenses(
   params: Omit<ExpenseQueryParams, 'page'> = {},
 ) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useInfiniteQuery<
     ExpenseResponse,
     Error,
@@ -68,7 +70,7 @@ export function useInfiniteExpenses(
     ReturnType<typeof queryKeys.expenses.list>,
     number
   >({
-    enabled: !!storage.get('auth_token', ''),
+    enabled: isAuthenticated,
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.page < lastPage.pagination.totalPages) {
         return lastPage.pagination.page + 1;

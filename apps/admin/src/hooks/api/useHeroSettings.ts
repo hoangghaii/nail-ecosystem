@@ -5,15 +5,15 @@ import { toast } from "sonner";
 import type { HeroSettings } from "@/types/heroSettings.types";
 
 import { heroSettingsService } from "@/services/heroSettings.service";
-import { storage } from "@/services/storage.service";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Query: Get hero settings (singleton)
  */
 export function useHeroSettings() {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   return useQuery({
-    // Don't run query if no auth token (prevents 401 errors on mount)
-    enabled: !!storage.get("auth_token", ""),
+    enabled: isAuthenticated,
     queryFn: () => heroSettingsService.getSettings(),
     queryKey: queryKeys.heroSettings.detail(),
   });
