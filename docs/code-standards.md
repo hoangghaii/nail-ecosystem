@@ -145,7 +145,7 @@ export default {
      }
    }
    ```
-3. Run `npm run type-check` from root to verify all apps
+3. Run `pnpm run type-check` from root to verify all apps
 4. Apps auto-import updated types (no changes needed)
 
 ### Adding New Utilities
@@ -165,18 +165,18 @@ export default {
 
 ```bash
 # Build all apps (respects dependency graph)
-npm run build
+pnpm run build
 
 # Type-check all apps (parallel)
-npm run type-check
+pnpm run type-check
 
 # Lint all apps (parallel)
-npm run lint
+pnpm run lint
 
 # Build specific app only
-npx turbo build --filter=client
-npx turbo build --filter=admin
-npx turbo build --filter=api
+pnpm exec turbo build --filter=client
+pnpm exec turbo build --filter=admin
+pnpm exec turbo build --filter=api
 ```
 
 ### Package Dependencies
@@ -416,13 +416,13 @@ fix(types,api): align booking status types
 **Commands**:
 ```bash
 # Full build: 7s
-npm run build
+pnpm run build
 
 # Cached build: 89ms (FULL TURBO)
-npm run build
+pnpm run build
 
 # Clear cache if needed
-npm run clean
+pnpm run clean
 ```
 
 ---

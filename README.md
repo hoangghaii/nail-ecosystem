@@ -12,17 +12,20 @@ Complete nail salon business management system built with React, NestJS, and Mon
 ## Project Status
 
 **Client App (Customer Website)**: ✅ **100% API Integrated**
+
 - All pages connected to backend API (services, gallery, bookings, contacts)
 - Performance optimized (prefetching, lazy loading, mobile caching)
 - Loading states + error handling complete
 - Production-ready
 
 **Admin App (Dashboard)**: ✅ Complete
+
 - Gallery, Services, Bookings, Contacts, Banners management
 - Infinite scroll, search, filters
 - Real-time data with TanStack Query
 
 **Backend API**: ✅ Complete
+
 - RESTful endpoints (services, gallery, bookings, contacts, banners)
 - MongoDB + Redis caching
 - JWT authentication
@@ -73,17 +76,19 @@ pink-nail-salon/
 ### Prerequisites
 
 - Node.js >= 20.0.0
-- npm >= 9.0.0
+- pnpm >= 10.0.0 (`corepack enable && corepack use pnpm@10.30.0`)
 - Docker + Docker Compose (for containerized deployment)
+
+> **Note**: This project uses pnpm. Run `corepack enable` once on your machine, then `pnpm install`. Do not run `npm install`.
 
 ### Development (Local)
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Run all apps in parallel
-npm run dev
+pnpm run dev
 
 # Access:
 # Client: http://localhost:5173
@@ -122,39 +127,40 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 ```bash
 # Build all apps (7s full, 89ms cached)
-npm run build
+pnpm run build
 
 # Run all apps in dev mode
-npm run dev
+pnpm run dev
 
 # Type-check all apps (3.9s)
-npm run type-check
+pnpm run type-check
 
 # Lint all apps
-npm run lint
+pnpm run lint
 
 # Clean all caches
-npm run clean
+pnpm run clean
 
 # Format code
-npm run format
+pnpm run format
 ```
 
 ### Filtered Commands
 
 ```bash
 # Build specific app
-npx turbo build --filter=client
-npx turbo build --filter=admin
-npx turbo build --filter=api
+pnpm exec turbo build --filter=client
+pnpm exec turbo build --filter=admin
+pnpm exec turbo build --filter=api
 
 # Run specific app
-npx turbo dev --filter=client
+pnpm exec turbo dev --filter=client
 ```
 
 ## Tech Stack
 
 ### Frontend (Client + Admin)
+
 - React 19.2 + TypeScript 5.9
 - Vite 7.2 (SWC compiler)
 - Tailwind CSS v4
@@ -164,6 +170,7 @@ npx turbo dev --filter=client
 - Motion (animations)
 
 ### Backend (API)
+
 - NestJS 11 + TypeScript 5.7
 - MongoDB + Mongoose
 - Redis + ioredis
@@ -173,20 +180,23 @@ npx turbo dev --filter=client
 - class-validator + class-transformer
 
 ### DevOps
+
 - Turborepo 2.3 (build system)
 - Docker + Docker Compose
 - Nginx (production proxy)
-- npm workspaces
+- pnpm workspaces
 
 ## Design Systems
 
 **Client (Customer Website)**:
+
 - Warm, cozy, feminine aesthetic
 - Soft neutrals (beige, cream, warm grays)
 - Border-based design (NO shadows)
 - Organic shapes
 
 **Admin (Dashboard)**:
+
 - Professional, clean, modern
 - Blue theme (shadcn/ui style)
 - Glassmorphism with shadows
@@ -197,12 +207,14 @@ npx turbo dev --filter=client
 ## Environment Variables
 
 ### Client (`apps/client/.env`)
+
 ```env
 VITE_API_BASE_URL=http://localhost:3000  # Dev
 VITE_API_BASE_URL=/api                    # Prod
 ```
 
 ### Admin (`apps/admin/.env`)
+
 ```env
 VITE_API_BASE_URL=http://localhost:3000  # Dev
 VITE_USE_MOCK_API=true                    # Dev with mock data
@@ -211,6 +223,7 @@ VITE_USE_MOCK_API=false                   # Prod with real API
 ```
 
 ### API (`apps/api/.env`)
+
 ```env
 MONGODB_URI=mongodb://localhost:27017/nail-salon
 REDIS_URL=redis://localhost:6379
@@ -224,16 +237,19 @@ CLOUDINARY_API_SECRET=your-secret
 ## Docker Configuration
 
 ### Compose Files
+
 - `docker-compose.yml`: Base service definitions
 - `docker-compose.dev.yml`: Development overrides (hot-reload, volume mounts)
 - `docker-compose.prod.yml`: Production overrides (nginx, resource limits)
 
 ### Multi-Stage Builds
+
 - **Client/Admin**: base → deps → dev → builder → production (nginx)
 - **API**: base → deps → dev → builder → prod-deps → production
 
 ### Key Features
-- BuildKit cache mounts for faster builds
+
+- BuildKit cache mounts for faster builds (`/root/.local/share/pnpm/store`)
 - Non-root users (uid 1001)
 - Health checks + startup dependencies
 - Log rotation
@@ -242,6 +258,7 @@ CLOUDINARY_API_SECRET=your-secret
 ## Project Documentation
 
 ### Core Docs
+
 - `./docs/project-overview-pdr.md` - Product requirements & architecture
 - `./docs/code-standards.md` - Coding conventions & best practices
 - `./docs/system-architecture.md` - Infrastructure & components
@@ -249,6 +266,7 @@ CLOUDINARY_API_SECRET=your-secret
 - `./docs/api-endpoints.md` - REST API reference
 
 ### Additional Docs
+
 - `./docs/design-guidelines.md` - UI/UX design systems
 - `./docs/deployment-guide.md` - Production deployment
 - `./docs/project-roadmap.md` - Feature planning
@@ -256,6 +274,7 @@ CLOUDINARY_API_SECRET=your-secret
 - `./MIGRATION-SUMMARY.md` - Turborepo migration details
 
 ### Scout Reports
+
 - `./plans/scout-reports/` - Comprehensive project documentation
   - `executive-summary.md` - High-level overview
   - `apps/` - Detailed app breakdowns
@@ -288,13 +307,13 @@ import { useDebounce } from "@repo/utils/hooks";
 
 ```bash
 # Type-check all apps
-npm run type-check
+pnpm run type-check
 
 # Build all apps (tests integration)
-npm run build
+pnpm run build
 
 # Lint all apps
-npm run lint
+pnpm run lint
 ```
 
 ### Docker Testing
@@ -316,12 +335,14 @@ docker exec -it [container-name] sh
 ## Performance
 
 ### Build Metrics
+
 - **Full build**: 7s (all apps)
 - **Cached build**: 89ms (FULL TURBO)
 - **Type-check**: 3.9s (all apps)
 - **Cache hit rate**: 100% on repeat builds
 
 ### Migration Results
+
 - **Type duplication**: 100% → 0%
 - **Build speed**: 79x faster with caching
 - **Code sharing**: 7 shared packages
@@ -329,6 +350,7 @@ docker exec -it [container-name] sh
 ## Troubleshooting
 
 ### Port Conflicts
+
 ```bash
 # Find process using port
 lsof -i :5173  # Client
@@ -340,18 +362,20 @@ kill -9 <PID>
 ```
 
 ### Type Errors
+
 ```bash
 # Rebuild all packages
-npm run build
+pnpm run build
 
 # Check type-check output
-npm run type-check
+pnpm run type-check
 
 # Verify shared types synced
 cat packages/types/src/*.ts
 ```
 
 ### Docker Issues
+
 ```bash
 # Clean build cache
 docker builder prune -a
@@ -367,12 +391,13 @@ docker compose restart [service-name]
 ```
 
 ### Turbo Cache Issues
+
 ```bash
 # Clear Turbo cache
-npm run clean
+pnpm run clean
 
 # Rebuild from scratch
-npm run clean && npm run build
+pnpm run clean && pnpm run build
 ```
 
 ## API Routes (Production Nginx)
@@ -387,24 +412,26 @@ npm run clean && npm run build
 ## Contributing
 
 ### Code Standards
+
 - Follow YAGNI + KISS + DRY principles
 - Use TypeScript strict mode
 - Follow project design systems (client vs admin)
 - Write clear commit messages
 
 ### Before Committing
+
 ```bash
 # Type-check
-npm run type-check
+pnpm run type-check
 
 # Lint
-npm run lint
+pnpm run lint
 
 # Format
-npm run format
+pnpm run format
 
 # Build
-npm run build
+pnpm run build
 ```
 
 ## License
@@ -414,8 +441,8 @@ Private - Pink Nail Salon Business
 ## Version
 
 **Current Version**: 0.1.0
-**Last Updated**: 2025-12-31
-**Migration Status**: Complete (Turborepo)
+**Last Updated**: 2026-02-20
+**Migration Status**: Complete (Turborepo + pnpm)
 
 ## Support
 

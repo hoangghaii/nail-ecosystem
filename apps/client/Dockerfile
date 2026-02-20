@@ -6,13 +6,16 @@ FROM node:24.12.0-alpine AS base
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
+# Enable pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@10.30.0 --activate
+
 WORKDIR /app
 
-# Copy workspace package files
-COPY package*.json ./
+# Copy workspace manifests (order matters for layer caching)
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY turbo.json ./
 
-# Copy all workspace packages manifests
+# Copy all workspace package manifests
 COPY packages/types/package.json ./packages/types/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
@@ -21,16 +24,21 @@ COPY packages/tailwind-config/package.json ./packages/tailwind-config/
 COPY tooling/prettier-config/package.json ./tooling/prettier-config/
 
 # Copy client package.json
-COPY apps/client/package*.json ./apps/client/
+COPY apps/client/package.json ./apps/client/
 
 # ==========================================
-# DEPENDENCIES LAYER - Shared Dependencies
+# DEPENDENCIES LAYER - Fetch packages
 # ==========================================
 FROM base AS dependencies
 
-# Install ALL dependencies from root
-RUN --mount=type=cache,target=/root/.npm \
-  npm ci --ignore-scripts
+# Fetch: download tarballs to virtual store (no node_modules yet)
+# This layer only re-runs when pnpm-lock.yaml changes
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm fetch
+
+# Install from virtual store (offline — no network needed)
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm install --frozen-lockfile --offline
 
 # ==========================================
 # DEVELOPMENT LAYER
@@ -55,7 +63,7 @@ USER viteuser
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+CMD ["pnpm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 # ==========================================
 # BUILDER LAYER
@@ -68,7 +76,7 @@ COPY . .
 WORKDIR /app
 
 # Build the application using Turbo
-RUN npm run build -- --filter=client
+RUN pnpm run build -- --filter=client
 
 # ==========================================
 # PRODUCTION LAYER - Nginx Serving Static Files

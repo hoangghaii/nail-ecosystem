@@ -102,7 +102,7 @@ All important docs are in `./docs` folder:
 
 ### DevOps & Build System
 - Turborepo 2.3 (build orchestration, caching)
-- npm workspaces (dependency management)
+- pnpm workspaces + pnpm 10.30.0 (dependency management)
 - Docker + Docker Compose + Nginx
 - Health checks + logging
 - Ready for GitHub Actions CI/CD
@@ -173,10 +173,10 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 **Turborepo Commands**:
 ```bash
-npm run dev        # Run all apps in parallel
-npm run build      # Build all apps (7s full, 89ms cached)
-npm run type-check # Type-check all apps
-npm run lint       # Lint all apps
+pnpm run dev        # Run all apps in parallel
+pnpm run build      # Build all apps (7s full, 89ms cached)
+pnpm run type-check # Type-check all apps
+pnpm run lint       # Lint all apps
 ```
 
 ---
@@ -185,10 +185,10 @@ npm run lint       # Lint all apps
 
 ### Turborepo Workflow
 
-**All apps**: `npm run dev` (run from root, parallel execution)
-**Single app**: `npx turbo dev --filter=client|admin|api`
-**Build**: `npm run build` (7s full, 89ms cached with Turbo)
-**Type-check**: `npm run type-check` (all apps in parallel)
+**All apps**: `pnpm run dev` (run from root, parallel execution)
+**Single app**: `pnpm exec turbo dev --filter=client|admin|api`
+**Build**: `pnpm run build` (7s full, 89ms cached with Turbo)
+**Type-check**: `pnpm run type-check` (all apps in parallel)
 
 ### Working with Shared Packages
 
@@ -287,8 +287,8 @@ docker compose ps && docker compose logs -f nginx
 **Port conflicts**: `lsof -i :{5173,5174,3000} && kill -9 <PID>`
 **Hot-reload**: Check `CHOKIDAR_USEPOLLING=true` in docker-compose.dev.yml
 **API connection**: `docker compose ps && docker compose logs nail-api`
-**Type errors**: `npm run type-check` + verify @repo/types imports
-**Turbo cache**: `npm run clean` to clear Turbo cache
+**Type errors**: `pnpm run type-check` + verify @repo/types imports
+**Turbo cache**: `pnpm run clean` to clear Turbo cache
 **Docker build**: `docker builder prune -a && docker compose build --no-cache`
 
 ---
@@ -312,7 +312,7 @@ If change affects multiple apps:
 1. **Plan the change** across all affected apps
 2. **Update shared packages** first (types, utils, configs)
 3. **Implement in order**: API → Admin → Client
-4. **Verify with Turbo**: `npm run type-check && npm run build`
+4. **Verify with Turbo**: `pnpm run type-check && pnpm run build`
 5. **Test integration** with Docker Compose
 6. **Update documentation** when adding shared packages
 
@@ -322,8 +322,8 @@ When modifying packages/* or tooling/*:
 
 1. **Update package** in packages/[name]/
 2. **Verify all apps** use updated package correctly
-3. **Type-check**: `npm run type-check` (validates all apps)
-4. **Build**: `npm run build` (tests integration)
+3. **Type-check**: `pnpm run type-check` (validates all apps)
+4. **Build**: `pnpm run build` (tests integration)
 5. **Document changes** in package README if adding features
 
 ---
@@ -336,10 +336,10 @@ When modifying packages/* or tooling/*:
 
 **Turborepo Commands**:
 ```bash
-# Dev all: npm run dev
-# Build all: npm run build (7s full, 89ms cached)
-# Type-check: npm run type-check
-# Single app: npx turbo dev --filter=client|admin|api
+# Dev all: pnpm run dev
+# Build all: pnpm run build (7s full, 89ms cached)
+# Type-check: pnpm run type-check
+# Single app: pnpm exec turbo dev --filter=client|admin|api
 ```
 
 **Docker Commands**:
@@ -351,8 +351,9 @@ When modifying packages/* or tooling/*:
 
 ---
 
-**Last Updated**: 2025-12-31
+**Last Updated**: 2026-02-20
 **Project Status**: Production-ready Turborepo monorepo
 **Current Version**: 0.1.0
-**Migration**: Turborepo complete (7/7 phases)
+**Migration**: Turborepo complete (7/7 phases) + npm→pnpm complete
+**Package Manager**: pnpm@10.30.0
 **Build Performance**: 7s full / 89ms cached (79x faster)

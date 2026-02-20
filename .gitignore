@@ -27,9 +27,9 @@ dist-ssr
 *.sln
 *.sw?
 
-!package-lock.json
+# Lock files from other package managers (ignore if accidentally generated)
+package-lock.json
 yarn.lock
-pnpm-lock.yaml
 .env
 .env.test
 .env.production

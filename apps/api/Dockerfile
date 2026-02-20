@@ -6,13 +6,16 @@ FROM node:20.18.2-alpine AS base
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
+# Enable pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@10.30.0 --activate
+
 WORKDIR /app
 
-# Copy workspace package files
-COPY package*.json ./
+# Copy workspace manifests (order matters for layer caching)
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY turbo.json ./
 
-# Copy all workspace packages manifests
+# Copy all workspace package manifests
 COPY packages/types/package.json ./packages/types/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
@@ -20,16 +23,21 @@ COPY packages/eslint-config/package.json ./packages/eslint-config/
 COPY tooling/prettier-config/package.json ./tooling/prettier-config/
 
 # Copy API package.json
-COPY apps/api/package*.json ./apps/api/
+COPY apps/api/package.json ./apps/api/
 
 # ==========================================
 # DEPENDENCIES LAYER - Shared Dependencies
 # ==========================================
 FROM base AS dependencies
 
-# Install ALL dependencies from root
-RUN --mount=type=cache,target=/root/.npm \
-  npm ci --ignore-scripts
+# Fetch: download tarballs to virtual store (no node_modules yet)
+# This layer only re-runs when pnpm-lock.yaml changes
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm fetch
+
+# Install from virtual store (offline — no network needed)
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm install --frozen-lockfile --offline
 
 # ==========================================
 # DEVELOPMENT LAYER
@@ -54,7 +62,7 @@ USER nestjs
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD ["npm", "run", "start:dev"]
+CMD ["pnpm", "run", "start:dev"]
 
 # ==========================================
 # BUILD LAYER - Compile TypeScript
@@ -67,16 +75,20 @@ COPY . .
 WORKDIR /app
 
 # Build the application using Turbo
-RUN npm run build -- --filter=api
+RUN pnpm run build -- --filter=api
 
 # ==========================================
 # PRODUCTION DEPENDENCIES LAYER
 # ==========================================
 FROM base AS production-deps
 
-# Install production dependencies only
-RUN --mount=type=cache,target=/root/.npm \
-  npm ci --ignore-scripts --omit=dev
+# Fetch prod-only tarballs
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm fetch --prod
+
+# Install prod deps only from virtual store
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+  pnpm install --frozen-lockfile --offline --prod
 
 # ==========================================
 # PRODUCTION LAYER - Final production image
@@ -97,7 +109,7 @@ COPY --from=production-deps --chown=nestjs:nodejs /app/node_modules ./node_modul
 
 # Copy built application
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./dist
-COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package*.json ./
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./
 
 # Switch to non-root user
 USER nestjs

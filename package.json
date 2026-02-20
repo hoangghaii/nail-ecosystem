@@ -2,11 +2,6 @@
   "name": "pink-nail-salon",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "tooling/*"
-  ],
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -22,7 +17,7 @@
   },
   "engines": {
     "node": ">=20.0.0",
-    "npm": ">=9.0.0"
+    "pnpm": ">=10.0.0"
   },
-  "packageManager": "npm@11.7.0"
+  "packageManager": "pnpm@10.30.0"
 }
