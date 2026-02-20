@@ -2,14 +2,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type GalleryImageFieldProps = {
-  isEditMode: boolean;
   imagePreview: string;
+  isEditMode: boolean;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export function GalleryImageField({
-  isEditMode,
   imagePreview,
+  isEditMode,
   onFileChange,
 }: GalleryImageFieldProps) {
   return (

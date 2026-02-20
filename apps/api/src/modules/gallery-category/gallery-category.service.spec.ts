@@ -12,7 +12,7 @@ import { GalleryCategory } from './schemas/gallery-category.schema';
 describe('GalleryCategoryService', () => {
   let service: GalleryCategoryService;
   let model: Model<GalleryCategory>;
-  let galleryModel: Model<any>;
+  let _galleryModel: Model<any>;
 
   const mockCategory = {
     _id: new Types.ObjectId(),
@@ -59,7 +59,7 @@ describe('GalleryCategoryService', () => {
     model = module.get<Model<GalleryCategory>>(
       getModelToken(GalleryCategory.name),
     );
-    galleryModel = module.get<Model<any>>(getModelToken('Gallery'));
+    _galleryModel = module.get<Model<any>>(getModelToken('Gallery'));
   });
 
   afterEach(() => {
@@ -99,7 +99,7 @@ describe('GalleryCategoryService', () => {
       const dto = { name: 'Nail Art' };
       const savedCategory = { ...mockCategory, ...dto, slug: 'nail-art' };
 
-      (model as any).mockImplementationOnce((data: any) => ({
+      (model as any).mockImplementationOnce((_data: any) => ({
         save: jest.fn().mockResolvedValue(savedCategory),
       }));
 
@@ -112,7 +112,7 @@ describe('GalleryCategoryService', () => {
       const dto = { name: 'Nail Art', slug: 'custom-slug' };
       const savedCategory = { ...mockCategory, ...dto };
 
-      (model as any).mockImplementationOnce((data: any) => ({
+      (model as any).mockImplementationOnce((_data: any) => ({
         save: jest.fn().mockResolvedValue(savedCategory),
       }));
 
@@ -125,7 +125,7 @@ describe('GalleryCategoryService', () => {
       const dto = { name: 'Nail Art' };
       const error: any = { code: 11000, keyPattern: { name: 1 } };
 
-      (model as any).mockImplementationOnce((data: any) => ({
+      (model as any).mockImplementationOnce((_data: any) => ({
         save: jest.fn().mockRejectedValue(error),
       }));
 
@@ -136,7 +136,7 @@ describe('GalleryCategoryService', () => {
       const dto = { name: 'Nail Art', slug: 'existing-slug' };
       const error: any = { code: 11000, keyPattern: { slug: 1 } };
 
-      (model as any).mockImplementationOnce((data: any) => ({
+      (model as any).mockImplementationOnce((_data: any) => ({
         save: jest.fn().mockRejectedValue(error),
       }));
 

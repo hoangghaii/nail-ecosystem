@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Contact, ContactDocument } from './schemas/contact.schema';
 import { CreateContactDto } from './dto/create-contact.dto';
-import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
+import { ContactStatus, UpdateContactStatusDto } from './dto/update-contact-status.dto';
 import {
   QueryContactsDto,
   ContactSortField,
@@ -131,7 +131,7 @@ export class ContactsService {
       updateData.adminNotes = updateContactStatusDto.adminNotes;
     }
 
-    if (updateContactStatusDto.status === 'responded') {
+    if (updateContactStatusDto.status === ContactStatus.RESPONDED) {
       updateData.respondedAt = new Date();
     }
 

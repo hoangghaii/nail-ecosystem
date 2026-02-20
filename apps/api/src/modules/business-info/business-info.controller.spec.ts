@@ -1,10 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BusinessInfoController } from './business-info.controller';
 import { BusinessInfoService } from './business-info.service';
-import {
-  UpdateBusinessInfoDto,
-  DayOfWeek,
-} from './dto/update-business-info.dto';
+import { UpdateBusinessInfoDto } from './dto/update-business-info.dto';
 
 describe('BusinessInfoController', () => {
   let controller: BusinessInfoController;

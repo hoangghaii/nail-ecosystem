@@ -13,7 +13,6 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-
 import {
   galleryService,
   type GalleriesQueryParams,

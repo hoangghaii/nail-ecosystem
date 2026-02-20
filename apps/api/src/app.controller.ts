@@ -1,11 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { SkipThrottle } from '@nestjs/throttler';
-import { AppService } from './app.service';
-import { Public } from './modules/auth/decorators/public.decorator';
+import { Controller, Get } from "@nestjs/common";
+import { SkipThrottle } from "@nestjs/throttler";
+import { AppService } from "./app.service";
+import { Public } from "./modules/auth/decorators/public.decorator";
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService) { }
 
   @Public()
   @Get()
@@ -15,10 +15,10 @@ export class AppController {
 
   @Public()
   @SkipThrottle()
-  @Get('health')
+  @Get("health")
   healthCheck() {
     return {
-      status: 'ok',
+      status: "ok",
       timestamp: new Date().toISOString(),
     };
   }

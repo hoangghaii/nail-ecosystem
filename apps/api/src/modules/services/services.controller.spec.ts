@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ServicesController } from './services.controller';
 import { ServicesService } from './services.service';
-import { CreateServiceDto, ServiceCategory } from './dto/create-service.dto';
+import { ServiceCategory } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { QueryServicesDto } from './dto/query-services.dto';
 import { StorageService } from '../storage/storage.service';

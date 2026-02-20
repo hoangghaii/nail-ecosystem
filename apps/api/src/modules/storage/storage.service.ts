@@ -6,7 +6,7 @@ import { v2 as cloudinary } from 'cloudinary';
 export class StorageService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
-  async onModuleInit() {
+  onModuleInit() {
     const cloudName = this.configService.get<string>('cloudinary.cloudName');
     const apiKey = this.configService.get<string>('cloudinary.apiKey');
     const apiSecret = this.configService.get<string>('cloudinary.apiSecret');
@@ -41,7 +41,7 @@ export class StorageService implements OnModuleInit {
         },
         (error, result) => {
           if (error) {
-            reject(error);
+            reject(new Error(error.message ?? 'Upload failed'));
           } else if (result) {
             resolve(result.secure_url);
           } else {

@@ -79,10 +79,10 @@ async function dropCollections() {
         await mongoose.connection.db.dropCollection(collection);
         logger.log(`   ✓ Dropped ${collection}`);
       }
-    } catch (error) {
+    } catch {
       // Collection doesn't exist, ignore
     }
   }
 }
 
-bootstrap();
+void bootstrap();

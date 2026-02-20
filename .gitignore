@@ -43,3 +43,5 @@ build
 # Backups
 *.backup
 .migration-baseline.txt
+# TypeScript incremental build cache
+.tmp/

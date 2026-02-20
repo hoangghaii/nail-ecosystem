@@ -31,8 +31,8 @@ export class GalleryCategoryService {
       .toLowerCase()
       .trim()
       .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/[^\w\-]+/g, '') // Remove non-word chars except hyphens
-      .replace(/\-\-+/g, '-') // Collapse multiple hyphens
+      .replace(/[^\w-]+/g, '') // Remove non-word chars except hyphens
+      .replace(/--+/g, '-') // Collapse multiple hyphens
       .replace(/^-+/, '') // Trim leading hyphens
       .replace(/-+$/, ''); // Trim trailing hyphens
   }

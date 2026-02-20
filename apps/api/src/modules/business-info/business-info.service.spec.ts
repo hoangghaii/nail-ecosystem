@@ -7,10 +7,7 @@ import {
   BusinessInfo,
   BusinessInfoDocument,
 } from './schemas/business-info.schema';
-import {
-  UpdateBusinessInfoDto,
-  DayOfWeek,
-} from './dto/update-business-info.dto';
+import { UpdateBusinessInfoDto } from './dto/update-business-info.dto';
 
 describe('BusinessInfoService', () => {
   let service: BusinessInfoService;

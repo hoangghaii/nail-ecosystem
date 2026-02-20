@@ -29,7 +29,6 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { BannersService } from './banners.service';
-import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 import { QueryBannersDto } from './dto/query-banners.dto';
 import { UploadBannerDto } from './dto/upload-banner.dto';

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BannersController } from './banners.controller';
 import { BannersService } from './banners.service';
-import { CreateBannerDto, BannerType } from './dto/create-banner.dto';
+import { BannerType } from './dto/create-banner.dto';
 import { StorageService } from '../storage/storage.service';
 
 describe('BannersController', () => {

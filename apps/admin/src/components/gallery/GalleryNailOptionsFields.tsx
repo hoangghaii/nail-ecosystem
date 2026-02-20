@@ -12,19 +12,19 @@ import {
 type GalleryNailOptionsFieldsProps = {
   nailShape: string | undefined;
   nailStyle: string | undefined;
-  shapes: NailShapeItem[];
-  styles: NailStyleItem[];
   onShapeChange: (value: string) => void;
   onStyleChange: (value: string) => void;
+  shapes: NailShapeItem[];
+  styles: NailStyleItem[];
 };
 
 export function GalleryNailOptionsFields({
   nailShape,
   nailStyle,
-  shapes,
-  styles,
   onShapeChange,
   onStyleChange,
+  shapes,
+  styles,
 }: GalleryNailOptionsFieldsProps) {
   return (
     <div className="grid grid-cols-2 gap-4">

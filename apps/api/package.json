@@ -25,7 +25,6 @@
     "seed:test:drop": "ts-node -r tsconfig-paths/register src/seeds/seed-test-data.ts --drop"
   },
   "dependencies": {
-    "@repo/types": "*",
     "@nest-lab/throttler-storage-redis": "^1.1.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
@@ -37,6 +36,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.3",
     "@nestjs/throttler": "^6.5.0",
+    "@repo/types": "*",
     "argon2": "^0.44.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
@@ -51,14 +51,16 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
-    "@repo/eslint-config": "*",
-    "@repo/prettier-config": "*",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@repo/eslint-config": "*",
+    "@repo/prettier-config": "*",
+    "@repo/typescript-config": "*",
+    "@swc/cli": "^0.8.0",
+    "@swc/core": "^1.15.11",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.0.0",

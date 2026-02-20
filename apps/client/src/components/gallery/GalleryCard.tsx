@@ -118,12 +118,12 @@ export function GalleryCard({ index, item, onImageClick }: GalleryCardProps) {
           {/* Action strip — bottom-right, vertical */}
           <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1">
             <span className="font-sans text-xs font-semibold text-white">
-              {item.price || "$30"} 
+              {item.price || "$30"}
             </span>
-          
+
             <span className="flex items-center gap-0.5 font-sans text-xs text-white/80">
               <Clock className="size-3" />
-              {item.duration|| "2hrs"} 
+              {item.duration || "2hrs"}
             </span>
 
             <button

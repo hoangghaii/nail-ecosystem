@@ -1,7 +1,16 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.preferences.includePackageJsonAutoImports": "on",
+  // "off" stops VS Code scanning all package.json across node_modules for auto-imports
+  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "typescript.disableAutomaticTypeAcquisition": true,
+  // Use syntax server immediately for basic features while semantic server loads
+  "typescript.tsserver.useSyntaxServer": "auto",
+  // Reduce file-watching overhead — exclude heavy directories the TS server doesn't need to watch
+  "typescript.tsserver.watchOptions": {
+    "excludeDirectories": ["**/node_modules", "**/.git", "**/dist", "**/coverage"]
+  },
 
   // ESLint: run per-app from its own CWD so tsconfigRootDir resolves correctly
   "eslint.workingDirectories": [
@@ -26,5 +35,14 @@
   // On save: ESLint auto-fixes linting issues; Prettier formats
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
   }
 }
